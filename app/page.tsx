@@ -471,7 +471,7 @@ export default function SPMHomePage() {
                     href="/pengaduan"
                     className="w-full py-3 rounded-xl bg-teal-600 text-white text-center font-bold"
                   >
-                    Ajukan Pengaduan SPM
+                    Ajukan Pengaduan
                   </Link>
                   <Link
                     href="/login"
@@ -551,7 +551,7 @@ export default function SPMHomePage() {
                 className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-black text-base shadow-lg shadow-teal-500/25 transition flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
               >
                 <FileText size={20} />
-                <span>Ajukan Pengaduan SPM</span>
+                <span>Ajukan Pengaduan</span>
                 <ArrowRight size={18} />
               </Link>
 

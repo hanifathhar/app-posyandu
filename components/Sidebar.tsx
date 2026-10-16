@@ -69,7 +69,7 @@ export default function Sidebar({
 
   useEffect(() => {
     if (pathname.startsWith("/laporan")) {
-      setOpenMenu("Laporan SPM");
+      setOpenMenu("Laporan");
     } else if (pathname.startsWith("/master-data")) {
       setOpenMenu("Master Data");
     }
@@ -115,7 +115,7 @@ export default function Sidebar({
     },
     // Menu Khusus Admin Kabupaten & Superadmin
     {
-      title: "Pengaduan SPM",
+      title: "Pengaduan",
       icon: <FileText size={18} />,
       href: "/pengaduan-admin",
       roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "OPERATOR", "PETUGAS", "VERIFIKATOR"],
@@ -153,7 +153,7 @@ export default function Sidebar({
       roles: ["SUPERADMIN", "ADMIN_KABUPATEN"],
     },
     {
-      title: "Laporan SPM",
+      title: "Laporan",
       icon: <BarChart3 size={18} />,
       href: "/laporan/posyandu-desa",
       roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN", "ADMIN_DESA"],
