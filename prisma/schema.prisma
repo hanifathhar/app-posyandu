@@ -1,0 +1,440 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ======================================================
+// ENUM
+// ======================================================
+
+enum BidangSPM {
+  SOSIAL
+  PENDIDIKAN
+  KESEHATAN
+  PEKERJAAN_UMUM
+  PERUMAHAN_RAKYAT
+  TRANTIBUM_LINMAS
+}
+
+enum RolePengguna {
+  SUPERADMIN
+  ADMIN_KABUPATEN
+  ADMIN_KECAMATAN
+  ADMIN_DESA
+  OPERATOR
+  PETUGAS
+  VERIFIKATOR
+}
+
+enum StatusPengaduan {
+  BARU
+  MENUNGGU_VERIFIKASI_DESA
+  MENUNGGU_VERIFIKASI_KECAMATAN
+  MENUNGGU_VERIFIKASI_KABUPATEN
+  PERLU_PERBAIKAN
+  DISETUJUI
+  DITOLAK
+  DITINDAKLANJUTI
+  SELESAI
+}
+
+enum TahapVerifikasi {
+  DESA
+  KECAMATAN
+  KABUPATEN
+}
+
+enum KeputusanVerifikasi {
+  DISETUJUI
+  PERLU_PERBAIKAN
+  DITOLAK
+}
+
+enum JenisDokumen {
+  KTP
+  KARTU_KELUARGA
+  SURAT_KETERANGAN_TIDAK_MAMPU
+  DOKUMEN_LAINNYA
+}
+
+enum JenisTindakLanjut {
+  VERIFIKASI_DATA
+  EDUKASI
+  KUNJUNGAN_RUMAH
+  PELAPORAN_PEMERINTAH_DESA
+  TINDAKAN_LAINNYA
+}
+
+enum JenisPeristiwa {
+  PENGADUAN_DIBUAT
+  VERIFIKASI
+  PERBAIKAN_DIMINTA
+  PERBAIKAN_DIKIRIM
+  STATUS_DIUBAH
+  TINDAK_LANJUT
+  PENGADUAN_DISELESAIKAN
+}
+
+// ======================================================
+// PENGGUNA
+// ======================================================
+
+model Pengguna {
+  id       String       @id @default(cuid())
+  nama     String
+  username String       @unique
+  password String
+  role     RolePengguna @default(PETUGAS)
+  aktif    Boolean      @default(true)
+
+  // Admin desa menggunakan desaId.
+  // Admin kecamatan menggunakan kecamatanId.
+  // Admin kabupaten tidak memerlukan keduanya.
+  kecamatanId String?
+  kecamatan   Kecamatan? @relation("PenggunaKecamatan", fields: [kecamatanId], references: [kd_kecamatan], onDelete: Restrict)
+
+  desaId String?
+  desa   Desa?   @relation("PenggunaDesa", fields: [desaId], references: [kd_desa], onDelete: Restrict)
+
+  pengaduanDibuat    Pengaduan[] @relation("PengaduanDibuat")
+  pengaduanDitangani Pengaduan[] @relation("PetugasPengaduan")
+
+  verifikasiPengaduan VerifikasiPengaduan[]
+  tindakLanjut        TindakLanjut[]
+  riwayatStatus       RiwayatPengaduan[]
+  dokumenDiverifikasi DokumenPendukung[]    @relation("VerifikasiDokumen")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([role, aktif])
+  @@index([kecamatanId])
+  @@index([desaId])
+  @@map("pengguna")
+}
+
+// ======================================================
+// WILAYAH
+// ======================================================
+
+model Kecamatan {
+  id           String  @id @default(cuid())
+  kd_kecamatan String  @unique
+  nm_kecamatan String
+  aktif        Boolean @default(true)
+
+  desa     Desa[]
+  posyandu Posyandu[]
+
+  pengguna  Pengguna[]  @relation("PenggunaKecamatan")
+  pelapor   Pelapor[]
+  pengaduan Pengaduan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([nm_kecamatan])
+  @@map("kecamatan")
+}
+
+model Desa {
+  id           String  @id @default(cuid())
+  kd_desa      String  @unique
+  nm_desa      String
+  kd_kecamatan String
+  aktif        Boolean @default(true)
+
+  kecamatan Kecamatan @relation(fields: [kd_kecamatan], references: [kd_kecamatan], onDelete: Restrict)
+
+  posyandu  Posyandu[]
+  pelapor   Pelapor[]
+  pengaduan Pengaduan[]
+
+  pengguna Pengguna[] @relation("PenggunaDesa")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kd_kecamatan, nm_desa])
+  @@map("desa")
+}
+
+// ======================================================
+// POSYANDU
+// ======================================================
+
+model Posyandu {
+  id            String  @id @default(cuid())
+  nama_posyandu String
+  alamat        String?
+  kd_desa       String
+  kd_kecamatan  String
+  aktif         Boolean @default(true)
+
+  desa Desa @relation(fields: [kd_desa], references: [kd_desa], onDelete: Restrict)
+
+  kecamatan Kecamatan @relation(fields: [kd_kecamatan], references: [kd_kecamatan], onDelete: Restrict)
+
+  pengaduan Pengaduan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([nama_posyandu, kd_desa])
+  @@index([kd_desa])
+  @@index([kd_kecamatan])
+  @@map("posyandu")
+}
+
+// ======================================================
+// IDENTITAS PELAPOR
+// Masyarakat tidak wajib mempunyai akun
+// ======================================================
+
+model Pelapor {
+  id           String  @id @default(cuid())
+  nama         String
+  alamat       String  @db.Text
+  nik          String? @unique
+  noHp         String?
+  kd_desa      String?
+  kd_kecamatan String?
+
+  desa Desa? @relation(fields: [kd_desa], references: [kd_desa], onDelete: Restrict)
+
+  kecamatan Kecamatan? @relation(fields: [kd_kecamatan], references: [kd_kecamatan], onDelete: Restrict)
+
+  pengaduan Pengaduan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([nama])
+  @@index([noHp])
+  @@index([kd_desa])
+  @@map("pelapor")
+}
+
+// ======================================================
+// MASTER BIDANG SPM
+// ======================================================
+
+model Bidang {
+  id        String    @id @default(cuid())
+  kode      BidangSPM @unique
+  nm_bidang String
+  deskripsi String?
+  aktif     Boolean   @default(true)
+
+  jenis     JenisPengaduan[]
+  pengaduan Pengaduan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("bidang_spm")
+}
+
+model JenisPengaduan {
+  id        String  @id @default(cuid())
+  bidangId  String
+  nama      String
+  deskripsi String?
+  aktif     Boolean @default(true)
+
+  bidang Bidang @relation(fields: [bidangId], references: [id], onDelete: Restrict)
+
+  pengaduan Pengaduan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bidangId, nama])
+  @@index([bidangId, aktif])
+  @@map("jenis_pengaduan")
+}
+
+// ======================================================
+// PENGADUAN UTAMA
+// ======================================================
+
+model Pengaduan {
+  id               String   @id @default(cuid())
+  nomorPengaduan   String   @unique
+  tanggalPengaduan DateTime @default(now())
+
+  pelaporId String
+  pelapor   Pelapor @relation(fields: [pelaporId], references: [id], onDelete: Restrict)
+
+  bidangId String
+  bidang   Bidang @relation(fields: [bidangId], references: [id], onDelete: Restrict)
+
+  jenisPengaduan JenisPengaduan[]
+
+  // Wilayah tempat pengaduan disampaikan
+  kd_desa String
+  desa    Desa   @relation(fields: [kd_desa], references: [kd_desa], onDelete: Restrict)
+
+  kd_kecamatan String
+  kecamatan    Kecamatan @relation(fields: [kd_kecamatan], references: [kd_kecamatan], onDelete: Restrict)
+
+  posyanduId String
+  posyandu   Posyandu @relation(fields: [posyanduId], references: [id], onDelete: Restrict)
+
+  deskripsi String @db.Text
+
+  status StatusPengaduan @default(MENUNGGU_VERIFIKASI_DESA)
+
+  alasanPenolakan  String?          @db.Text
+  catatan          String?          @db.Text
+  tahapPerbaikanKe TahapVerifikasi?
+
+  // Token acak untuk pelacakan publik.
+  // Harus dibuat dan divalidasi di server.
+  tokenPelacakan String? @unique
+
+  dibuatOlehId String?
+  dibuatOleh   Pengguna? @relation("PengaduanDibuat", fields: [dibuatOlehId], references: [id], onDelete: Restrict)
+
+  petugasId String?
+  petugas   Pengguna? @relation("PetugasPengaduan", fields: [petugasId], references: [id], onDelete: Restrict)
+
+  tanggalDisetujui  DateTime?
+  tanggalSelesai    DateTime?
+  hasilPenyelesaian String?   @db.Text
+
+  namaPetugasTtd     String?
+  tandaTanganPetugas String?
+
+  dokumen       DokumenPendukung[]
+  verifikasi    VerifikasiPengaduan[]
+  tindakLanjut  TindakLanjut[]
+  riwayatStatus RiwayatPengaduan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tanggalPengaduan])
+  @@index([status, tanggalPengaduan])
+  @@index([bidangId, status])
+  @@index([kd_desa, status])
+  @@index([kd_kecamatan, status])
+  @@index([posyanduId])
+  @@index([pelaporId])
+  @@index([petugasId])
+  @@map("pengaduan")
+}
+
+// ======================================================
+// DOKUMEN PENDUKUNG
+// ======================================================
+
+model DokumenPendukung {
+  id          String       @id @default(cuid())
+  pengaduanId String
+  jenis       JenisDokumen
+  namaFile    String
+  pathFile    String
+  mimeType    String?
+  ukuranFile  Int?
+
+  terverifikasi      Boolean   @default(false)
+  diverifikasiOlehId String?
+  tanggalVerifikasi  DateTime?
+  catatan            String?
+
+  pengaduan Pengaduan @relation(fields: [pengaduanId], references: [id], onDelete: Cascade)
+
+  diverifikasiOleh Pengguna? @relation("VerifikasiDokumen", fields: [diverifikasiOlehId], references: [id], onDelete: Restrict)
+
+  uploadedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([pengaduanId, jenis])
+  @@map("dokumen_pendukung")
+}
+
+// ======================================================
+// VERIFIKASI BERJENJANG
+// DESA -> KECAMATAN -> KABUPATEN
+// ======================================================
+
+model VerifikasiPengaduan {
+  id          String              @id @default(cuid())
+  pengaduanId String
+  penggunaId  String
+
+  tahap     TahapVerifikasi
+  keputusan KeputusanVerifikasi
+  catatan   String?             @db.Text
+  tanggal   DateTime            @default(now())
+
+  // Bertambah pada setiap putaran verifikasi ulang.
+  putaran Int @default(1)
+
+  pengaduan Pengaduan @relation(fields: [pengaduanId], references: [id], onDelete: Cascade)
+
+  pengguna Pengguna @relation(fields: [penggunaId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  @@index([pengaduanId, tahap, tanggal])
+  @@index([penggunaId, tanggal])
+  @@index([pengaduanId, putaran])
+  @@map("verifikasi_pengaduan")
+}
+
+// ======================================================
+// TINDAK LANJUT
+// ======================================================
+
+model TindakLanjut {
+  id          String            @id @default(cuid())
+  pengaduanId String
+
+  jenis   JenisTindakLanjut
+  tanggal DateTime          @default(now())
+  uraian  String            @db.Text
+  hasil   String?           @db.Text
+
+  petugasId String?
+  petugas   Pengguna? @relation(fields: [petugasId], references: [id], onDelete: Restrict)
+
+  pengaduan Pengaduan @relation(fields: [pengaduanId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pengaduanId, tanggal])
+  @@index([petugasId])
+  @@map("tindak_lanjut")
+}
+
+// ======================================================
+// RIWAYAT STATUS DAN AUDIT
+// ======================================================
+
+model RiwayatPengaduan {
+  id          String          @id @default(cuid())
+  pengaduanId String
+  penggunaId  String?
+
+  peristiwa     JenisPeristiwa
+  statusSebelum StatusPengaduan?
+  statusSesudah StatusPengaduan?
+  keterangan    String?          @db.Text
+  tanggal       DateTime         @default(now())
+
+  pengaduan Pengaduan @relation(fields: [pengaduanId], references: [id], onDelete: Cascade)
+
+  pengguna Pengguna? @relation(fields: [penggunaId], references: [id], onDelete: Restrict)
+
+  @@index([pengaduanId, tanggal])
+  @@index([penggunaId, tanggal])
+  @@map("riwayat_pengaduan")
+}
