@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pengaduan SPM Terpadu",
-  description: "Layanan Standar Pelayanan Minimal Berbasis Posyandu",
+  title: "SIPANDU Ceria",
+  description: "Sistem Informasi Posyandu Cepat, Responsif, Integratif, Akuntabel",
   icons: {
     icon: "/favicon.png",
   },

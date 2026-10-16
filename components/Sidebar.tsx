@@ -226,8 +226,8 @@ export default function Sidebar({
                 </div>
 
                 <div>
-                  <h2 className="font-bold text-base leading-tight">SPM Terpadu</h2>
-                  <p className="text-[11px] text-teal-100">Berbasis Posyandu & Wilayah</p>
+                  <h2 className="font-bold text-base leading-tight">SIPANDU Ceria</h2>
+                  <p className="text-[11px] text-teal-100">Sistem Informasi Posyandu Cepat, Responsif, Integratif, Akuntabel.</p>
                 </div>
               </div>
 
