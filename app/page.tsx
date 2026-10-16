@@ -330,24 +330,7 @@ export default function SPMHomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-[#0c3b5e] selection:text-white">
-      {/* 1. TOP ANNOUNCEMENT BAR */}
-      <div className="bg-[#082942] text-slate-200 text-xs py-2 px-4 sm:px-8 border-b border-white/10">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-center sm:text-left">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="font-medium">
-              Portal Resmi Standar Pelayanan Minimal (SPM) Berbasis Posyandu Kab. Tapanuli Selatan
-            </span>
-          </div>
-          <div className="flex items-center gap-4 text-[11px] text-slate-300">
-            <span className="hidden md:inline">|</span>
-            <span className="hidden md:flex items-center gap-1">
-              <MapPin size={12} className="text-amber-400" />
-              <span>Sipirok, Tapanuli Selatan</span>
-            </span>
-          </div>
-        </div>
-      </div>
+
 
       {/* 2. MAIN HEADER NAVIGATION */}
       <header
@@ -384,7 +367,7 @@ export default function SPMHomePage() {
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-700">
             <a href="#tentang" className="hover:text-[#0c3b5e] transition">
-              Tentang SPM
+              SPM
             </a>
             <a href="#bidang" className="hover:text-[#0c3b5e] transition">
               6 Bidang Pelayanan
