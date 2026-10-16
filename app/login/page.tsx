@@ -149,7 +149,7 @@ export default function LoginPage() {
             href="/"
             className="group inline-flex items-center gap-4 transition-transform hover:scale-[1.01]"
           >
-            <div className="relative w-12 h-14 xl:w-14 xl:h-16 shrink-0 drop-shadow-lg">
+            <div className="relative w-16 h-20 xl:w-20 xl:h-24 shrink-0 drop-shadow-xl transition-transform group-hover:scale-105">
               <Image
                 src={tapselLogo}
                 alt="Logo Pemerintah Kabupaten Tapanuli Selatan"
@@ -253,8 +253,8 @@ export default function LoginPage() {
         </div>
 
         {/* Header Identitas Pemkab khusus tampilan Mobile */}
-        <div className="lg:hidden flex items-center gap-3 p-3.5 mb-6 rounded-2xl bg-gradient-to-r from-[#0c3b5e] to-[#082942] text-white shadow-md">
-          <div className="relative w-10 h-12 shrink-0">
+        <div className="lg:hidden flex items-center gap-3.5 p-4 mb-6 rounded-2xl bg-gradient-to-r from-[#0c3b5e] to-[#082942] text-white shadow-md">
+          <div className="relative w-14 h-16 shrink-0 drop-shadow-md">
             <Image
               src={tapselLogo}
               alt="Logo Tapsel"
@@ -263,10 +263,10 @@ export default function LoginPage() {
             />
           </div>
           <div className="min-w-0">
-            <span className="block text-[10px] font-black uppercase tracking-wider text-amber-300">
+            <span className="block text-[11px] font-black uppercase tracking-wider text-amber-300">
               Pemerintah Kabupaten Tapanuli Selatan
             </span>
-            <span className="block text-xs font-bold truncate">
+            <span className="block text-xs sm:text-sm font-bold truncate">
               Sistem Informasi SPM Terpadu Posyandu
             </span>
           </div>
@@ -277,8 +277,8 @@ export default function LoginPage() {
           <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-200/90 p-6 sm:p-9 transition-all">
             {/* Header Kartu Login */}
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center p-2 rounded-2xl bg-slate-50 border border-slate-100 shadow-xs mb-3">
-                <div className="relative w-36 h-12 sm:w-44 sm:h-14">
+              <div className="inline-flex items-center justify-center p-3 sm:p-4 rounded-3xl bg-slate-50 border border-slate-200/80 shadow-sm mb-4 transition-transform hover:scale-105 duration-200">
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28">
                   <Image
                     src={logoPic}
                     alt="Logo SPM Posyandu"
