@@ -33,6 +33,7 @@ import {
   X,
   FileCheck2,
   Lock,
+  PlusCircle,
 } from "lucide-react";
 import tapselLogo from "@/public/images/logo-tapsel.png";
 
@@ -303,6 +304,22 @@ function PengaduanMasyarakatContent() {
     }
   };
 
+  // Buat Laporan Baru (Reset Form & Kembali Tampilkan Form)
+  const handleBuatLaporanBaru = () => {
+    setNama("");
+    setNik("");
+    setNoHp("");
+    setAlamat("");
+    setSelectedKecamatan("");
+    setSelectedDesa("");
+    setSelectedPosyandu("");
+    setSelectedJenisIds([]);
+    setDeskripsi("");
+    setDokumenList([]);
+    setErrorMsg(null);
+    setSubmitSuccess(null);
+  };
+
   // Lacak Pengaduan
   const handleLacak = async (queryInput?: string) => {
     const q = (queryInput || trackingQuery).trim();
@@ -534,79 +551,130 @@ function PengaduanMasyarakatContent() {
 
       {/* 4. MAIN CONTAINER FORM & TRACKING */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 mt-6 sm:mt-8">
-        {/* MODAL SUKSES PENGADUAN */}
-        {submitSuccess && (
-          <div className="mb-6 p-5 sm:p-7 bg-emerald-50 border-2 border-emerald-400/60 rounded-3xl shadow-lg relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex flex-col sm:flex-row items-start gap-4">
-              <div className="p-3 bg-emerald-500 text-white rounded-2xl shadow-md shrink-0">
-                <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8" />
+        {/* ========================================================= */}
+        {/* TAB 1: FORMULIR PENGADUAN / TAMPILAN SUKSES */}
+        {/* ========================================================= */}
+        {activeTab === "form" && (
+          submitSuccess ? (
+            /* TAMPILAN SUKSES (FORM INPUT DISEMBUNYIKAN) */
+            <div className="bg-white rounded-3xl border border-emerald-200 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+              {/* Header Sukses dengan Gradient Hijau-Teal */}
+              <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 p-6 sm:p-10 text-white text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.18),transparent_60%)]" />
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center mb-4 shadow-inner border border-white/30">
+                    <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+                  </div>
+                  <span className="px-3.5 py-1 rounded-full bg-white/20 text-emerald-100 text-xs font-semibold mb-2.5 border border-white/20 backdrop-blur-xs">
+                    Pengaduan Berhasil Tercatat
+                  </span>
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight">
+                    Pengaduan Berhasil Terkirim!
+                  </h3>
+                  <p className="mt-2 text-xs sm:text-sm text-emerald-100 max-w-xl leading-relaxed">
+                    Laporan Anda telah tercatat pada sistem dan langsung diteruskan ke{" "}
+                    <strong className="text-white">Kader Posyandu & Verifikator Desa</strong> setempat untuk ditindaklanjuti.
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 w-full">
-                <h3 className="text-lg sm:text-xl font-black text-emerald-950">
-                  Pengaduan Berhasil Terkirim!
-                </h3>
-                <p className="text-xs sm:text-sm text-emerald-800 mt-1 leading-relaxed">
-                  Laporan Anda telah tercatat pada sistem dan diteruskan ke{" "}
-                  <strong>Kader Posyandu & Verifikator Desa</strong> terkait. Simpan nomor & token di bawah untuk memantau proses tindak lanjut:
-                </p>
 
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-white rounded-2xl border border-emerald-200 shadow-xs">
-                  <div>
-                    <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                      Nomor Pengaduan
-                    </span>
-                    <p className="text-sm sm:text-base font-mono font-black text-slate-900 mt-0.5 break-all">
-                      {submitSuccess.nomorPengaduan}
-                    </p>
+              {/* Rincian Nomor Pengaduan & Token */}
+              <div className="p-6 sm:p-8 space-y-6">
+                <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 sm:p-6 space-y-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <Info className="w-4 h-4 text-teal-600" />
+                    <span>Informasi Bukti Pengaduan</span>
                   </div>
-                  <div>
-                    <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                      Token Pelacakan (Privat)
-                    </span>
-                    <p className="text-sm sm:text-base font-mono font-black text-teal-700 mt-0.5 break-all">
-                      {submitSuccess.tokenPelacakan}
-                    </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide block">
+                        Nomor Pengaduan
+                      </span>
+                      <p className="text-base sm:text-lg font-mono font-black text-slate-900 mt-1 break-all">
+                        {submitSuccess.nomorPengaduan}
+                      </p>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-xl border border-teal-200 bg-teal-50/30 shadow-2xs">
+                      <span className="text-[11px] font-bold text-teal-800 uppercase tracking-wide block">
+                        Token Pelacakan (Privat)
+                      </span>
+                      <p className="text-base sm:text-lg font-mono font-black text-teal-700 mt-1 break-all">
+                        {submitSuccess.tokenPelacakan}
+                      </p>
+                    </div>
                   </div>
+
+                  {(submitSuccess.posyandu || submitSuccess.bidang) && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200/60 text-xs">
+                      {submitSuccess.posyandu && (
+                        <div>
+                          <span className="text-slate-500 font-medium">Posyandu Sasaran:</span>
+                          <p className="font-bold text-slate-800 mt-0.5">{submitSuccess.posyandu}</p>
+                        </div>
+                      )}
+                      {submitSuccess.bidang && (
+                        <div>
+                          <span className="text-slate-500 font-medium">Bidang SPM:</span>
+                          <p className="font-bold text-slate-800 mt-0.5">{submitSuccess.bidang}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                <div className="p-4 bg-amber-50 border border-amber-200/90 rounded-2xl text-xs text-amber-900 flex items-start gap-3">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="leading-relaxed">
+                    <strong>Penting:</strong> Simpan atau catat <strong>Nomor Pengaduan</strong> dan <strong>Token Pelacakan</strong> Anda. Anda dapat menggunakannya di tab <strong>Lacak Status</strong> untuk melihat progres penanganan secara transparan kapan saja.
+                  </p>
+                </div>
+
+                {/* Tombol Aksi: Buat Laporan Baru, Salin, & Lacak */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
                   <button
                     type="button"
-                    onClick={() =>
-                      copyToClipboard(
-                        `Nomor Pengaduan: ${submitSuccess.nomorPengaduan}\nToken Pelacakan: ${submitSuccess.tokenPelacakan}`
-                      )
-                    }
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-emerald-700 border border-emerald-300 rounded-xl text-xs sm:text-sm font-bold hover:bg-emerald-100 transition shadow-xs cursor-pointer"
+                    onClick={handleBuatLaporanBaru}
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 active:scale-[0.99] text-white font-bold text-xs sm:text-sm shadow-md shadow-teal-600/20 transition cursor-pointer"
                   >
-                    {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                    <span>{copied ? "Tersalin ke Clipboard" : "Salin Nomor & Token"}</span>
+                    <PlusCircle className="w-4 h-4" />
+                    <span>Buat Laporan Baru</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTrackingQuery(submitSuccess.tokenPelacakan);
-                      setActiveTab("lacak");
-                      handleLacak(submitSuccess.tokenPelacakan);
-                      setSubmitSuccess(null);
-                    }}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-emerald-700 transition shadow-sm cursor-pointer"
-                  >
-                    <span>Lacak Status Sekarang</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        copyToClipboard(
+                          `Nomor Pengaduan: ${submitSuccess.nomorPengaduan}\nToken Pelacakan: ${submitSuccess.tokenPelacakan}`
+                        )
+                      }
+                      className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-white text-slate-700 hover:text-teal-700 border border-slate-300 hover:border-teal-300 rounded-xl text-xs sm:text-sm font-bold hover:bg-slate-50 transition shadow-2xs cursor-pointer"
+                    >
+                      {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                      <span>{copied ? "Tersalin ke Clipboard" : "Salin Nomor & Token"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTrackingQuery(submitSuccess.tokenPelacakan);
+                        setActiveTab("lacak");
+                        handleLacak(submitSuccess.tokenPelacakan);
+                        setSubmitSuccess(null);
+                      }}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#0c3b5e] hover:bg-[#082942] text-white rounded-xl text-xs sm:text-sm font-bold transition shadow-xs cursor-pointer"
+                    >
+                      <span>Lacak Status Sekarang</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* ========================================================= */}
-        {/* TAB 1: FORMULIR PENGADUAN LENGKAP */}
-        {/* ========================================================= */}
-        {activeTab === "form" && (
-          <div className="bg-white rounded-3xl border border-slate-200/90 shadow-md overflow-hidden">
+          ) : (
+            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-md overflow-hidden">
             {/* Header Form */}
             <div className="border-b border-slate-100 px-5 sm:px-8 py-4 sm:py-5 bg-slate-50/70 flex flex-wrap items-center justify-between gap-2">
               <div>
@@ -1019,7 +1087,8 @@ function PengaduanMasyarakatContent() {
               </div>
             </form>
           </div>
-        )}
+        )
+      )}
 
         {/* ========================================================= */}
         {/* TAB 2: PELACAKAN STATUS PENGADUAN */}
