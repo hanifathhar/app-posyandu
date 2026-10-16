@@ -52,11 +52,7 @@ export default function Header({
             <Menu size={22} />
           </button>
 
-          <div>
-            <span className="text-xs font-bold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-md border border-teal-200 uppercase tracking-wider">
-              Panel Pengelola SPM
-            </span>
-          </div>
+
         </div>
 
         {/* Kanan */}
