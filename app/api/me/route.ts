@@ -6,7 +6,16 @@ const JWT_SECRET = process.env.JWT_SECRET || "rahasia-super-aman";
 
 export async function GET(req: Request) {
   try {
-    const token = req.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
+    const cookieHeader = req.headers.get("cookie") || "";
+    const match = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
+    let token = match ? match[1] : req.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
+
+    if (!token) {
+      const authHeader = req.headers.get("authorization");
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.substring(7);
+      }
+    }
 
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -14,8 +23,12 @@ export async function GET(req: Request) {
 
     const decoded = jwt.verify(token, JWT_SECRET) as any;
 
+    if (!decoded || !decoded.id) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
     const pengguna = await prisma.pengguna.findUnique({
-      where: { id: decoded.id },
+      where: { id: String(decoded.id) },
       include: {
         kecamatan: true,
         desa: true,

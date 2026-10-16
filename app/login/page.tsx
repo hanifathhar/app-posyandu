@@ -88,14 +88,20 @@ export default function LoginPage() {
             "Kredensial tidak valid. Silakan periksa kembali username dan kata sandi Anda.",
         });
       } else {
+        if (data.token) {
+          try {
+            localStorage.setItem("token", data.token);
+          } catch {}
+        }
+
         setNotif({
           type: "success",
           message: "Autentikasi berhasil! Mengalihkan ke dashboard...",
         });
 
         setTimeout(() => {
-          router.push("/dashboard");
-        }, 600);
+          window.location.href = "/dashboard";
+        }, 500);
       }
     } catch {
       setNotif({
