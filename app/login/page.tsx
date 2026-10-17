@@ -30,9 +30,9 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import logoPic from "@/public/favicon.png";
+import logoPic from "@/public/logo.png";
 import tapselLogo from "@/public/images/logo-tapsel.png";
-import bgBack from "@/public/images/bg_back.png";
+import bgBack from "@/public/images/bg_log.png";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -91,7 +91,7 @@ export default function LoginPage() {
         if (data.token) {
           try {
             localStorage.setItem("token", data.token);
-          } catch {}
+          } catch { }
         }
 
         setNotif({
@@ -134,9 +134,9 @@ export default function LoginPage() {
       {/* ========================================================= */}
       {/* PANEL KIRI: IDENTITAS PEMKAB & SHOWCASE SPM (DESKTOP/TABLET) */}
       {/* ========================================================= */}
-      <div className="relative hidden lg:flex lg:col-span-7 xl:col-span-7 flex-col justify-between p-8 xl:p-12 2xl:p-16 overflow-hidden">
-        {/* Latar Belakang Citra Resmi dengan Overlay Biru Pemerintahan */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
+      <div className="relative hidden lg:flex lg:col-span-7 xl:col-span-7 flex-col justify-between p-8 xl:p-12 2xl:p-16 overflow-hidden bg-gradient-to-br from-[#061828] via-[#0c2f4d] to-[#1e1b4b]">
+        {/* Latar Belakang Citra Resmi dengan Fit Sesuai Frame & Overlay Transparan */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <Image
             src={bgBack}
             alt="Pemandangan Alam dan Pemerintahan Kabupaten Tapanuli Selatan"
@@ -144,9 +144,9 @@ export default function LoginPage() {
             priority
             className="object-cover object-center"
           />
-          {/* Multi-layered government gradient: Deep navy + emerald subtle tone */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#061828]/95 via-[#0c2f4d]/90 to-[#0a375e]/95 backdrop-blur-[1px]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.12),transparent_50%)]" />
+          {/* Multi-layered government gradient: Deep navy + emerald subtle tone (transparan seperti tampilan awal) */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#061828]/85 via-[#0c2f4d]/80 to-[#0a375e]/85 backdrop-blur-[0.5px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.15),transparent_50%)]" />
         </div>
 
         {/* 1. Header Kiri Atas: Lambang Daerah Pemkab Tapanuli Selatan */}
@@ -165,7 +165,9 @@ export default function LoginPage() {
               />
             </div>
             <div>
-
+              <span className="inline-block text-[11px] font-black uppercase tracking-wider text-amber-300 mb-0.5">
+                Portal Pelayanan Publik
+              </span>
               <h1 className="text-sm xl:text-base font-extrabold tracking-wide uppercase text-white drop-shadow-sm">
                 Pemerintah Kabupaten Tapanuli Selatan
               </h1>
@@ -190,7 +192,7 @@ export default function LoginPage() {
             Platform digital terintegrasi untuk pencatatan indikator, verifikasi berjenjang dari tingkat desa hingga kabupaten, serta penanganan respon cepat pengaduan warga.
           </p>
 
-          {/* Grid 6 Bidang SPM */}
+          {/* Grid 6 Bidang SPM dengan kartu transparan / glassmorphism */}
           <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-2xl">
             {spmCategories.map((item, idx) => {
               const IconComp = item.icon;
@@ -237,7 +239,6 @@ export default function LoginPage() {
             <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
             <span>Kembali ke Beranda / Portal Informasi Publik</span>
           </Link>
-
         </div>
       </div>
 
@@ -254,12 +255,10 @@ export default function LoginPage() {
             <ArrowLeft size={14} />
             <span>Beranda</span>
           </Link>
-
-
         </div>
 
         {/* Header Identitas Pemkab khusus tampilan Mobile */}
-        <div className="lg:hidden flex items-center gap-3.5 p-4 mb-6 rounded-2xl bg-gradient-to-r from-[#0c3b5e] to-[#082942] text-white shadow-md">
+        <div className="lg:hidden flex items-center gap-3.5 p-4 mb-6 rounded-2xl bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-950 text-white shadow-md">
           <div className="relative w-14 h-16 shrink-0 drop-shadow-md">
             <Image
               src={tapselLogo}
@@ -347,7 +346,7 @@ export default function LoginPage() {
                     placeholder="Masukkan username atau ID akun"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0c3b5e]/20 focus:border-[#0c3b5e] transition bg-white font-medium"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition bg-white font-medium"
                   />
                 </div>
               </div>
@@ -373,7 +372,7 @@ export default function LoginPage() {
                     placeholder="Masukkan kata sandi akun"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-11 py-3 rounded-xl border border-slate-300 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0c3b5e]/20 focus:border-[#0c3b5e] transition bg-white font-medium"
+                    className="w-full pl-10 pr-11 py-3 rounded-xl border border-slate-300 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition bg-white font-medium"
                   />
                   <button
                     type="button"
@@ -393,7 +392,7 @@ export default function LoginPage() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 text-[#0c3b5e] border-slate-300 rounded focus:ring-[#0c3b5e] accent-[#0c3b5e]"
+                    className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 accent-blue-600"
                   />
                   <span className="text-xs text-slate-600 font-medium">Ingat sesi saya</span>
                 </label>
@@ -401,7 +400,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowForgotModal(true)}
-                  className="text-xs text-[#0c3b5e] hover:text-[#082942] font-semibold hover:underline transition"
+                  className="text-xs text-blue-700 hover:text-blue-900 font-semibold hover:underline transition"
                 >
                   Lupa kata sandi?
                 </button>
@@ -412,7 +411,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#0c3b5e] to-[#082942] hover:from-[#092e4a] hover:to-[#051c2e] active:scale-[0.99] text-white font-bold text-sm sm:text-base shadow-md shadow-[#0c3b5e]/25 transition-all flex items-center justify-center space-x-2.5 disabled:opacity-60 cursor-pointer"
+                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 hover:from-blue-800 hover:to-purple-900 active:scale-[0.99] text-white font-bold text-sm sm:text-base shadow-md shadow-blue-900/25 transition-all flex items-center justify-center space-x-2.5 disabled:opacity-60 cursor-pointer"
                 >
                   {loading ? (
                     <>

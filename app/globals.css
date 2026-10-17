@@ -42,6 +42,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-brand-blue: #0284c7;
+  --color-brand-purple: #7c3aed;
+  --color-brand-orange: #f97316;
+  --color-brand-green: #10b981;
 }
 
 :root {
@@ -150,6 +154,24 @@
 
 .leaflet-container {
   z-index: 0 !important;
+}
+
+/* Brand Logo Colors: Biru, Ungu, Orange, Hijau */
+.brand-logo-stripe {
+  background: linear-gradient(90deg, #0284c7 0%, #7c3aed 35%, #f97316 70%, #10b981 100%);
+}
+
+.brand-gradient-text {
+  background: linear-gradient(135deg, #0284c7 0%, #7c3aed 40%, #ea580c 75%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-hero-glow {
+  background: radial-gradient(circle at 20% 30%, rgba(2, 132, 199, 0.25) 0%, transparent 40%),
+              radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.2) 0%, transparent 40%),
+              radial-gradient(circle at 70% 80%, rgba(249, 115, 22, 0.15) 0%, transparent 40%),
+              radial-gradient(circle at 30% 85%, rgba(16, 185, 129, 0.18) 0%, transparent 40%);
 }
 
 @media print {

@@ -65,12 +65,12 @@ export default function Header({
               <p className="text-sm font-bold text-slate-800 leading-tight">
                 {user?.nama || "Petugas SPM"}
               </p>
-              <p className="text-[11px] text-teal-700 font-semibold uppercase tracking-wider">
+              <p className="text-[11px] text-blue-700 font-semibold uppercase tracking-wider">
                 {formatRoleName(user?.role)}
               </p>
             </div>
 
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-600 to-emerald-500 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-purple-600 to-orange-500 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0 ring-1 ring-white/50">
               {user?.nama?.charAt(0).toUpperCase() || "P"}
             </div>
           </button>
@@ -79,16 +79,16 @@ export default function Header({
           {open && (
             <div className="absolute right-0 mt-2.5 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
               {/* Header Dropdown */}
-              <div className="bg-gradient-to-r from-teal-700 to-emerald-600 p-4 text-white">
+              <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 p-4 text-white">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-white text-teal-700 flex items-center justify-center font-bold text-lg shrink-0 shadow-sm">
+                  <div className="w-12 h-12 rounded-xl bg-white text-blue-700 flex items-center justify-center font-bold text-lg shrink-0 shadow-sm">
                     {user?.nama?.charAt(0).toUpperCase() || "P"}
                   </div>
                   <div className="overflow-hidden">
                     <h3 className="font-bold text-sm leading-tight truncate">
                       {user?.nama || "Petugas SPM"}
                     </h3>
-                    <p className="text-xs text-teal-100 mt-0.5 truncate uppercase font-medium">
+                    <p className="text-xs text-blue-100 mt-0.5 truncate uppercase font-medium">
                       {formatRoleName(user?.role)}
                     </p>
                   </div>

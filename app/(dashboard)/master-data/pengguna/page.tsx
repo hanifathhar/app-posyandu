@@ -239,7 +239,7 @@ export default function ManajemenPenggunaPage() {
       case "ADMIN_KABUPATEN":
         return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-100 text-blue-800 border border-blue-200">ADMIN KABUPATEN</span>;
       case "ADMIN_KECAMATAN":
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-teal-100 text-teal-800 border border-teal-200">ADMIN KECAMATAN</span>;
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-indigo-100 text-indigo-800 border border-indigo-200">ADMIN KECAMATAN</span>;
       case "ADMIN_DESA":
         return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">ADMIN DESA / KADER</span>;
       case "VERIFIKATOR":
@@ -266,7 +266,7 @@ export default function ManajemenPenggunaPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-1">
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Users className="text-teal-600" size={28} />
+            <Users className="text-blue-600" size={28} />
             <span>Manajemen Pengguna & Otoritas Wilayah</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -279,7 +279,7 @@ export default function ManajemenPenggunaPage() {
             setFeedback(null);
             setModalOpen(true);
           }}
-          className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs shadow-sm transition hover:shadow shrink-0"
+          className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-sm transition hover:shadow shrink-0"
         >
           <Plus size={16} />
           <span>Tambah Akun Pengguna</span>
@@ -297,7 +297,7 @@ export default function ManajemenPenggunaPage() {
                 setRoleFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full sm:w-auto px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white shadow-2xs"
+              className="w-full sm:w-auto px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white shadow-2xs"
             >
               <option value="">Semua Peran / Role</option>
               <option value="SUPERADMIN">SUPERADMIN</option>
@@ -318,7 +318,7 @@ export default function ManajemenPenggunaPage() {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition bg-white shadow-2xs"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition bg-white shadow-2xs"
             />
           </div>
         </div>
@@ -327,7 +327,7 @@ export default function ManajemenPenggunaPage() {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-12 text-center text-slate-400 text-xs flex items-center justify-center space-x-2">
-              <RefreshCw size={18} className="animate-spin text-teal-600" />
+              <RefreshCw size={18} className="animate-spin text-blue-600" />
               <span>Memuat daftar akun pengguna...</span>
             </div>
           ) : (
@@ -356,7 +356,7 @@ export default function ManajemenPenggunaPage() {
                     <tr key={user.id} className="hover:bg-slate-50/60 transition">
                       <td className="px-5 py-3.5">
                         <div className="flex items-center space-x-3">
-                          <div className="w-9 h-9 rounded-xl bg-teal-100/70 text-teal-800 flex items-center justify-center font-bold text-sm shrink-0">
+                          <div className="w-9 h-9 rounded-xl bg-blue-100/70 text-blue-800 flex items-center justify-center font-bold text-sm shrink-0">
                             {user.nama.charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -376,7 +376,7 @@ export default function ManajemenPenggunaPage() {
                           </span>
                         ) : user.role === "ADMIN_KECAMATAN" ? (
                           <span className="text-slate-700 font-medium flex items-center gap-1.5">
-                            <Building2 size={14} className="text-teal-600" />
+                            <Building2 size={14} className="text-indigo-600" />
                             Kec. {user.kecamatan?.nm_kecamatan || user.kecamatanId}
                           </span>
                         ) : user.role === "ADMIN_DESA" ? (
@@ -402,11 +402,11 @@ export default function ManajemenPenggunaPage() {
                           title="Klik untuk ubah status aktif/nonaktif"
                         >
                           {user.aktif ? (
-                            <ToggleRight size={22} className="text-teal-600" />
+                            <ToggleRight size={22} className="text-blue-600" />
                           ) : (
                             <ToggleLeft size={22} className="text-slate-300" />
                           )}
-                          <span className={`text-[10px] font-bold ${user.aktif ? "text-teal-700" : "text-slate-400"}`}>
+                          <span className={`text-[10px] font-bold ${user.aktif ? "text-blue-700" : "text-slate-400"}`}>
                             {user.aktif ? "Aktif" : "Nonaktif"}
                           </span>
                         </button>
@@ -416,7 +416,7 @@ export default function ManajemenPenggunaPage() {
                         <div className="flex items-center justify-center space-x-1.5">
                           <button
                             onClick={() => handleOpenEditModal(user)}
-                            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-teal-700 transition"
+                            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-blue-700 transition"
                             title="Edit Pengguna"
                           >
                             <Edit size={14} />
@@ -483,7 +483,7 @@ export default function ManajemenPenggunaPage() {
                   placeholder="Contoh: Bidan Siti Rahmah, S.Tr.Keb"
                   value={formData.nama}
                   onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -496,7 +496,7 @@ export default function ManajemenPenggunaPage() {
                     placeholder="kader_desa"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().trim() })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono"
                   />
                 </div>
 
@@ -508,7 +508,7 @@ export default function ManajemenPenggunaPage() {
                     placeholder="Minimal 6 karakter"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -527,7 +527,7 @@ export default function ManajemenPenggunaPage() {
                       desaId: r === "ADMIN_DESA" ? formData.desaId : "",
                     });
                   }}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white font-medium"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
                 >
                   <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
                   <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
@@ -544,7 +544,7 @@ export default function ManajemenPenggunaPage() {
                     required
                     value={formData.kecamatanId}
                     onChange={(e) => setFormData({ ...formData, kecamatanId: e.target.value, desaId: "" })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                   >
                     <option value="">-- Pilih Kecamatan --</option>
                     {kecamatanList.map((k) => (
@@ -564,7 +564,7 @@ export default function ManajemenPenggunaPage() {
                     disabled={!formData.kecamatanId}
                     value={formData.desaId}
                     onChange={(e) => setFormData({ ...formData, desaId: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white disabled:bg-slate-100"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white disabled:bg-slate-100"
                   >
                     <option value="">-- Pilih Desa --</option>
                     {desaList
@@ -589,7 +589,7 @@ export default function ManajemenPenggunaPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
                 >
                   {submitting && <RefreshCw size={14} className="animate-spin" />}
                   <span>Buat Akun</span>
@@ -630,7 +630,7 @@ export default function ManajemenPenggunaPage() {
                   required
                   value={editForm.nama}
                   onChange={(e) => setEditForm({ ...editForm, nama: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -642,7 +642,7 @@ export default function ManajemenPenggunaPage() {
                     required
                     value={editForm.username}
                     onChange={(e) => setEditForm({ ...editForm, username: e.target.value.toLowerCase().trim() })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono"
                   />
                 </div>
 
@@ -653,7 +653,7 @@ export default function ManajemenPenggunaPage() {
                     placeholder="Kosongkan jika tak diubah"
                     value={editForm.password}
                     onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -672,7 +672,7 @@ export default function ManajemenPenggunaPage() {
                       desaId: r === "ADMIN_DESA" ? editForm.desaId : "",
                     });
                   }}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white font-medium"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
                 >
                   <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
                   <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
@@ -688,7 +688,7 @@ export default function ManajemenPenggunaPage() {
                     required
                     value={editForm.kecamatanId}
                     onChange={(e) => setEditForm({ ...editForm, kecamatanId: e.target.value, desaId: "" })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                   >
                     <option value="">-- Pilih Kecamatan --</option>
                     {kecamatanList.map((k) => (
@@ -708,7 +708,7 @@ export default function ManajemenPenggunaPage() {
                     disabled={!editForm.kecamatanId}
                     value={editForm.desaId}
                     onChange={(e) => setEditForm({ ...editForm, desaId: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white disabled:bg-slate-100"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white disabled:bg-slate-100"
                   >
                     <option value="">-- Pilih Desa --</option>
                     {desaList
@@ -733,7 +733,7 @@ export default function ManajemenPenggunaPage() {
                 <button
                   type="submit"
                   disabled={editSubmitting}
-                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
                 >
                   {editSubmitting && <RefreshCw size={14} className="animate-spin" />}
                   <span>Simpan Perubahan</span>

@@ -202,7 +202,7 @@ export default function MasterWilayahPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-1">
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-            <MapPin className="text-teal-600" size={28} />
+            <MapPin className="text-blue-600" size={28} />
             <span>Master Wilayah & Posyandu</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -212,7 +212,7 @@ export default function MasterWilayahPage() {
 
         <button
           onClick={handleOpenAddModal}
-          className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs shadow-sm transition hover:shadow shrink-0"
+          className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-sm transition hover:shadow shrink-0"
         >
           <Plus size={16} />
           <span>
@@ -232,13 +232,13 @@ export default function MasterWilayahPage() {
           onClick={() => setActiveTab("kecamatan")}
           className={`cursor-pointer p-4 rounded-2xl border transition-all ${
             activeTab === "kecamatan"
-              ? "bg-teal-50/80 border-teal-500 shadow-sm"
+              ? "bg-purple-50/80 border-purple-500 shadow-sm"
               : "bg-white border-slate-200/90 hover:border-slate-300 shadow-2xs hover:shadow-xs"
           }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Kecamatan</span>
-            <div className={`p-2 rounded-xl transition ${activeTab === "kecamatan" ? "bg-teal-600 text-white" : "bg-teal-50 text-teal-600"}`}>
+            <div className={`p-2 rounded-xl transition ${activeTab === "kecamatan" ? "bg-purple-600 text-white" : "bg-purple-50 text-purple-600"}`}>
               <Building2 size={18} />
             </div>
           </div>
@@ -252,13 +252,13 @@ export default function MasterWilayahPage() {
           onClick={() => setActiveTab("desa")}
           className={`cursor-pointer p-4 rounded-2xl border transition-all ${
             activeTab === "desa"
-              ? "bg-teal-50/80 border-teal-500 shadow-sm"
+              ? "bg-emerald-50/80 border-emerald-500 shadow-sm"
               : "bg-white border-slate-200/90 hover:border-slate-300 shadow-2xs hover:shadow-xs"
           }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Desa / Kelurahan</span>
-            <div className={`p-2 rounded-xl transition ${activeTab === "desa" ? "bg-teal-600 text-white" : "bg-teal-50 text-teal-600"}`}>
+            <div className={`p-2 rounded-xl transition ${activeTab === "desa" ? "bg-emerald-600 text-white" : "bg-emerald-50 text-emerald-600"}`}>
               <Home size={18} />
             </div>
           </div>
@@ -272,13 +272,13 @@ export default function MasterWilayahPage() {
           onClick={() => setActiveTab("posyandu")}
           className={`cursor-pointer p-4 rounded-2xl border transition-all ${
             activeTab === "posyandu"
-              ? "bg-teal-50/80 border-teal-500 shadow-sm"
+              ? "bg-blue-50/80 border-blue-500 shadow-sm"
               : "bg-white border-slate-200/90 hover:border-slate-300 shadow-2xs hover:shadow-xs"
           }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Posyandu SPM</span>
-            <div className={`p-2 rounded-xl transition ${activeTab === "posyandu" ? "bg-teal-600 text-white" : "bg-teal-50 text-teal-600"}`}>
+            <div className={`p-2 rounded-xl transition ${activeTab === "posyandu" ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-600"}`}>
               <Layers size={18} />
             </div>
           </div>
@@ -297,7 +297,7 @@ export default function MasterWilayahPage() {
             <button
               onClick={() => { setActiveTab("posyandu"); setCurrentPage(1); }}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                activeTab === "posyandu" ? "bg-white text-teal-800 shadow-xs" : "text-slate-600 hover:text-slate-900"
+                activeTab === "posyandu" ? "bg-white text-blue-800 shadow-xs" : "text-slate-600 hover:text-slate-900"
               }`}
             >
               Posyandu ({data.posyandu.length})
@@ -305,7 +305,7 @@ export default function MasterWilayahPage() {
             <button
               onClick={() => { setActiveTab("desa"); setCurrentPage(1); }}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                activeTab === "desa" ? "bg-white text-teal-800 shadow-xs" : "text-slate-600 hover:text-slate-900"
+                activeTab === "desa" ? "bg-white text-emerald-800 shadow-xs" : "text-slate-600 hover:text-slate-900"
               }`}
             >
               Desa ({data.desa.length})
@@ -313,7 +313,7 @@ export default function MasterWilayahPage() {
             <button
               onClick={() => { setActiveTab("kecamatan"); setCurrentPage(1); }}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                activeTab === "kecamatan" ? "bg-white text-teal-800 shadow-xs" : "text-slate-600 hover:text-slate-900"
+                activeTab === "kecamatan" ? "bg-white text-purple-800 shadow-xs" : "text-slate-600 hover:text-slate-900"
               }`}
             >
               Kecamatan ({data.kecamatan.length})
@@ -327,7 +327,7 @@ export default function MasterWilayahPage() {
               placeholder={`Cari nama ${activeTab}...`}
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition bg-white shadow-2xs"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition bg-white shadow-2xs"
             />
           </div>
         </div>
@@ -336,7 +336,7 @@ export default function MasterWilayahPage() {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-12 text-center text-slate-400 text-xs flex items-center justify-center space-x-2">
-              <RefreshCw size={18} className="animate-spin text-teal-600" />
+              <RefreshCw size={18} className="animate-spin text-blue-600" />
               <span>Memuat data wilayah...</span>
             </div>
           ) : (
@@ -395,7 +395,7 @@ export default function MasterWilayahPage() {
                           <td className="px-5 py-3.5">{item.desa?.nm_desa}</td>
                           <td className="px-5 py-3.5 text-slate-600">{item.kecamatan?.nm_kecamatan}</td>
                           <td className="px-5 py-3.5 text-slate-500 max-w-xs truncate">{item.alamat || "-"}</td>
-                          <td className="px-5 py-3.5 text-center font-bold text-teal-700">
+                          <td className="px-5 py-3.5 text-center font-bold text-blue-700">
                             {item._count?.pengaduan || 0}
                           </td>
                         </>
@@ -407,7 +407,7 @@ export default function MasterWilayahPage() {
                           <td className="px-5 py-3.5 font-bold text-slate-900">{item.nm_desa}</td>
                           <td className="px-5 py-3.5 text-slate-600">{item.kecamatan?.nm_kecamatan}</td>
                           <td className="px-5 py-3.5 text-center font-bold text-slate-800">{item._count?.posyandu || 0}</td>
-                          <td className="px-5 py-3.5 text-center font-bold text-teal-700">{item._count?.pengaduan || 0}</td>
+                          <td className="px-5 py-3.5 text-center font-bold text-blue-700">{item._count?.pengaduan || 0}</td>
                         </>
                       )}
 
@@ -417,7 +417,7 @@ export default function MasterWilayahPage() {
                           <td className="px-5 py-3.5 font-bold text-slate-900">{item.nm_kecamatan}</td>
                           <td className="px-5 py-3.5 text-center font-bold text-slate-800">{item._count?.desa || 0}</td>
                           <td className="px-5 py-3.5 text-center font-bold text-slate-800">{item._count?.posyandu || 0}</td>
-                          <td className="px-5 py-3.5 text-center font-bold text-teal-700">{item._count?.pengaduan || 0}</td>
+                          <td className="px-5 py-3.5 text-center font-bold text-blue-700">{item._count?.pengaduan || 0}</td>
                         </>
                       )}
 
@@ -433,7 +433,7 @@ export default function MasterWilayahPage() {
                         <div className="flex items-center justify-center space-x-1.5">
                           <button
                             onClick={() => handleOpenEdit(item)}
-                            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-teal-700 transition"
+                            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-blue-700 transition"
                             title="Edit Data"
                           >
                             <Edit size={14} />
@@ -504,7 +504,7 @@ export default function MasterWilayahPage() {
                       placeholder="12.03.05"
                       value={formData.kd_kecamatan || ""}
                       onChange={(e) => setFormData({ ...formData, kd_kecamatan: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -515,7 +515,7 @@ export default function MasterWilayahPage() {
                       placeholder="Nama Kecamatan..."
                       value={formData.nm_kecamatan || ""}
                       onChange={(e) => setFormData({ ...formData, nm_kecamatan: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
                 </>
@@ -529,7 +529,7 @@ export default function MasterWilayahPage() {
                       required
                       value={formData.kd_kecamatan || ""}
                       onChange={(e) => setFormData({ ...formData, kd_kecamatan: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                     >
                       <option value="">-- Pilih Kecamatan --</option>
                       {data.kecamatan.map((k) => (
@@ -547,7 +547,7 @@ export default function MasterWilayahPage() {
                       placeholder="12.03.01.2005"
                       value={formData.kd_desa || ""}
                       onChange={(e) => setFormData({ ...formData, kd_desa: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -558,7 +558,7 @@ export default function MasterWilayahPage() {
                       placeholder="Nama Desa..."
                       value={formData.nm_desa || ""}
                       onChange={(e) => setFormData({ ...formData, nm_desa: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
                 </>
@@ -572,7 +572,7 @@ export default function MasterWilayahPage() {
                       required
                       value={formData.kd_kecamatan || ""}
                       onChange={(e) => setFormData({ ...formData, kd_kecamatan: e.target.value, kd_desa: "" })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                     >
                       <option value="">-- Pilih Kecamatan --</option>
                       {data.kecamatan.map((k) => (
@@ -590,7 +590,7 @@ export default function MasterWilayahPage() {
                       disabled={!formData.kd_kecamatan}
                       value={formData.kd_desa || ""}
                       onChange={(e) => setFormData({ ...formData, kd_desa: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white disabled:bg-slate-100"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white disabled:bg-slate-100"
                     >
                       <option value="">-- Pilih Desa --</option>
                       {data.desa
@@ -611,7 +611,7 @@ export default function MasterWilayahPage() {
                       placeholder="Contoh: Posyandu Mawar I"
                       value={formData.nama_posyandu || ""}
                       onChange={(e) => setFormData({ ...formData, nama_posyandu: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
 
@@ -622,7 +622,7 @@ export default function MasterWilayahPage() {
                       placeholder="Contoh: Dusun II, Samping Kantor Kepala Desa"
                       value={formData.alamat || ""}
                       onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
                 </>
@@ -639,7 +639,7 @@ export default function MasterWilayahPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
                 >
                   {submitting && <RefreshCw size={14} className="animate-spin" />}
                   <span>Simpan</span>
@@ -683,7 +683,7 @@ export default function MasterWilayahPage() {
                     required
                     value={editFormData.nm_kecamatan || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, nm_kecamatan: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
               )}
@@ -697,7 +697,7 @@ export default function MasterWilayahPage() {
                       required
                       value={editFormData.nm_desa || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, nm_desa: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -706,7 +706,7 @@ export default function MasterWilayahPage() {
                       required
                       value={editFormData.kd_kecamatan || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, kd_kecamatan: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                     >
                       {data.kecamatan.map((k: any) => (
                         <option key={k.kd_kecamatan} value={k.kd_kecamatan}>
@@ -727,7 +727,7 @@ export default function MasterWilayahPage() {
                       required
                       value={editFormData.nama_posyandu || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, nama_posyandu: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -736,7 +736,7 @@ export default function MasterWilayahPage() {
                       required
                       value={editFormData.kd_kecamatan || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, kd_kecamatan: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                     >
                       {data.kecamatan.map((k: any) => (
                         <option key={k.kd_kecamatan} value={k.kd_kecamatan}>
@@ -751,7 +751,7 @@ export default function MasterWilayahPage() {
                       required
                       value={editFormData.kd_desa || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, kd_desa: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                     >
                       {data.desa
                         .filter((d: any) => !editFormData.kd_kecamatan || d.kd_kecamatan === editFormData.kd_kecamatan)
@@ -768,7 +768,7 @@ export default function MasterWilayahPage() {
                       type="text"
                       value={editFormData.alamat || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, alamat: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
                 </>
@@ -785,7 +785,7 @@ export default function MasterWilayahPage() {
                 <button
                   type="submit"
                   disabled={editSubmitting}
-                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
                 >
                   {editSubmitting && <RefreshCw size={14} className="animate-spin" />}
                   <span>Simpan Perubahan</span>

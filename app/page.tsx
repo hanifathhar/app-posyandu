@@ -130,9 +130,9 @@ const BIDANG_SPM_DATA = [
     subjudul: "Akses Air Minum Aman & Sanitasi Sehat",
     tagline: "Menjamin ketersediaan air bersih dan jamban sehat sebagai fondasi hidup bersih dan bebas stunting.",
     icon: Building2,
-    badgeColor: "bg-teal-50 text-teal-800 border-teal-200",
-    themeColor: "from-teal-500 to-emerald-600",
-    accentBg: "bg-teal-500/10 text-teal-600",
+    badgeColor: "bg-sky-50 text-sky-800 border-sky-200",
+    themeColor: "from-sky-500 to-blue-600",
+    accentBg: "bg-sky-500/10 text-sky-600",
     deskripsi:
       "Pemenuhan kebutuhan pokok air minum perpipaan/non-perpajakan yang terlindungi serta penyediaan sistem pengelolaan sanitasi air limbah domestik (jamban sehat keluarga) untuk mewujudkan desa bebas buang air besar sembarangan (ODF).",
     sasaran: [
@@ -183,7 +183,7 @@ const BIDANG_SPM_DATA = [
     tagline: "Mewujudkan lingkungan yang aman, tertib, serta tanggap darurat bencana dan perlindungan warga.",
     icon: Shield,
     badgeColor: "bg-emerald-50 text-emerald-800 border-emerald-200",
-    themeColor: "from-emerald-600 to-teal-700",
+    themeColor: "from-emerald-600 to-green-700",
     accentBg: "bg-emerald-500/10 text-emerald-600",
     deskripsi:
       "Pelayanan pencegahan gangguan ketenteraman dan ketertiban umum, penegakan regulasi daerah, penanganan darurat bencana (BPBD/Damkar), serta perlindungan khusus bagi perempuan dan anak dari tindak kekerasan.",
@@ -358,7 +358,7 @@ export default function SPMHomePage() {
               <div className="text-base sm:text-lg font-black text-[#0c3b5e] tracking-tight">
                 Tapanuli Selatan
               </div>
-              <div className="text-[10px] font-semibold text-teal-700 uppercase tracking-widest flex items-center gap-1">
+              <div className="text-[10px] font-semibold text-blue-700 uppercase tracking-widest flex items-center gap-1">
                 <span>SPM Terpadu Posyandu</span>
               </div>
             </div>
@@ -390,7 +390,7 @@ export default function SPMHomePage() {
           <div className="hidden sm:flex items-center gap-3">
             <Link
               href="/pengaduan"
-              className="py-2.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-teal-600/20 transition flex items-center gap-2"
+              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-600/20 transition flex items-center gap-2"
             >
               <FileText size={16} />
               <span>Buat Pengaduan</span>
@@ -469,7 +469,7 @@ export default function SPMHomePage() {
                 <div className="pt-2 flex flex-col gap-2">
                   <Link
                     href="/pengaduan"
-                    className="w-full py-3 rounded-xl bg-teal-600 text-white text-center font-bold"
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center font-bold"
                   >
                     Ajukan Pengaduan
                   </Link>
@@ -499,9 +499,11 @@ export default function SPMHomePage() {
           />
         </div>
 
-        {/* Ambient Gradient Glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-teal-500/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        {/* Ambient Gradient Glows in 4 Brand Colors: Biru, Ungu, Orange, Hijau */}
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[350px] bg-blue-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-1/3 right-1/4 w-[500px] h-[350px] bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-10 left-10 w-[400px] h-[400px] bg-orange-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-10 right-10 w-[400px] h-[400px] bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
@@ -510,10 +512,15 @@ export default function SPMHomePage() {
               initial={{ opacity: 0, y: -15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs sm:text-sm font-bold text-teal-300 mb-6 shadow-inner"
+              className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs sm:text-sm font-bold text-white mb-6 shadow-inner"
             >
-              <Sparkles size={16} className="text-amber-300" />
-              <span>Standar Pelayanan Minimal Terpadu Berbasis Posyandu</span>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-sky-400" />
+                <span className="w-2 h-2 rounded-full bg-purple-400" />
+                <span className="w-2 h-2 rounded-full bg-orange-400" />
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              </div>
+              <span className="text-blue-100">Standar Pelayanan Minimal Terpadu Berbasis Posyandu</span>
             </motion.div>
 
             {/* Main Headline */}
@@ -524,7 +531,7 @@ export default function SPMHomePage() {
               className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight sm:leading-tight"
             >
               Penuhi Hak Layanan Dasar Masyarakat{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-emerald-200 to-amber-300">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-purple-300 via-amber-300 to-emerald-300">
                 Kabupaten Tapanuli Selatan
               </span>
             </motion.h1>
@@ -548,7 +555,7 @@ export default function SPMHomePage() {
             >
               <Link
                 href="/pengaduan"
-                className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-black text-base shadow-lg shadow-teal-500/25 transition flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+                className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-base shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-3 transform hover:-translate-y-0.5 cursor-pointer"
               >
                 <FileText size={20} />
                 <span>Ajukan Pengaduan</span>
@@ -559,7 +566,7 @@ export default function SPMHomePage() {
                 href="#bidang"
                 className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-base border border-white/20 backdrop-blur-md transition flex items-center justify-center gap-2"
               >
-                <Layers size={18} className="text-teal-300" />
+                <Layers size={18} className="text-sky-300" />
                 <span>Eksplorasi 6 Bidang SPM</span>
               </a>
             </motion.div>
@@ -583,12 +590,12 @@ export default function SPMHomePage() {
                       placeholder="Lacak laporan Anda? Masukkan Kode Token (misal: TRK-7A9B2C)..."
                       value={trackingInput}
                       onChange={(e) => setTrackingInput(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium"
+                      className="w-full pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="py-3 px-6 rounded-xl bg-[#0c3b5e] hover:bg-[#082942] text-white text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+                    className="py-3 px-6 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900 text-white text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-md"
                   >
                     <Search size={16} />
                     <span>Lacak Aduan</span>
@@ -611,7 +618,7 @@ export default function SPMHomePage() {
               <p className="text-[11px] text-slate-300 mt-0.5">Urusan Wajib Pelayanan Dasar</p>
             </div>
             <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 text-center">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-teal-300">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-purple-300">
                 {stats.loading ? "-" : stats.kecamatan}
               </div>
               <div className="text-xs sm:text-sm font-bold text-white mt-1">Kecamatan Wilayah</div>
@@ -641,8 +648,8 @@ export default function SPMHomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Sisi Kiri: Narasi & Penjelasan */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold uppercase tracking-wider">
-                <BookOpen size={14} />
+              <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider">
+                <BookOpen size={14} className="text-blue-600" />
                 <span>Pengenalan Standar Pelayanan Minimal</span>
               </div>
 
@@ -658,10 +665,10 @@ export default function SPMHomePage() {
                 Pemerintah Kabupaten Tapanuli Selatan berkomitmen tinggi dalam mengawal pemenuhan 6 urusan wajib pelayanan dasar. Melalui platform digital SPM Terpadu, setiap pengaduan kendala warga di pelosok desa dapat didengar, diverifikasi, dan segera ditindaklanjuti secara berjenjang oleh dinas teknis terkait.
               </p>
 
-              {/* 4 Pilar SPM */}
+              {/* 4 Pilar SPM dengan 4 Warna Logo: Biru, Ungu, Orange, Hijau */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3 hover:border-blue-300 transition">
+                  <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm shadow-blue-500/20">
                     1
                   </div>
                   <div>
@@ -672,8 +679,8 @@ export default function SPMHomePage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3 hover:border-purple-300 transition">
+                  <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm shadow-purple-500/20">
                     2
                   </div>
                   <div>
@@ -684,8 +691,8 @@ export default function SPMHomePage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3 hover:border-orange-300 transition">
+                  <div className="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm shadow-orange-500/20">
                     3
                   </div>
                   <div>
@@ -696,8 +703,8 @@ export default function SPMHomePage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3 hover:border-emerald-300 transition">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm shadow-emerald-500/20">
                     4
                   </div>
                   <div>
@@ -713,7 +720,7 @@ export default function SPMHomePage() {
             {/* Sisi Kanan: Kartu Regulasi & Dasar Hukum */}
             <div className="lg:col-span-5">
               <div className="bg-gradient-to-br from-slate-900 via-[#0c3b5e] to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-slate-800">
-                <div className="absolute top-0 right-0 translate-x-8 -translate-y-8 w-40 h-40 bg-teal-500/20 rounded-full blur-2xl"></div>
+                <div className="absolute top-0 right-0 translate-x-8 -translate-y-8 w-40 h-40 bg-blue-500/20 rounded-full blur-2xl"></div>
 
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-amber-400">
@@ -721,14 +728,14 @@ export default function SPMHomePage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-white">Dasar Hukum Penyelenggaraan</h3>
-                    <p className="text-xs text-teal-300">Regulasi Resmi Republik Indonesia</p>
+                    <p className="text-xs text-blue-300">Regulasi Resmi Republik Indonesia</p>
                   </div>
                 </div>
 
                 <div className="space-y-4 text-xs sm:text-sm">
                   <div className="p-3.5 rounded-xl bg-white/10 border border-white/10">
                     <span className="font-bold text-amber-300 block mb-1">
-                      Undang-Undang No. 23 Tahun 2014
+                       Undang-Undang No. 23 Tahun 2014
                     </span>
                     <p className="text-slate-300 text-xs leading-relaxed">
                       Tentang Pemerintahan Daerah, yang menegaskan bahwa pelayanan dasar merupakan urusan pemerintahan wajib bagi Pemerintah Daerah.
@@ -754,7 +761,7 @@ export default function SPMHomePage() {
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-white/10 border border-white/10">
-                    <span className="font-bold text-teal-300 block mb-1">
+                    <span className="font-bold text-blue-300 block mb-1">
                       Peraturan Daerah Pemkab Tapanuli Selatan
                     </span>
                     <p className="text-slate-300 text-xs leading-relaxed">
@@ -773,7 +780,7 @@ export default function SPMHomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold uppercase tracking-wider mb-3">
+            <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider mb-3">
               <Layers size={14} />
               <span>Cakupan Urusan Wajib Pelayanan Dasar</span>
             </div>
@@ -869,7 +876,7 @@ export default function SPMHomePage() {
               {/* Sasaran Penerima */}
               <div className="space-y-4">
                 <h4 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Users size={18} className="text-teal-600" />
+                  <Users size={18} className="text-blue-600" />
                   <span>Kelompok Sasaran Penerima Manfaat:</span>
                 </h4>
                 <ul className="space-y-2.5">
@@ -891,7 +898,7 @@ export default function SPMHomePage() {
                 <ul className="space-y-2.5">
                   {selectedBidang.layananUtama.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700">
-                      <ChevronRight size={16} className="text-teal-600 shrink-0 mt-0.5" />
+                      <ChevronRight size={16} className="text-blue-600 shrink-0 mt-0.5" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -918,9 +925,9 @@ export default function SPMHomePage() {
       {/* 7. SECTION: TRANSFORMASI POSYANDU BERBASIS 6 BIDANG SPM */}
       <section id="posyandu" className="py-20 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-teal-900 via-[#0c3b5e] to-slate-900 rounded-3xl p-8 sm:p-12 lg:p-16 text-white relative overflow-hidden shadow-2xl">
+          <div className="bg-gradient-to-br from-blue-950 via-indigo-950 to-slate-900 rounded-3xl p-8 sm:p-12 lg:p-16 text-white relative overflow-hidden shadow-2xl">
             <div className="relative z-10 max-w-3xl">
-              <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-white/10 backdrop-blur-md text-teal-300 text-xs font-bold uppercase tracking-wider mb-4 border border-white/15">
+              <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-white/10 backdrop-blur-md text-blue-300 text-xs font-bold uppercase tracking-wider mb-4 border border-white/15">
                 <Sparkles size={14} className="text-amber-300" />
                 <span>Inovasi Daerah Tapanuli Selatan</span>
               </div>
@@ -935,13 +942,13 @@ export default function SPMHomePage() {
 
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
-                  <div className="text-amber-300 font-black text-lg mb-1">01. Deteksi Dini</div>
+                  <div className="text-orange-400 font-black text-lg mb-1">01. Deteksi Dini</div>
                   <p className="text-xs text-slate-300">
                     Kader mengenali kebutuhan warga dari pintu ke pintu saat hari buka posyandu dan kunjungan rumah.
                   </p>
                 </div>
                 <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
-                  <div className="text-teal-300 font-black text-lg mb-1">02. Input Cepat</div>
+                  <div className="text-purple-300 font-black text-lg mb-1">02. Input Cepat</div>
                   <p className="text-xs text-slate-300">
                     Kader desa dapat langsung mendaftarkan pengaduan warga ke sistem portal SPM Terpadu.
                   </p>
@@ -979,7 +986,7 @@ export default function SPMHomePage() {
       <section id="alur" className="py-20 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold uppercase tracking-wider mb-3">
+            <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider mb-3">
               <Compass size={14} />
               <span>Transparansi & Akuntabilitas</span>
             </div>
@@ -994,23 +1001,30 @@ export default function SPMHomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
             {ALUR_TAHAPAN.map((tahap, idx) => {
               const IconComp = tahap.icon;
+              const stepStyles = [
+                { num: "text-blue-600", bg: "bg-blue-50 text-blue-600", border: "hover:border-blue-500", badge: "bg-blue-50 text-blue-700 border-blue-200" },
+                { num: "text-purple-600", bg: "bg-purple-50 text-purple-600", border: "hover:border-purple-500", badge: "bg-purple-50 text-purple-700 border-purple-200" },
+                { num: "text-orange-500", bg: "bg-orange-50 text-orange-600", border: "hover:border-orange-500", badge: "bg-orange-50 text-orange-700 border-orange-200" },
+                { num: "text-emerald-600", bg: "bg-emerald-50 text-emerald-600", border: "hover:border-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+              ][idx];
+
               return (
                 <div
                   key={idx}
-                  className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-lg relative flex flex-col justify-between group hover:border-[#0c3b5e] transition"
+                  className={`bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-lg relative flex flex-col justify-between group ${stepStyles.border} transition`}
                 >
                   <div>
                     {/* Header Card Tahap */}
                     <div className="flex items-center justify-between mb-5">
-                      <span className="text-3xl font-black text-teal-600 font-mono">
+                      <span className={`text-3xl font-black font-mono ${stepStyles.num}`}>
                         {tahap.nomor}
                       </span>
-                      <span className="text-[10px] font-bold py-1 px-2.5 rounded-full bg-slate-100 text-slate-600 uppercase tracking-wider border border-slate-200">
+                      <span className={`text-[10px] font-bold py-1 px-2.5 rounded-full uppercase tracking-wider border ${stepStyles.badge}`}>
                         {tahap.badge}
                       </span>
                     </div>
 
-                    <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center mb-4 group-hover:bg-[#0c3b5e] group-hover:text-white transition-colors">
+                    <div className={`w-12 h-12 rounded-2xl ${stepStyles.bg} flex items-center justify-center mb-4 transition-colors`}>
                       <IconComp size={24} />
                     </div>
 
@@ -1023,8 +1037,8 @@ export default function SPMHomePage() {
                     </p>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-xs font-bold text-amber-700">
-                    <Clock size={14} />
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                    <Clock size={14} className="text-slate-400" />
                     <span>Estimasi: {tahap.waktu}</span>
                   </div>
                 </div>
@@ -1035,7 +1049,7 @@ export default function SPMHomePage() {
           {/* Banner Pelacakan Cepat */}
           <div className="mt-12 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
                 <Search size={28} />
               </div>
               <div>
@@ -1063,7 +1077,7 @@ export default function SPMHomePage() {
       <section id="faq" className="py-20 bg-white border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold uppercase tracking-wider mb-3">
+            <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider mb-3">
               <HelpCircle size={14} />
               <span>Bantuan & Informasi</span>
             </div>
@@ -1090,7 +1104,7 @@ export default function SPMHomePage() {
                     <span>{item.pertanyaan}</span>
                     <ChevronDown
                       size={20}
-                      className={`text-slate-400 shrink-0 transition-transform ${isOpen ? "rotate-180 text-teal-600" : ""
+                      className={`text-slate-400 shrink-0 transition-transform ${isOpen ? "rotate-180 text-blue-600" : ""
                         }`}
                     />
                   </button>
@@ -1121,7 +1135,7 @@ export default function SPMHomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Informasi Kontak */}
             <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 py-1 px-3 rounded-md bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider">
                 <PhoneCall size={14} />
                 <span>Pusat Informasi & Pengaduan</span>
               </div>
@@ -1136,7 +1150,7 @@ export default function SPMHomePage() {
 
               <div className="space-y-4 pt-2">
                 <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
                     <MapPin size={20} />
                   </div>
                   <div>
@@ -1171,7 +1185,7 @@ export default function SPMHomePage() {
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
                   <Link
                     href="/pengaduan"
-                    className="py-3.5 px-6 rounded-2xl bg-teal-500 hover:bg-teal-600 text-white font-bold text-sm text-center shadow-md transition"
+                    className="py-3.5 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm text-center shadow-md shadow-blue-600/20 transition cursor-pointer"
                   >
                     Mulai Buat Pengaduan Sekarang
                   </Link>
@@ -1208,7 +1222,7 @@ export default function SPMHomePage() {
                   <h4 className="text-sm font-black text-white uppercase tracking-wider">
                     Pemerintah Kabupaten
                   </h4>
-                  <h3 className="text-base font-black text-teal-400">Tapanuli Selatan</h3>
+                  <h3 className="text-base font-black text-blue-400">Tapanuli Selatan</h3>
                   <span className="text-[11px] text-slate-400">
                     Sistem SPM Terpadu Berbasis Posyandu
                   </span>

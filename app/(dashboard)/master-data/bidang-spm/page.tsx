@@ -207,7 +207,7 @@ export default function MasterBidangSPMPage() {
       case "TRANTIBUM_LINMAS":
         return <Shield className="text-purple-600" size={24} />;
       default:
-        return <Tag className="text-teal-600" size={24} />;
+        return <Tag className="text-blue-600" size={24} />;
     }
   };
 
@@ -236,7 +236,7 @@ export default function MasterBidangSPMPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-1">
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Tag className="text-teal-600" size={28} />
+            <Tag className="text-blue-600" size={28} />
             <span>Master 6 Bidang SPM & Kategori Masalah</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -252,13 +252,13 @@ export default function MasterBidangSPMPage() {
               placeholder="Cari kategori masalah..."
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition bg-white shadow-2xs"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition bg-white shadow-2xs"
             />
           </div>
 
           <button
             onClick={() => handleOpenAddModal()}
-            className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs shadow-sm transition hover:shadow shrink-0"
+            className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-sm transition hover:shadow shrink-0"
           >
             <Plus size={16} />
             <span>Tambah Kategori Masalah</span>
@@ -269,7 +269,7 @@ export default function MasterBidangSPMPage() {
       {/* Grid 6 Bidang SPM */}
       {loading ? (
         <div className="p-16 text-center text-slate-400 text-xs flex items-center justify-center space-x-2 bg-white rounded-2xl border border-slate-200">
-          <RefreshCw size={20} className="animate-spin text-teal-600" />
+          <RefreshCw size={20} className="animate-spin text-blue-600" />
           <span>Memuat 6 Bidang SPM...</span>
         </div>
       ) : (
@@ -315,13 +315,13 @@ export default function MasterBidangSPMPage() {
                       <span>
                         Kategori Masalah ({displayCategories.length}
                         {searchFilter && displayCategories.length !== (bidang.jenisPengaduan?.length || 0) && (
-                          <span className="text-teal-600 font-normal"> dari {bidang.jenisPengaduan?.length}</span>
+                          <span className="text-blue-600 font-normal"> dari {bidang.jenisPengaduan?.length}</span>
                         )}
                         ):
                       </span>
                       <button
                         onClick={() => handleOpenAddModal(bidang.id)}
-                        className="text-teal-600 hover:text-teal-700 text-[11px] font-bold flex items-center space-x-1"
+                        className="text-blue-600 hover:text-blue-700 text-[11px] font-bold flex items-center space-x-1"
                       >
                         <Plus size={13} />
                         <span>Tambah</span>
@@ -357,21 +357,21 @@ export default function MasterBidangSPMPage() {
                               className="p-1 hover:opacity-80 transition"
                             >
                               {jenis.aktif ? (
-                                <ToggleRight size={20} className="text-teal-600" />
+                                <ToggleRight size={20} className="text-blue-600" />
                               ) : (
                                 <ToggleLeft size={20} className="text-slate-300" />
                               )}
                             </button>
                             <button
                               onClick={() => handleOpenEditModal(jenis)}
-                              className="p-1 rounded-md border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-teal-700 transition"
+                              className="p-1 rounded-md border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-blue-700 transition"
                               title="Edit Kategori"
                             >
                               <Edit size={12} />
                             </button>
                             <button
                               onClick={() => handleOpenDeleteModal(jenis)}
-                              className="p-1 rounded-md border border-slate-200 bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition"
+                              className="p-1 rounded-md border border-slate-200 bg-white hover:bg-rose-50 text-slate-500 hover:rose-600 transition"
                               title="Hapus Kategori"
                             >
                               <Trash2 size={12} />
@@ -427,7 +427,7 @@ export default function MasterBidangSPMPage() {
                   required
                   value={targetBidangId}
                   onChange={(e) => setTargetBidangId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white font-medium"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
                 >
                   {bidangList.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -445,7 +445,7 @@ export default function MasterBidangSPMPage() {
                   placeholder="Contoh: Balita Gizi Buruk / Stunting, RTLH, dll."
                   value={namaJenis}
                   onChange={(e) => setNamaJenis(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -456,7 +456,7 @@ export default function MasterBidangSPMPage() {
                   placeholder="Kriteria atau catatan kategori..."
                   value={deskripsiJenis}
                   onChange={(e) => setDeskripsiJenis(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -471,7 +471,7 @@ export default function MasterBidangSPMPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
                 >
                   {submitting && <RefreshCw size={14} className="animate-spin" />}
                   <span>Simpan</span>
@@ -512,7 +512,7 @@ export default function MasterBidangSPMPage() {
                   required
                   value={editNama}
                   onChange={(e) => setEditNama(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -523,7 +523,7 @@ export default function MasterBidangSPMPage() {
                   value={editDeskripsi}
                   onChange={(e) => setEditDeskripsi(e.target.value)}
                   placeholder="Kriteria atau catatan kategori..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -538,7 +538,7 @@ export default function MasterBidangSPMPage() {
                 <button
                   type="submit"
                   disabled={editSubmitting}
-                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
                 >
                   {editSubmitting && <RefreshCw size={14} className="animate-spin" />}
                   <span>Simpan Perubahan</span>

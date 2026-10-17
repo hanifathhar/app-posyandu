@@ -240,12 +240,12 @@ export default function LaporanPosyanduKecamatanPage() {
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-              <Building2 className="text-teal-600" size={28} />
+              <Building2 className="text-purple-600" size={28} />
               <span>Laporan Posyandu Kecamatan</span>
             </h1>
             {currentUser && (
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200 flex items-center gap-1.5 shadow-2xs">
-                <MapPin size={13} className="text-teal-600" />
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200 flex items-center gap-1.5 shadow-2xs">
+                <MapPin size={13} className="text-purple-600" />
                 {currentUser.role === "ADMIN_KECAMATAN"
                   ? `Penugasan: Kec. ${currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId || "-"}`
                   : currentUser.role === "ADMIN_DESA"
@@ -273,7 +273,7 @@ export default function LaporanPosyanduKecamatanPage() {
           <button
             onClick={handlePrint}
             disabled={!hasFiltered || reportData.detailList.length === 0}
-            className="inline-flex items-center space-x-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs shadow-sm transition disabled:opacity-40 disabled:cursor-not-allowed hover:shadow"
+            className="inline-flex items-center space-x-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-xs shadow-sm transition disabled:opacity-40 disabled:cursor-not-allowed hover:shadow"
             title={!hasFiltered ? "Terapkan filter terlebih dahulu" : "Cetak format cetak resmi ke printer atau PDF"}
           >
             <Printer size={15} />
@@ -291,7 +291,7 @@ export default function LaporanPosyanduKecamatanPage() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white"
             />
           </div>
 
@@ -301,7 +301,7 @@ export default function LaporanPosyanduKecamatanPage() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white"
             />
           </div>
 
@@ -314,7 +314,7 @@ export default function LaporanPosyanduKecamatanPage() {
                 setSelectedKecamatan(e.target.value);
                 setSelectedDesa("");
               }}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white font-medium disabled:bg-slate-100 disabled:text-slate-500"
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white font-medium disabled:bg-slate-100 disabled:text-slate-500"
             >
               <option value="">Semua Kecamatan</option>
               {kecamatanList.map((k) => (
@@ -331,7 +331,7 @@ export default function LaporanPosyanduKecamatanPage() {
               value={selectedDesa}
               disabled={currentUser?.role === "ADMIN_DESA"}
               onChange={(e) => setSelectedDesa(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white font-medium disabled:bg-slate-100 disabled:text-slate-500"
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white font-medium disabled:bg-slate-100 disabled:text-slate-500"
             >
               <option value="">Semua Desa di Kecamatan</option>
               {desaList.map((d) => (
@@ -356,7 +356,7 @@ export default function LaporanPosyanduKecamatanPage() {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold transition flex items-center justify-center space-x-1.5 shadow-sm disabled:opacity-50 text-xs"
+              className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition flex items-center justify-center space-x-1.5 shadow-sm disabled:opacity-50 text-xs"
             >
               {loading ? <RefreshCw size={14} className="animate-spin" /> : <Filter size={14} />}
               <span>Terapkan Filter</span>
@@ -370,13 +370,13 @@ export default function LaporanPosyanduKecamatanPage() {
       {/* ========================================================================= */}
       {!hasFiltered ? (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center flex flex-col items-center justify-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shadow-inner">
+          <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shadow-inner">
             <Filter size={28} />
           </div>
           <div className="max-w-md">
             <h3 className="text-base font-bold text-slate-800">Laporan Belum Ditampilkan</h3>
             <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-              Tampilan awal laporan dalam keadaan kosong. Silakan tentukan kriteria filter (Kecamatan, Desa, atau Periode Tanggal) pada panel di atas, kemudian klik tombol <strong className="text-teal-700">"Terapkan Filter"</strong> untuk menampilkan data laporan resmi.
+              Tampilan awal laporan dalam keadaan kosong. Silakan tentukan kriteria filter (Kecamatan, Desa, atau Periode Tanggal) pada panel di atas, kemudian klik tombol <strong className="text-purple-700">"Terapkan Filter"</strong> untuk menampilkan data laporan resmi.
             </p>
           </div>
         </div>
@@ -403,7 +403,7 @@ export default function LaporanPosyanduKecamatanPage() {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-12 text-center text-slate-400 text-xs flex items-center justify-center space-x-2">
-              <RefreshCw size={18} className="animate-spin text-teal-600" />
+              <RefreshCw size={18} className="animate-spin text-purple-600" />
               <span>Memuat data laporan kecamatan...</span>
             </div>
           ) : (

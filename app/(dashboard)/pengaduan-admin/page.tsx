@@ -850,8 +850,8 @@ function PengaduanAdminContent() {
               Lembar Kerja Pengaduan SPM
             </h1>
             {currentUser && (
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200 flex items-center gap-1.5 shadow-2xs">
-                <MapPin size={13} className="text-teal-600" />
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1.5 shadow-2xs">
+                <MapPin size={13} className="text-blue-600" />
                 {currentUser.role === "ADMIN_DESA"
                   ? `Wilayah: Desa ${currentUser.desa?.nm_desa || currentUser.desaId || "-"}`
                   : currentUser.role === "ADMIN_KECAMATAN"
@@ -869,7 +869,7 @@ function PengaduanAdminContent() {
           onClick={fetchList}
           className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition shadow-2xs self-start sm:self-auto hover:border-slate-300"
         >
-          <RefreshCw size={14} className={loading ? "animate-spin text-teal-600" : ""} />
+          <RefreshCw size={14} className={loading ? "animate-spin text-blue-600" : ""} />
           <span>Segarkan Data</span>
         </button>
       </div>
@@ -887,7 +887,7 @@ function PengaduanAdminContent() {
               }}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                 isActive
-                  ? "bg-teal-600 text-white shadow-2xs"
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-2xs"
                   : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-2xs"
               }`}
             >
@@ -906,7 +906,7 @@ function PengaduanAdminContent() {
             placeholder="Cari Nomor, NIK, atau Nama Pelapor..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition bg-white shadow-2xs"
+            className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition bg-white shadow-2xs"
           />
         </form>
 
@@ -918,7 +918,7 @@ function PengaduanAdminContent() {
               setSelectedBidangId(e.target.value);
               setPage(1);
             }}
-            className="w-full sm:w-auto px-3.5 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-2xs font-medium"
+            className="w-full sm:w-auto px-3.5 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-2xs font-medium"
           >
             <option value="">Semua Bidang SPM</option>
             {bidangList.map((b) => (
@@ -930,14 +930,14 @@ function PengaduanAdminContent() {
 
           {/* Filter Wilayah Kecamatan & Desa */}
           {currentUser?.role === "ADMIN_DESA" ? (
-            <div className="px-3 py-2 rounded-xl border border-teal-200 bg-teal-50/70 text-teal-900 text-xs flex items-center gap-1.5 font-semibold">
-              <MapPin size={13} className="text-teal-700" />
+            <div className="px-3 py-2 rounded-xl border border-blue-200 bg-blue-50/70 text-blue-900 text-xs flex items-center gap-1.5 font-semibold">
+              <MapPin size={13} className="text-blue-700" />
               <span>Desa {currentUser.desa?.nm_desa || currentUser.desaId}</span>
             </div>
           ) : currentUser?.role === "ADMIN_KECAMATAN" ? (
             <>
-              <div className="px-3 py-2 rounded-xl border border-teal-200 bg-teal-50/70 text-teal-900 text-xs flex items-center gap-1.5 font-semibold">
-                <MapPin size={13} className="text-teal-700" />
+              <div className="px-3 py-2 rounded-xl border border-blue-200 bg-blue-50/70 text-blue-900 text-xs flex items-center gap-1.5 font-semibold">
+                <MapPin size={13} className="text-blue-700" />
                 <span>Kec. {currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId}</span>
               </div>
 
@@ -948,7 +948,7 @@ function PengaduanAdminContent() {
                   setSelectedDesa(e.target.value);
                   setPage(1);
                 }}
-                className="px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-700 focus:outline-none focus:border-teal-500"
+                className="px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-700 focus:outline-none focus:border-blue-500"
               >
                 <option value="">Semua Desa / Kelurahan</option>
                 {desaList.map((d) => (
@@ -968,7 +968,7 @@ function PengaduanAdminContent() {
                   setSelectedDesa("");
                   setPage(1);
                 }}
-                className="px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-700 focus:outline-none focus:border-teal-500"
+                className="px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-700 focus:outline-none focus:border-blue-500"
               >
                 <option value="">Semua Kecamatan</option>
                 {kecamatanList.map((k) => (
@@ -985,7 +985,7 @@ function PengaduanAdminContent() {
                   setSelectedDesa(e.target.value);
                   setPage(1);
                 }}
-                className="px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-700 focus:outline-none focus:border-teal-500"
+                className="px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-700 focus:outline-none focus:border-blue-500"
               >
                 <option value="">
                   {selectedKecamatan ? "Semua Desa di Kecamatan Terpilih" : "Semua Desa / Kelurahan"}
@@ -1018,7 +1018,7 @@ function PengaduanAdminContent() {
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-12 text-center text-teal-700">
+                  <td colSpan={6} className="px-5 py-12 text-center text-blue-700">
                     <RefreshCw size={20} className="animate-spin mx-auto mb-2" />
                     <span>Memuat data pengaduan...</span>
                   </td>
@@ -1031,7 +1031,7 @@ function PengaduanAdminContent() {
                         <span className="font-mono font-bold text-slate-900 block">{p.nomorPengaduan}</span>
                         {(p.dokumenCount > 0 || (p.dokumen && p.dokumen.length > 0)) && (
                           <span
-                            className="inline-flex items-center space-x-0.5 px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 text-[10px] font-bold border border-teal-200"
+                            className="inline-flex items-center space-x-0.5 px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200"
                             title={`Tersedia ${p.dokumenCount || p.dokumen?.length} dokumen lampiran pelapor`}
                           >
                             <Paperclip size={10} />
@@ -1059,7 +1059,7 @@ function PengaduanAdminContent() {
                       </span>
                     </td>
                     <td className="px-5 py-3.5 max-w-sm">
-                      <span className="font-semibold text-teal-800 text-[11px] block">{p.bidang.nama}</span>
+                      <span className="font-semibold text-blue-800 text-[11px] block">{p.bidang.nama}</span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {p.jenisPengaduan.map((j) => (
                           <span
@@ -1083,7 +1083,7 @@ function PengaduanAdminContent() {
                             setVerifCatatan("");
                             setDetailModalOpen(true);
                           }}
-                          className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 font-semibold text-xs transition shadow-xs"
+                          className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 font-semibold text-xs transition shadow-xs"
                           title="Detail & Verifikasi"
                         >
                           <Eye size={13} />
@@ -1167,7 +1167,7 @@ function PengaduanAdminContent() {
             {/* Modal Header */}
             <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700">
                   Lembar Kerja Verifikasi Pengaduan
                 </span>
                 <h3 className="text-base font-bold text-slate-900 font-mono mt-0.5">
@@ -1209,7 +1209,7 @@ function PengaduanAdminContent() {
                 </div>
                 <div>
                   <span className="text-slate-500 block text-[11px]">Token Pelacakan Publik:</span>
-                  <span className="font-mono font-bold text-teal-800 text-sm">{selectedItem.tokenPelacakan}</span>
+                  <span className="font-mono font-bold text-blue-800 text-sm">{selectedItem.tokenPelacakan}</span>
                 </div>
               </div>
 
@@ -1217,7 +1217,7 @@ function PengaduanAdminContent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2">
                   <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                    <User size={14} className="text-teal-600" />
+                    <User size={14} className="text-blue-600" />
                     <span>Identitas Pelapor</span>
                   </h4>
                   <div>
@@ -1240,7 +1240,7 @@ function PengaduanAdminContent() {
 
                 <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2">
                   <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                    <MapPin size={14} className="text-teal-600" />
+                    <MapPin size={14} className="text-blue-600" />
                     <span>Lokasi & Posyandu Terdekat</span>
                   </h4>
                   <div>
@@ -1271,9 +1271,9 @@ function PengaduanAdminContent() {
               </div>
 
               {/* Bidang & Kategori Masalah Terpilih */}
-              <div className="p-4 rounded-xl border border-teal-100 bg-teal-50/30 space-y-2">
+              <div className="p-4 rounded-xl border border-blue-100 bg-blue-50/30 space-y-2">
                 <span className="text-slate-500 block text-[11px] font-semibold">Bidang SPM Terkait:</span>
-                <span className="font-bold text-teal-900 text-sm block">{selectedItem.bidang.nama}</span>
+                <span className="font-bold text-blue-900 text-sm block">{selectedItem.bidang.nama}</span>
 
                 <span className="text-slate-500 block text-[11px] font-semibold pt-1">
                   Kategori Masalah yang Dicentang ({selectedItem.jenisPengaduan.length}):
@@ -1282,7 +1282,7 @@ function PengaduanAdminContent() {
                   {selectedItem.jenisPengaduan.map((j) => (
                     <span
                       key={j.id}
-                      className="px-2.5 py-1 rounded-lg bg-teal-100/70 text-teal-900 font-semibold border border-teal-200"
+                      className="px-2.5 py-1 rounded-lg bg-blue-100/70 text-blue-900 font-semibold border border-blue-200"
                     >
                       {j.nama}
                     </span>
@@ -1312,11 +1312,11 @@ function PengaduanAdminContent() {
               <div className="space-y-2.5 p-4 rounded-2xl border border-slate-200 bg-slate-50/50">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center space-x-1.5">
-                    <Paperclip size={15} className="text-teal-600" />
+                    <Paperclip size={15} className="text-blue-600" />
                     <span>Dokumen Lampiran Pelapor ({selectedItem.dokumen?.length || selectedItem.dokumenCount || 0})</span>
                   </span>
                   {selectedItem.dokumen && selectedItem.dokumen.length > 0 && (
-                    <span className="text-[10px] text-teal-800 bg-teal-100/80 px-2.5 py-0.5 rounded-full font-bold">
+                    <span className="text-[10px] text-blue-800 bg-blue-100/80 px-2.5 py-0.5 rounded-full font-bold">
                       Tersedia untuk Diverifikasi
                     </span>
                   )}
@@ -1348,10 +1348,10 @@ function PengaduanAdminContent() {
                       return (
                         <div
                           key={doc.id || idx}
-                          className="p-3 rounded-xl border border-slate-200 bg-white hover:border-teal-400 hover:shadow-xs transition group flex flex-col justify-between space-y-2.5"
+                          className="p-3 rounded-xl border border-slate-200 bg-white hover:border-blue-400 hover:shadow-xs transition group flex flex-col justify-between space-y-2.5"
                         >
                           <div className="flex items-start space-x-2.5">
-                            <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-700 shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
+                            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700 shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
                               {isImage && doc.pathFile ? (
                                 <img
                                   src={doc.pathFile}
@@ -1361,7 +1361,7 @@ function PengaduanAdminContent() {
                               ) : isPdf ? (
                                 <FileText size={20} className="text-rose-600" />
                               ) : (
-                                <Paperclip size={18} className="text-teal-600" />
+                                <Paperclip size={18} className="text-blue-600" />
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
@@ -1381,7 +1381,7 @@ function PengaduanAdminContent() {
                             <button
                               type="button"
                               onClick={() => setPreviewDoc(doc)}
-                              className="flex-1 inline-flex items-center justify-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-[11px] transition border border-teal-200"
+                              className="flex-1 inline-flex items-center justify-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-[11px] transition border border-blue-200"
                             >
                               <Eye size={12} />
                               <span>Lihat Dokumen</span>
@@ -1505,9 +1505,9 @@ function PengaduanAdminContent() {
                 }
 
                 return (
-                  <div className="p-5 rounded-2xl border-2 border-teal-500/30 bg-teal-50/40 space-y-4">
+                  <div className="p-5 rounded-2xl border-2 border-blue-500/30 bg-blue-50/40 space-y-4">
                     <div className="flex items-center space-x-2">
-                      <ShieldAlert size={18} className="text-teal-700" />
+                      <ShieldAlert size={18} className="text-blue-700" />
                       <h4 className="font-bold text-slate-900 text-sm">
                         Form Keputusan Verifikasi{" "}
                         {selectedItem.status === "MENUNGGU_VERIFIKASI_DESA"
@@ -1527,7 +1527,7 @@ function PengaduanAdminContent() {
                         placeholder="Tuliskan catatan hasil pemeriksaan berkas atau survei lapangan... (Wajib jika menolak atau meminta perbaikan)"
                         value={verifCatatan}
                         onChange={(e) => setVerifCatatan(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition bg-white"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition bg-white"
                       />
                     </div>
 
@@ -1556,7 +1556,7 @@ function PengaduanAdminContent() {
                         type="button"
                         disabled={verifSubmitting}
                         onClick={() => handleProcessVerifikasi("DISETUJUI")}
-                        className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition shadow-sm disabled:opacity-50 flex items-center space-x-1.5"
+                        className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-sm disabled:opacity-50 flex items-center space-x-1.5"
                       >
                         {verifSubmitting ? <RefreshCw size={14} className="animate-spin" /> : <Check size={14} />}
                         <span>
@@ -1805,7 +1805,7 @@ function PengaduanAdminContent() {
                     required
                     value={editForm.namaPelapor}
                     onChange={(e) => setEditForm({ ...editForm, namaPelapor: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -1814,7 +1814,7 @@ function PengaduanAdminContent() {
                     type="text"
                     value={editForm.noHpPelapor}
                     onChange={(e) => setEditForm({ ...editForm, noHpPelapor: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -1825,7 +1825,7 @@ function PengaduanAdminContent() {
                   type="text"
                   value={editForm.alamatPelapor}
                   onChange={(e) => setEditForm({ ...editForm, alamatPelapor: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -1834,7 +1834,7 @@ function PengaduanAdminContent() {
                 <select
                   value={editForm.status}
                   onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white font-medium"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
                 >
                   <option value="MENUNGGU_VERIFIKASI_DESA">Menunggu Verifikasi Desa</option>
                   <option value="MENUNGGU_VERIFIKASI_KECAMATAN">Menunggu Verifikasi Kecamatan</option>
@@ -1854,7 +1854,7 @@ function PengaduanAdminContent() {
                   required
                   value={editForm.deskripsi}
                   onChange={(e) => setEditForm({ ...editForm, deskripsi: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -1865,7 +1865,7 @@ function PengaduanAdminContent() {
                   value={editForm.catatan}
                   onChange={(e) => setEditForm({ ...editForm, catatan: e.target.value })}
                   placeholder="Catatan verifikasi atau rekomendasi..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -1876,7 +1876,7 @@ function PengaduanAdminContent() {
                   value={editForm.hasilPenyelesaian}
                   onChange={(e) => setEditForm({ ...editForm, hasilPenyelesaian: e.target.value })}
                   placeholder="Bantuan disalurkan / penanganan tuntas..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -1891,7 +1891,7 @@ function PengaduanAdminContent() {
                 <button
                   type="submit"
                   disabled={editSubmitting}
-                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50 shadow-sm"
                 >
                   {editSubmitting && <RefreshCw size={14} className="animate-spin" />}
                   <span>Simpan Perubahan</span>
@@ -2029,14 +2029,14 @@ function PengaduanAdminContent() {
           <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col">
             <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <div className="flex items-center space-x-2.5 min-w-0 pr-2">
-                <div className="p-2 rounded-xl bg-teal-100 text-teal-800 shrink-0">
+                <div className="p-2 rounded-xl bg-blue-100 text-blue-800 shrink-0">
                   <Paperclip size={16} />
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
                     {previewDoc.namaFile}
                   </h3>
-                  <span className="text-[11px] text-teal-700 font-semibold block">
+                  <span className="text-[11px] text-blue-700 font-semibold block">
                     {previewDoc.jenis === "KTP"
                       ? "KTP Pelapor"
                       : previewDoc.jenis === "KARTU_KELUARGA"
@@ -2089,7 +2089,7 @@ function PengaduanAdminContent() {
                 />
               ) : (
                 <div className="text-center p-8 bg-white rounded-xl border border-slate-200 max-w-md shadow-xs">
-                  <FileText size={48} className="mx-auto text-teal-600 mb-3" />
+                  <FileText size={48} className="mx-auto text-blue-600 mb-3" />
                   <p className="text-sm font-bold text-slate-800 mb-1">{previewDoc.namaFile}</p>
                   <p className="text-xs text-slate-500 mb-4 leading-relaxed">
                     Format berkas ini dapat dibuka langsung di peramban atau diunduh untuk verifikasi.
@@ -2099,7 +2099,7 @@ function PengaduanAdminContent() {
                       href={previewDoc.pathFile}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-teal-600 text-white font-bold text-xs hover:bg-teal-700 transition"
+                      className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition"
                     >
                       <ExternalLink size={14} />
                       <span>Buka Dokumen di Tab Baru</span>
@@ -2132,7 +2132,7 @@ export default function PengaduanAdminPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex justify-center items-center h-full min-h-[500px] text-teal-700 text-xs font-semibold">
+        <div className="flex justify-center items-center h-full min-h-[500px] text-blue-700 text-xs font-semibold">
           <RefreshCw size={20} className="animate-spin mr-2" />
           <span>Memuat data pengaduan admin...</span>
         </div>

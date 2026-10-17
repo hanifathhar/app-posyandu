@@ -211,11 +211,14 @@ export default function Sidebar({
         `}
       >
         <div className="flex-1 overflow-y-auto">
+          {/* Logo 4-Color Stripe: Biru, Ungu, Orange, Hijau */}
+          <div className="h-1.5 w-full brand-logo-stripe shrink-0" />
+
           {/* Header Sidebar */}
-          <div className="p-5 border-b border-slate-100 bg-gradient-to-r from-teal-700 via-teal-600 to-emerald-600 text-white">
+          <div className="p-5 border-b border-slate-100 bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 text-white shadow-inner">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center shadow-md overflow-hidden p-1 shrink-0">
+                <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center shadow-md overflow-hidden p-1 shrink-0 ring-2 ring-white/20">
                   <Image
                     src={logoPic}
                     alt="Logo SPM Posyandu"
@@ -226,8 +229,8 @@ export default function Sidebar({
                 </div>
 
                 <div>
-                  <h2 className="font-bold text-base leading-tight">SIPANDU Ceria</h2>
-                  <p className="text-[11px] text-teal-100">Sistem Informasi Posyandu Cepat, Responsif, Integratif, Akuntabel.</p>
+                  <h2 className="font-black text-base leading-tight tracking-tight">SIPANDU Ceria</h2>
+                  <p className="text-[11px] text-blue-100/90 font-medium">Posyandu Cepat, Responsif, Integratif, Akuntabel.</p>
                 </div>
               </div>
 
@@ -241,21 +244,21 @@ export default function Sidebar({
 
             {/* Scope Wilayah Badge */}
             {userInfo && (
-              <div className="mt-3.5 pt-2.5 border-t border-white/20 text-[11px] flex flex-col space-y-0.5 text-teal-100">
+              <div className="mt-3.5 pt-2.5 border-t border-white/20 text-[11px] flex flex-col space-y-0.5 text-blue-100">
                 <div className="flex items-center space-x-1.5 font-bold uppercase tracking-wider truncate">
-                  <ShieldCheck size={14} className="shrink-0 text-teal-300" />
+                  <ShieldCheck size={14} className="shrink-0 text-amber-300" />
                   <span>{userInfo.role?.replace(/_/g, " ")}</span>
                 </div>
                 {userInfo.desa?.nm_desa ? (
-                  <span className="text-[10px] text-teal-200 font-medium truncate">
+                  <span className="text-[10px] text-sky-200 font-medium truncate">
                     Desa {userInfo.desa.nm_desa}
                   </span>
                 ) : userInfo.kecamatan?.nm_kecamatan ? (
-                  <span className="text-[10px] text-teal-200 font-medium truncate">
+                  <span className="text-[10px] text-sky-200 font-medium truncate">
                     Kec. {userInfo.kecamatan.nm_kecamatan}
                   </span>
                 ) : (
-                  <span className="text-[10px] text-teal-200 font-medium truncate">
+                  <span className="text-[10px] text-sky-200 font-medium truncate">
                     Wilayah Kab. Tapanuli Selatan
                   </span>
                 )}
@@ -283,7 +286,7 @@ export default function Sidebar({
                           text-xs font-semibold
                           transition-all
                           ${isSubActive || openMenu === item.title
-                            ? "bg-teal-50/70 text-teal-900 font-bold"
+                            ? "bg-blue-50/80 text-blue-900 font-bold"
                             : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                           }
                         `}
@@ -296,7 +299,7 @@ export default function Sidebar({
                           }}
                           className="flex items-center gap-3 flex-1 py-2.5 px-3.5"
                         >
-                          <span className={isSubActive ? "text-teal-600" : "text-slate-400"}>
+                          <span className={isSubActive ? "text-blue-600" : "text-slate-400"}>
                             {item.icon}
                           </span>
                           <span>{item.title}</span>
@@ -313,7 +316,7 @@ export default function Sidebar({
                           title={openMenu === item.title ? "Tutup Submenu" : "Buka Submenu"}
                         >
                           {openMenu === item.title ? (
-                            <ChevronDown size={14} className="text-teal-700" />
+                            <ChevronDown size={14} className="text-blue-700" />
                           ) : (
                             <ChevronRight size={14} className="text-slate-400" />
                           )}
@@ -321,7 +324,7 @@ export default function Sidebar({
                       </div>
 
                       {openMenu === item.title && (
-                        <div className="ml-5 pl-3 mt-1 space-y-1 border-l-2 border-teal-100">
+                        <div className="ml-5 pl-3 mt-1 space-y-1 border-l-2 border-indigo-200">
                           {item.children.map((sub) => {
                             const isCurrent = isLinkActive(sub.href);
                             return (
@@ -334,8 +337,8 @@ export default function Sidebar({
                                   rounded-lg text-xs font-medium
                                   transition-all
                                   ${isCurrent
-                                    ? "bg-teal-600 text-white font-semibold shadow-xs"
-                                    : "text-slate-600 hover:text-teal-700 hover:bg-slate-50"
+                                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-xs"
+                                    : "text-slate-600 hover:text-blue-700 hover:bg-blue-50/50"
                                   }
                                 `}
                               >
@@ -357,7 +360,7 @@ export default function Sidebar({
                         text-xs font-semibold
                         transition-all
                         ${isActive
-                          ? "bg-teal-600 text-white shadow-xs"
+                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs"
                           : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         }
                       `}
@@ -379,13 +382,13 @@ export default function Sidebar({
           <Link
             href="/pengaduan"
             target="_blank"
-            className="flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 transition border border-teal-200"
+            className="flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-semibold text-blue-700 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition border border-blue-200"
           >
             <div className="flex items-center gap-2">
-              <ExternalLink size={14} />
+              <ExternalLink size={14} className="text-blue-600" />
               <span>Portal Pengaduan Publik</span>
             </div>
-            <span className="text-[10px] bg-teal-200/60 px-1.5 py-0.5 rounded text-teal-800">Buka</span>
+            <span className="text-[10px] bg-blue-200/70 px-1.5 py-0.5 rounded text-blue-800 font-bold">Buka</span>
           </Link>
 
           <button

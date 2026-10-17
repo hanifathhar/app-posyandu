@@ -50,21 +50,21 @@ const SPM_COLORS: Record<string, string> = {
 };
 
 const KECAMATAN_PALETTE = [
-  "#0d9488", // Teal
-  "#3b82f6", // Blue
+  "#2563eb", // Biru (Logo)
+  "#9333ea", // Ungu (Logo)
+  "#16a34a", // Hijau (Logo)
+  "#f97316", // Orange (Logo)
+  "#0284c7", // Sky Blue
+  "#7c3aed", // Violet
+  "#059669", // Emerald
+  "#ea580c", // Dark Orange
+  "#3b82f6", // Royal Blue
+  "#a855f7", // Light Purple
+  "#10b981", // Light Emerald
   "#f59e0b", // Amber
-  "#10b981", // Emerald
-  "#8b5cf6", // Purple
-  "#ec4899", // Pink
-  "#06b6d4", // Cyan
-  "#f97316", // Orange
   "#6366f1", // Indigo
-  "#14b8a6", // Light Teal
-  "#84cc16", // Lime
-  "#a855f7", // Violet
-  "#e11d48", // Rose
-  "#64748b", // Slate
-  "#0284c7", // Sky
+  "#14b8a6", // Teal
+  "#ec4899", // Pink
 ];
 
 interface UserLevel {
@@ -191,8 +191,8 @@ export default function DashboardPage() {
 
   if (loading && !data) {
     return (
-      <div className="flex flex-col justify-center items-center h-full min-h-[550px] text-teal-700">
-        <Loader2 className="w-10 h-10 animate-spin mb-3 text-teal-600" />
+      <div className="flex flex-col justify-center items-center h-full min-h-[550px] text-blue-700">
+        <Loader2 className="w-10 h-10 animate-spin mb-3 text-blue-600" />
         <span className="text-sm font-bold text-slate-700">Menyiapkan Dashboard Eksekutif SPM...</span>
         <span className="text-xs text-slate-400 mt-1">Menghitung analitik berjenjang berdasarkan wilayah penugasan</span>
       </div>
@@ -252,25 +252,35 @@ export default function DashboardPage() {
   return (
     <div className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 max-w-7xl mx-auto">
       {/* 1. HERO HEADER WITH EXECUTIVE GREETING */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-teal-900 via-teal-800 to-emerald-900 text-white p-6 sm:p-8 shadow-xl shadow-teal-950/10 border border-teal-700/40">
-        {/* Subtle background glow */}
-        <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
-        <div className="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-teal-400/10 blur-3xl pointer-events-none"></div>
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white p-6 sm:p-8 shadow-xl shadow-blue-950/20 border border-blue-800/40">
+        {/* Subtle ambient glows of the 4 logo colors: Biru, Ungu, Orange, Hijau */}
+        <div className="absolute -top-16 -left-16 w-72 h-72 rounded-full bg-blue-500/15 blur-3xl pointer-events-none"></div>
+        <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-purple-500/15 blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-16 left-1/3 w-64 h-64 rounded-full bg-orange-500/10 blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-16 -right-16 w-72 h-72 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-emerald-200 text-xs font-semibold">
-              <Building2 size={13} className="text-emerald-300" />
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-blue-200 text-xs font-semibold">
+              <Building2 size={13} className="text-amber-300" />
               <span>{roleBadge}</span>
               <span className="text-white/40">•</span>
               <span className="text-white font-medium">{roleTitle}</span>
+              <span className="text-white/40">•</span>
+              {/* 4 dots from application logo */}
+              <div className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-sky-400" title="Biru (Pelayanan Dasar)" />
+                <span className="w-2 h-2 rounded-full bg-purple-400" title="Ungu (Integrasi Posyandu)" />
+                <span className="w-2 h-2 rounded-full bg-orange-400" title="Orange (Respon Cepat)" />
+                <span className="w-2 h-2 rounded-full bg-emerald-400" title="Hijau (Kesehatan Masyarakat)" />
+              </div>
             </div>
 
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
               {greeting}, {userLevel.nama}
             </h1>
 
-            <p className="text-teal-100/90 text-xs sm:text-sm max-w-2xl leading-relaxed">
+            <p className="text-blue-100/90 text-xs sm:text-sm max-w-2xl leading-relaxed">
               {isDesa
                 ? `Pusat monitoring dan verifikasi pengaduan 6 Bidang SPM Posyandu untuk wilayah Desa ${userLevel.desaNama || ""}. Pastikan seluruh aduan warga tertangani tepat waktu.`
                 : isKecamatan
@@ -282,14 +292,14 @@ export default function DashboardPage() {
           {/* Quick Action & Periode Filter */}
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             {/* Periode Pill Filter */}
-            <div className="bg-teal-950/40 backdrop-blur-md p-1 rounded-2xl border border-white/10 flex items-center space-x-1">
+            <div className="bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/15 flex items-center space-x-1">
               <button
                 type="button"
                 onClick={() => setPeriode("semua")}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
                   periode === "semua"
-                    ? "bg-white text-teal-900 shadow-sm"
-                    : "text-teal-200 hover:text-white hover:bg-white/5"
+                    ? "bg-white text-blue-950 shadow-sm"
+                    : "text-blue-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 Semua
@@ -299,8 +309,8 @@ export default function DashboardPage() {
                 onClick={() => setPeriode("tahun-ini")}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
                   periode === "tahun-ini"
-                    ? "bg-white text-teal-900 shadow-sm"
-                    : "text-teal-200 hover:text-white hover:bg-white/5"
+                    ? "bg-white text-blue-950 shadow-sm"
+                    : "text-blue-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 Tahun Ini
@@ -310,8 +320,8 @@ export default function DashboardPage() {
                 onClick={() => setPeriode("bulan-ini")}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
                   periode === "bulan-ini"
-                    ? "bg-white text-teal-900 shadow-sm"
-                    : "text-teal-200 hover:text-white hover:bg-white/5"
+                    ? "bg-white text-blue-950 shadow-sm"
+                    : "text-blue-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 Bulan Ini
@@ -330,23 +340,23 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 2. URGENT ACTION BANNER (JIKA ADA TUGAS VERIFIKASI PENDING SESUAI LEVEL USER) */}
+      {/* 2. URGENT ACTION BANNER (ORANGE ACCENT DARI LOGO) */}
       {urgentActionCount > 0 && (
-        <div className="p-4 sm:p-5 rounded-2xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in duration-300">
+        <div className="p-4 sm:p-5 rounded-2xl border-2 border-orange-300 bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in duration-300">
           <div className="flex items-start space-x-3.5">
-            <div className="p-2.5 rounded-2xl bg-amber-500 text-white shadow-md shadow-amber-500/20 shrink-0 mt-0.5">
+            <div className="p-2.5 rounded-2xl bg-orange-500 text-white shadow-md shadow-orange-500/20 shrink-0 mt-0.5">
               <ShieldAlert size={22} />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="px-2 py-0.5 rounded-md bg-amber-200 text-amber-900 font-extrabold text-[10px] uppercase tracking-wider">
+                <span className="px-2 py-0.5 rounded-md bg-orange-200 text-orange-900 font-extrabold text-[10px] uppercase tracking-wider">
                   Perhatian Tindakan
                 </span>
-                <span className="text-xs font-bold text-amber-950">
+                <span className="text-xs font-bold text-orange-950">
                   {urgentActionCount} Berkas Membutuhkan Persetujuan Anda
                 </span>
               </div>
-              <p className="text-xs text-amber-800/90 mt-1 leading-relaxed">
+              <p className="text-xs text-orange-800/90 mt-1 leading-relaxed">
                 Terdapat pengaduan warga berstatus <strong>{urgentActionLabel}</strong> yang memerlukan pemeriksaan berkas atau keputusan verifikasi berjenjang.
               </p>
             </div>
@@ -354,7 +364,7 @@ export default function DashboardPage() {
 
           <Link
             href={urgentActionLink}
-            className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md shadow-amber-600/20 transition shrink-0"
+            className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-md shadow-orange-600/20 transition shrink-0"
           >
             <CheckSquare size={15} />
             <span>Proses Verifikasi Sekarang</span>
@@ -362,25 +372,25 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* 3. DYNAMIC KPI METRICS CARDS (SESUAI LEVEL USER) */}
+      {/* 3. DYNAMIC KPI METRICS CARDS: SELARAS 4 WARNA LOGO (BIRU, ORANGE, UNGU, HIJAU) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        {/* Card 1: Total Pengaduan Wilayah */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:border-teal-300 hover:shadow-md transition-all group">
+        {/* Card 1: BIRU (Blue) - Total Pengaduan Wilayah */}
+        <div className="bg-white p-5 rounded-2xl border border-blue-200 bg-gradient-to-br from-white to-blue-50/20 shadow-xs hover:border-blue-400 hover:shadow-md transition-all group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-teal-700 transition">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 group-hover:text-blue-800 transition">
               {isDesa ? "Pengaduan Desa" : isKecamatan ? "Pengaduan Kecamatan" : "Total Kabupaten"}
             </span>
-            <div className="p-2.5 rounded-xl bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition">
+            <div className="p-2.5 rounded-xl bg-blue-100 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition">
               <FileText size={18} />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
             <span className="text-3xl font-extrabold text-slate-900">{kpi.total || 0}</span>
-            <span className="text-[11px] font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-lg border border-teal-100">
+            <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-lg border border-blue-200">
               {periode === "bulan-ini" ? "Bulan Ini" : periode === "tahun-ini" ? "Tahun Ini" : "Semua Waktu"}
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2">
+          <p className="text-[11px] text-slate-500 mt-2">
             {isDesa
               ? "Seluruh aduan masuk di wilayah Desa Anda"
               : isKecamatan
@@ -389,29 +399,29 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Card 2: Fokus Verifikasi Sesuai Level */}
-        <div className="bg-white p-5 rounded-2xl border border-amber-200 bg-amber-50/20 shadow-xs hover:border-amber-300 hover:shadow-md transition-all group">
+        {/* Card 2: ORANGE (Orange) - Fokus Verifikasi Pending Sesuai Level */}
+        <div className="bg-white p-5 rounded-2xl border border-orange-200 bg-gradient-to-br from-white to-orange-50/20 shadow-xs hover:border-orange-400 hover:shadow-md transition-all group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-orange-600 group-hover:text-orange-700">
               {isDesa
                 ? "Verifikasi Desa (Tugas Anda)"
                 : isKecamatan
                 ? "Verifikasi Camat (Tugas Anda)"
                 : "Verifikasi Dinas / Kab."}
             </span>
-            <div className="p-2.5 rounded-xl bg-amber-100 text-amber-700 group-hover:bg-amber-600 group-hover:text-white transition">
+            <div className="p-2.5 rounded-xl bg-orange-100 text-orange-700 group-hover:bg-orange-600 group-hover:text-white transition">
               <Clock size={18} />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-3xl font-extrabold text-amber-950">
+            <span className="text-3xl font-extrabold text-orange-950">
               {isDesa ? kpi.menungguDesa : isKecamatan ? kpi.menungguKecamatan : kpi.menungguKabupaten}
             </span>
-            <span className="text-[11px] font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-lg">
+            <span className="text-[11px] font-bold text-orange-800 bg-orange-100 px-2.5 py-0.5 rounded-lg border border-orange-200">
               Perlu Disetujui
             </span>
           </div>
-          <p className="text-[11px] text-amber-800/80 mt-2">
+          <p className="text-[11px] text-orange-800/80 mt-2">
             {isDesa
               ? `Tingkat lanjutan: Kec (${kpi.menungguKecamatan}) • Kab (${kpi.menungguKabupaten})`
               : isKecamatan
@@ -420,40 +430,40 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Card 3: Intervensi & Tindak Lanjut Lapangan */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:border-cyan-300 hover:shadow-md transition-all group">
+        {/* Card 3: UNGU (Purple) - Intervensi & Tindak Lanjut Lapangan */}
+        <div className="bg-white p-5 rounded-2xl border border-purple-200 bg-gradient-to-br from-white to-purple-50/20 shadow-xs hover:border-purple-400 hover:shadow-md transition-all group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-700 group-hover:text-cyan-800 transition">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-purple-700 group-hover:text-purple-800 transition">
               Ditindaklanjuti
             </span>
-            <div className="p-2.5 rounded-xl bg-cyan-50 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white transition">
+            <div className="p-2.5 rounded-xl bg-purple-100 text-purple-700 group-hover:bg-purple-600 group-hover:text-white transition">
               <HeartHandshake size={18} />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
             <span className="text-3xl font-extrabold text-slate-900">{kpi.ditindaklanjuti || 0}</span>
-            <span className="text-[11px] font-bold text-cyan-700 bg-cyan-50 px-2.5 py-0.5 rounded-lg border border-cyan-100">
+            <span className="text-[11px] font-bold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-lg border border-purple-200">
               Proses Intervensi
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2">
+          <p className="text-[11px] text-slate-500 mt-2">
             Sedang ditangani oleh Nakes Posyandu / Kader / Dinas Pengampu
           </p>
         </div>
 
-        {/* Card 4: Selesai Tuntas & Rasio Penyelesaian */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:border-emerald-300 hover:shadow-md transition-all group">
+        {/* Card 4: HIJAU (Green) - Selesai Tuntas & Rasio Penyelesaian */}
+        <div className="bg-white p-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-white to-emerald-50/20 shadow-xs hover:border-emerald-400 hover:shadow-md transition-all group">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 group-hover:text-emerald-800 transition">
               Selesai Tuntas
             </span>
-            <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition">
+            <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition">
               <CheckCircle2 size={18} />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
             <span className="text-3xl font-extrabold text-slate-900">{kpi.selesai || 0}</span>
-            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-100">
+            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
               {kpi.resolutionRate}% Rasio Tuntas
             </span>
           </div>
@@ -476,7 +486,7 @@ export default function DashboardPage() {
                 {data?.sebaranWilayah?.title || "Sebaran Kasus per Kecamatan se-Kabupaten"}
               </h3>
               <div className="flex items-center space-x-1.5">
-                <span className="px-2.5 py-0.5 rounded-lg bg-teal-50 text-teal-800 text-[10px] font-extrabold uppercase">
+                <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-800 text-[10px] font-extrabold uppercase">
                   {data?.sebaranWilayah?.type || "KECAMATAN"}
                 </span>
 
@@ -487,7 +497,7 @@ export default function DashboardPage() {
                     onClick={() => setWilayahChartMode("pie")}
                     className={`p-1 rounded-md transition ${
                       wilayahChartMode === "pie"
-                        ? "bg-white text-teal-700 shadow-2xs font-bold"
+                        ? "bg-white text-blue-700 shadow-2xs font-bold"
                         : "text-slate-400 hover:text-slate-600"
                     }`}
                     title="Tampilan Diagram Lingkaran (Pie Chart)"
@@ -499,7 +509,7 @@ export default function DashboardPage() {
                     onClick={() => setWilayahChartMode("bar")}
                     className={`p-1 rounded-md transition ${
                       wilayahChartMode === "bar"
-                        ? "bg-white text-teal-700 shadow-2xs font-bold"
+                        ? "bg-white text-blue-700 shadow-2xs font-bold"
                         : "text-slate-400 hover:text-slate-600"
                     }`}
                     title="Tampilan Diagram Batang (Bar Chart)"
@@ -612,7 +622,7 @@ export default function DashboardPage() {
                                 <span
                                   className={`font-mono text-[11px] font-bold px-1.5 py-0.5 rounded ${
                                     wilayah.total > 0
-                                      ? "bg-teal-50 text-teal-800 border border-teal-100"
+                                      ? "bg-blue-50 text-blue-800 border border-blue-100"
                                       : "text-slate-400 bg-slate-50"
                                   }`}
                                 >
@@ -732,7 +742,7 @@ export default function DashboardPage() {
       <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-2.5">
-            <Sparkles size={18} className="text-teal-600" />
+            <Sparkles size={18} className="text-blue-600" />
             <h4 className="font-bold text-xs sm:text-sm text-slate-800">
               Pintasan Cepat Lembar Kerja ({roleBadge}):
             </h4>
@@ -771,9 +781,9 @@ export default function DashboardPage() {
 
             <Link
               href="/pengaduan-admin?status=DITINDAKLANJUTI"
-              className="px-3.5 py-2 rounded-xl bg-white hover:bg-cyan-50 text-cyan-800 border border-cyan-200 text-xs font-bold transition shadow-2xs flex items-center space-x-1.5"
+              className="px-3.5 py-2 rounded-xl bg-white hover:bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold transition shadow-2xs flex items-center space-x-1.5"
             >
-              <HeartHandshake size={13} className="text-cyan-600" />
+              <HeartHandshake size={13} className="text-blue-600" />
               <span>Intervensi Lapangan ({kpi.ditindaklanjuti})</span>
             </Link>
 
@@ -805,7 +815,7 @@ export default function DashboardPage() {
 
           <Link
             href="/pengaduan-admin"
-            className="inline-flex items-center space-x-1 text-xs font-bold text-teal-700 hover:text-teal-800 transition"
+            className="inline-flex items-center space-x-1 text-xs font-bold text-blue-700 hover:text-blue-800 transition"
           >
             <span>Buka Seluruh Pengaduan</span>
             <ChevronRight size={14} />
@@ -845,7 +855,7 @@ export default function DashboardPage() {
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center space-x-2.5">
-                        <div className="w-7 h-7 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center font-extrabold text-[11px] shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-extrabold text-[11px] shrink-0">
                           {p.pelapor ? p.pelapor.charAt(0).toUpperCase() : "W"}
                         </div>
                         <div>
@@ -865,7 +875,7 @@ export default function DashboardPage() {
                       </span>
                     </td>
                     <td className="px-5 py-4 max-w-xs">
-                      <span className="font-bold text-teal-800 block text-[11px]">
+                      <span className="font-bold text-blue-800 block text-[11px]">
                         {p.bidang}
                       </span>
                       <div className="flex flex-wrap gap-1 mt-1">
@@ -885,7 +895,7 @@ export default function DashboardPage() {
                     <td className="px-5 py-4 text-right whitespace-nowrap">
                       <Link
                         href={`/pengaduan-admin?search=${p.nomorPengaduan}`}
-                        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-teal-50 text-teal-700 hover:bg-teal-100 font-bold text-xs transition border border-teal-200/80 shadow-2xs"
+                        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold text-xs transition border border-blue-200/80 shadow-2xs"
                       >
                         <span>Periksa</span>
                         <ArrowRight size={13} />

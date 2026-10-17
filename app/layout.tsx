@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SIPANDU Ceria",
+  title: "Si-Posyandu Tapanuli Selatan",
   description: "Sistem Informasi Posyandu Cepat, Responsif, Integratif, Akuntabel",
   icons: {
     icon: "/favicon.png",

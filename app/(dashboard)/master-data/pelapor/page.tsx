@@ -219,7 +219,7 @@ export default function MasterPelaporPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-1">
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-            <UserCheck className="text-teal-600" size={28} />
+            <UserCheck className="text-blue-600" size={28} />
             <span>Master Data Pelapor Masyarakat</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -229,7 +229,7 @@ export default function MasterPelaporPage() {
 
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs shadow-sm transition hover:shadow shrink-0"
+          className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-sm transition hover:shadow shrink-0"
         >
           <Plus size={16} />
           <span>Tambah Pelapor Baru</span>
@@ -241,7 +241,7 @@ export default function MasterPelaporPage() {
         {/* Sub Header & Search */}
         <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/40">
           <div className="flex items-center space-x-2 text-xs font-bold text-slate-700">
-            <Users size={16} className="text-teal-600" />
+            <Users size={16} className="text-blue-600" />
             <span>Daftar Pelapor Terdaftar</span>
           </div>
 
@@ -255,7 +255,7 @@ export default function MasterPelaporPage() {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition bg-white shadow-2xs"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition bg-white shadow-2xs"
             />
           </div>
         </div>
@@ -264,7 +264,7 @@ export default function MasterPelaporPage() {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-12 text-center text-slate-400 text-xs flex items-center justify-center space-x-2">
-              <RefreshCw size={18} className="animate-spin text-teal-600" />
+              <RefreshCw size={18} className="animate-spin text-blue-600" />
               <span>Memuat data pelapor...</span>
             </div>
           ) : (
@@ -299,7 +299,7 @@ export default function MasterPelaporPage() {
                       <td className="px-5 py-3.5 text-slate-600">
                         {item.noHp ? (
                           <span className="flex items-center space-x-1">
-                            <PhoneCall size={12} className="text-teal-600" />
+                            <PhoneCall size={12} className="text-emerald-600" />
                             <span>{item.noHp}</span>
                           </span>
                         ) : (
@@ -320,7 +320,7 @@ export default function MasterPelaporPage() {
                       </td>
                       <td className="px-5 py-3.5 text-slate-500 max-w-xs truncate">{item.alamat}</td>
                       <td className="px-5 py-3.5 text-center">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
                           {item._count?.pengaduan || 0} Laporan
                         </span>
                       </td>
@@ -328,7 +328,7 @@ export default function MasterPelaporPage() {
                         <div className="flex items-center justify-center space-x-1.5">
                           <button
                             onClick={() => handleOpenEdit(item)}
-                            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-teal-700 transition"
+                            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-blue-700 transition"
                             title="Edit Pelapor"
                           >
                             <Edit size={14} />
@@ -395,7 +395,7 @@ export default function MasterPelaporPage() {
                   placeholder="Contoh: Budi Santoso"
                   value={formData.nama}
                   onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -408,7 +408,7 @@ export default function MasterPelaporPage() {
                     placeholder="1203..."
                     value={formData.nik}
                     onChange={(e) => setFormData({ ...formData, nik: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono"
                   />
                 </div>
                 <div>
@@ -418,7 +418,7 @@ export default function MasterPelaporPage() {
                     placeholder="0812..."
                     value={formData.noHp}
                     onChange={(e) => setFormData({ ...formData, noHp: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -429,7 +429,7 @@ export default function MasterPelaporPage() {
                   <select
                     value={formData.kd_kecamatan}
                     onChange={(e) => setFormData({ ...formData, kd_kecamatan: e.target.value, kd_desa: "" })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                   >
                     <option value="">-- Pilih --</option>
                     {kecamatanList.map((k) => (
@@ -445,7 +445,7 @@ export default function MasterPelaporPage() {
                     value={formData.kd_desa}
                     disabled={!formData.kd_kecamatan}
                     onChange={(e) => setFormData({ ...formData, kd_desa: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white disabled:bg-slate-100"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white disabled:bg-slate-100"
                   >
                     <option value="">-- Pilih --</option>
                     {desaList
@@ -467,7 +467,7 @@ export default function MasterPelaporPage() {
                   placeholder="Dusun / RT / RW / Nama Jalan..."
                   value={formData.alamat}
                   onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -482,7 +482,7 @@ export default function MasterPelaporPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
                 >
                   {submitting && <RefreshCw size={14} className="animate-spin" />}
                   <span>Simpan Data</span>
@@ -524,7 +524,7 @@ export default function MasterPelaporPage() {
                   required
                   value={editFormData.nama}
                   onChange={(e) => setEditFormData({ ...editFormData, nama: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -536,7 +536,7 @@ export default function MasterPelaporPage() {
                     maxLength={16}
                     value={editFormData.nik}
                     onChange={(e) => setEditFormData({ ...editFormData, nik: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono"
                   />
                 </div>
                 <div>
@@ -545,7 +545,7 @@ export default function MasterPelaporPage() {
                     type="text"
                     value={editFormData.noHp}
                     onChange={(e) => setEditFormData({ ...editFormData, noHp: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -556,7 +556,7 @@ export default function MasterPelaporPage() {
                   <select
                     value={editFormData.kd_kecamatan}
                     onChange={(e) => setEditFormData({ ...editFormData, kd_kecamatan: e.target.value, kd_desa: "" })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                   >
                     <option value="">-- Pilih --</option>
                     {kecamatanList.map((k) => (
@@ -572,7 +572,7 @@ export default function MasterPelaporPage() {
                     value={editFormData.kd_desa}
                     disabled={!editFormData.kd_kecamatan}
                     onChange={(e) => setEditFormData({ ...editFormData, kd_desa: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white disabled:bg-slate-100"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white disabled:bg-slate-100"
                   >
                     <option value="">-- Pilih --</option>
                     {desaList
@@ -593,7 +593,7 @@ export default function MasterPelaporPage() {
                   required
                   value={editFormData.alamat}
                   onChange={(e) => setEditFormData({ ...editFormData, alamat: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -608,7 +608,7 @@ export default function MasterPelaporPage() {
                 <button
                   type="submit"
                   disabled={editSubmitting}
-                  className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
                 >
                   {editSubmitting && <RefreshCw size={14} className="animate-spin" />}
                   <span>Simpan Perubahan</span>

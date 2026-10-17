@@ -291,12 +291,12 @@ export default function LaporanRekapSPMPage() {
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-              <BarChart3 className="text-teal-600" size={28} />
+              <BarChart3 className="text-blue-600" size={28} />
               <span>Rekapitulasi Capaian 6 SPM</span>
             </h1>
             {currentUser && (
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200 flex items-center gap-1.5 shadow-2xs">
-                <MapPin size={13} className="text-teal-600" />
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1.5 shadow-2xs">
+                <MapPin size={13} className="text-blue-600" />
                 {currentUser.role === "ADMIN_DESA"
                   ? `Wilayah: Desa ${currentUser.desa?.nm_desa || currentUser.desaId || "-"}`
                   : currentUser.role === "ADMIN_KECAMATAN"
@@ -324,7 +324,7 @@ export default function LaporanRekapSPMPage() {
           <button
             onClick={handlePrint}
             disabled={!hasFiltered || reportData.detailList.length === 0}
-            className="inline-flex items-center space-x-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs shadow-sm transition disabled:opacity-40 disabled:cursor-not-allowed hover:shadow"
+            className="inline-flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold text-xs shadow-sm transition disabled:opacity-40 disabled:cursor-not-allowed hover:shadow"
             title={!hasFiltered ? "Terapkan filter terlebih dahulu" : "Cetak rekapitulasi ke printer atau PDF"}
           >
             <Printer size={15} />
@@ -356,7 +356,7 @@ export default function LaporanRekapSPMPage() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
             />
           </div>
 
@@ -366,7 +366,7 @@ export default function LaporanRekapSPMPage() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
             />
           </div>
 
@@ -379,7 +379,7 @@ export default function LaporanRekapSPMPage() {
                 setSelectedKecamatan(e.target.value);
                 setSelectedDesa("");
               }}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white font-medium disabled:bg-slate-100 disabled:text-slate-500"
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium disabled:bg-slate-100 disabled:text-slate-500"
             >
               <option value="">Semua Kecamatan</option>
               {kecamatanList.map((k) => (
@@ -396,7 +396,7 @@ export default function LaporanRekapSPMPage() {
               value={selectedDesa}
               disabled={currentUser?.role === "ADMIN_DESA"}
               onChange={(e) => setSelectedDesa(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white font-medium disabled:bg-slate-100 disabled:text-slate-500"
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium disabled:bg-slate-100 disabled:text-slate-500"
             >
               <option value="">Semua Desa</option>
               {desaList.map((d) => (
@@ -421,7 +421,7 @@ export default function LaporanRekapSPMPage() {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold transition flex items-center justify-center space-x-1.5 shadow-sm disabled:opacity-50 text-xs"
+              className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold transition flex items-center justify-center space-x-1.5 shadow-sm disabled:opacity-50 text-xs"
             >
               {loading ? <RefreshCw size={14} className="animate-spin" /> : <Filter size={14} />}
               <span>Terapkan Filter</span>
@@ -432,13 +432,13 @@ export default function LaporanRekapSPMPage() {
 
       {!hasFiltered ? (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center flex flex-col items-center justify-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shadow-inner">
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-inner">
             <Filter size={28} />
           </div>
           <div className="max-w-md">
             <h3 className="text-base font-bold text-slate-800">Laporan Belum Ditampilkan</h3>
             <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-              Tampilan awal laporan dalam keadaan kosong. Silakan tentukan kriteria filter (Kecamatan, Desa, atau Periode Tanggal) pada panel di atas, kemudian klik tombol <strong className="text-teal-700">"Terapkan Filter"</strong> untuk menampilkan data rekapitulasi.
+              Tampilan awal laporan dalam keadaan kosong. Silakan tentukan kriteria filter (Kecamatan, Desa, atau Periode Tanggal) pada panel di atas, kemudian klik tombol <strong className="text-blue-700">"Terapkan Filter"</strong> untuk menampilkan data rekapitulasi.
             </p>
           </div>
         </div>
@@ -485,7 +485,7 @@ export default function LaporanRekapSPMPage() {
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4 print:border-none print:shadow-none print:p-0">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center space-x-2">
-            <TrendingUp size={20} className="text-teal-600" />
+            <TrendingUp size={20} className="text-blue-600" />
             <h3 className="font-bold text-sm text-slate-900">Tingkat Penanganan Per 6 Bidang SPM</h3>
           </div>
           <span className="text-xs text-slate-500 font-medium">Standar Pelayanan Minimal</span>
@@ -502,7 +502,7 @@ export default function LaporanRekapSPMPage() {
               </div>
               <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-teal-600 rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-blue-600 to-emerald-500 rounded-full transition-all duration-500"
                   style={{ width: `${b.persentaseSelesai}%` }}
                 />
               </div>
@@ -515,7 +515,7 @@ export default function LaporanRekapSPMPage() {
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden print:border-none print:shadow-none">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between print:hidden">
           <div className="flex items-center space-x-2">
-            <Building2 size={18} className="text-teal-600" />
+            <Building2 size={18} className="text-blue-600" />
             <h3 className="font-bold text-sm text-slate-900">Daftar Detail Pengaduan SPM Masyarakat</h3>
           </div>
           <span className="text-xs text-slate-400 font-medium">
@@ -526,7 +526,7 @@ export default function LaporanRekapSPMPage() {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-12 text-center text-slate-400 text-xs flex items-center justify-center space-x-2">
-              <RefreshCw size={18} className="animate-spin text-teal-600" />
+              <RefreshCw size={18} className="animate-spin text-blue-600" />
               <span>Memuat data laporan...</span>
             </div>
           ) : (
@@ -554,7 +554,7 @@ export default function LaporanRekapSPMPage() {
                     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                     .map((row) => (
                       <tr key={row.id} className="hover:bg-slate-50/50 transition">
-                        <td className="px-4 py-3 font-mono font-bold text-teal-700">{row.nomorPengaduan}</td>
+                        <td className="px-4 py-3 font-mono font-bold text-blue-700">{row.nomorPengaduan}</td>
                         <td className="px-4 py-3 text-slate-500">
                           {new Date(row.tanggal).toLocaleDateString("id-ID", {
                             day: "numeric",
