@@ -735,7 +735,7 @@ export default function SPMHomePage() {
                 <div className="space-y-4 text-xs sm:text-sm">
                   <div className="p-3.5 rounded-xl bg-white/10 border border-white/10">
                     <span className="font-bold text-amber-300 block mb-1">
-                       Undang-Undang No. 23 Tahun 2014
+                      Undang-Undang No. 23 Tahun 2014
                     </span>
                     <p className="text-slate-300 text-xs leading-relaxed">
                       Tentang Pemerintahan Daerah, yang menegaskan bahwa pelayanan dasar merupakan urusan pemerintahan wajib bagi Pemerintah Daerah.
@@ -1337,7 +1337,7 @@ export default function SPMHomePage() {
                 </li>
                 <li>
                   <Link href="/login" className="hover:text-white transition">
-                    Panel Dinsos / Dinkes Kabupaten
+                    Panel Dinas/Kabupaten
                   </Link>
                 </li>
               </ul>

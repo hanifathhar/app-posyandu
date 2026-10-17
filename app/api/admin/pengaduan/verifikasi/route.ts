@@ -114,7 +114,7 @@ export async function POST(request: Request) {
         keterangan = `Verifikasi Desa disetujui oleh kader/admin desa. Diteruskan ke verifikasi Kecamatan.`;
       } else if (tahap === "KECAMATAN") {
         statusSesudah = StatusPengaduan.MENUNGGU_VERIFIKASI_KABUPATEN;
-        keterangan = `Verifikasi Kecamatan disetujui oleh Kasi Kessos/Camat. Diteruskan ke Dinas Kabupaten terkait.`;
+        keterangan = `Verifikasi Kecamatan disetujui oleh Admin Kecamatan. Diteruskan ke Dinas Kabupaten terkait.`;
       } else if (tahap === "KABUPATEN") {
         statusSesudah = StatusPengaduan.DITINDAKLANJUTI;
         keterangan = `Verifikasi Kabupaten disetujui oleh OPD Pengampu SPM. Pengaduan masuk tahap tindak lanjut/intervensi.`;

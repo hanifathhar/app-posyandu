@@ -531,11 +531,10 @@ function PengaduanMasyarakatContent() {
               setActiveTab("form");
               setSubmitSuccess(null);
             }}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-              activeTab === "form"
-                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm"
-                : "text-slate-600 hover:text-blue-700 hover:bg-slate-100/70"
-            }`}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === "form"
+              ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm"
+              : "text-slate-600 hover:text-blue-700 hover:bg-slate-100/70"
+              }`}
           >
             <FileText className="w-4 h-4 shrink-0" />
             <span>Buat Pengaduan</span>
@@ -547,11 +546,10 @@ function PengaduanMasyarakatContent() {
               setActiveTab("lacak");
               setSubmitSuccess(null);
             }}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-              activeTab === "lacak"
-                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-sm"
-                : "text-slate-600 hover:text-purple-700 hover:bg-slate-100/70"
-            }`}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTab === "lacak"
+              ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-sm"
+              : "text-slate-600 hover:text-purple-700 hover:bg-slate-100/70"
+              }`}
           >
             <Search className="w-4 h-4 shrink-0" />
             <span>Lacak Status</span>
@@ -685,420 +683,417 @@ function PengaduanMasyarakatContent() {
             </div>
           ) : (
             <div className="bg-white rounded-3xl border border-slate-200/90 shadow-md overflow-hidden">
-            {/* Header Form */}
-            <div className="border-b border-slate-100 px-5 sm:px-8 py-4 sm:py-5 bg-slate-50/70 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <h3 className="text-base sm:text-lg font-black text-slate-900">
-                  Formulir Pengaduan Masyarakat
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Silakan isi data pengaduan Anda dengan informasi yang valid dan sebenarnya.
-                </p>
-              </div>
-              <span className="text-[11px] font-bold px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg">
-                6 Bidang SPM
-              </span>
-            </div>
-
-            {/* Alert Error Form */}
-            {errorMsg && (
-              <div className="m-4 sm:m-6 p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl text-xs sm:text-sm flex items-start gap-2.5 font-medium">
-                <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-                <span className="leading-snug">{errorMsg}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-7 sm:space-y-8">
-              {/* BAGIAN 1: IDENTITAS PELAPOR */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
-                  <div className="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-sm shadow-blue-500/20">
-                    1
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-slate-900 text-sm">
-                      Identitas Pelapor
-                    </h4>
-                    <p className="text-[11px] text-slate-400">
-                      Data digunakan untuk verifikasi dan konfirmasi tindak lanjut oleh petugas
-                    </p>
-                  </div>
+              {/* Header Form */}
+              <div className="border-b border-slate-100 px-5 sm:px-8 py-4 sm:py-5 bg-slate-50/70 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900">
+                    Formulir Pengaduan Masyarakat
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Silakan isi data pengaduan Anda dengan informasi yang valid dan sebenarnya.
+                  </p>
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                      Nama Lengkap <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: Siti Aisyah Daulay"
-                      value={nama}
-                      onChange={(e) => setNama(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                      Nomor WhatsApp / HP Aktif <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="Contoh: 08126345xxxx"
-                      value={noHp}
-                      onChange={(e) => setNoHp(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium"
-                    />
-                    <span className="text-[10px] sm:text-[11px] text-slate-400 mt-1 block">
-                      Untuk konfirmasi jadwal kunjungan kader/petugas posyandu
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                      NIK KTP <span className="text-slate-400 font-normal lowercase">(opsional)</span>
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={16}
-                      placeholder="16 digit NIK kepala keluarga / pelapor"
-                      value={nik}
-                      onChange={(e) => setNik(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                      Alamat Domisili Lengkap <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Nama jalan, RT/RW, Dusun"
-                      value={alamat}
-                      onChange={(e) => setAlamat(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium"
-                    />
-                  </div>
-                </div>
+                <span className="text-[11px] font-bold px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg">
+                  6 Bidang SPM
+                </span>
               </div>
 
-              {/* BAGIAN 2: LOKASI & POSYANDU */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
-                  <div className="w-7 h-7 rounded-xl bg-purple-600 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-sm shadow-purple-500/20">
-                    2
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-slate-900 text-sm">
-                      Wilayah & Posyandu Sasaran
-                    </h4>
-                    <p className="text-[11px] text-slate-400">
-                      Pilih lokasi agar laporan langsung diteruskan ke Posyandu & Desa setempat
-                    </p>
-                  </div>
+              {/* Alert Error Form */}
+              {errorMsg && (
+                <div className="m-4 sm:m-6 p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl text-xs sm:text-sm flex items-start gap-2.5 font-medium">
+                  <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                  <span className="leading-snug">{errorMsg}</span>
                 </div>
+              )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                      Kecamatan <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      required
-                      value={selectedKecamatan}
-                      onChange={(e) => setSelectedKecamatan(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition bg-white font-medium"
-                    >
-                      <option value="">-- Pilih Kecamatan --</option>
-                      {kecamatans.map((kec) => (
-                        <option key={kec.kd_kecamatan} value={kec.kd_kecamatan}>
-                          {kec.nm_kecamatan}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                      Desa / Kelurahan <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      required
-                      disabled={!selectedKecamatan}
-                      value={selectedDesa}
-                      onChange={(e) => setSelectedDesa(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition bg-white disabled:bg-slate-100 disabled:text-slate-400 font-medium"
-                    >
-                      <option value="">
-                        {selectedKecamatan ? "-- Pilih Desa --" : "Pilih Kecamatan Dahulu"}
-                      </option>
-                      {desas.map((d) => (
-                        <option key={d.kd_desa} value={d.kd_desa}>
-                          {d.nm_desa}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                      Posyandu Terdekat <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      required
-                      disabled={!selectedDesa}
-                      value={selectedPosyandu}
-                      onChange={(e) => setSelectedPosyandu(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition bg-white disabled:bg-slate-100 disabled:text-slate-400 font-medium"
-                    >
-                      <option value="">
-                        {selectedDesa ? "-- Pilih Posyandu --" : "Pilih Desa Dahulu"}
-                      </option>
-                      {posyandus.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.nama_posyandu}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* BAGIAN 3: BIDANG SPM & PERMASALAHAN */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
-                  <div className="w-7 h-7 rounded-xl bg-orange-500 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-sm shadow-orange-500/20">
-                    3
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-slate-900 text-sm">
-                      Pilih Bidang SPM & Kategori Masalah
-                    </h4>
-                    <p className="text-[11px] text-slate-400">
-                      Tentukan jenis layanan dasar SPM yang membutuhkan penanganan
-                    </p>
-                  </div>
-                </div>
-
-                {/* PILIHAN 6 BIDANG SPM (Grid 2 Kolom Mobile, 3 Kolom Desktop) */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
-                  {bidangs.map((b) => {
-                    const isSelected = selectedBidangId === b.id;
-                    return (
-                      <button
-                        type="button"
-                        key={b.id}
-                        onClick={() => setSelectedBidangId(b.id)}
-                        className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all relative flex flex-col justify-between cursor-pointer ${
-                          isSelected
-                            ? "border-orange-500 bg-orange-50/70 ring-2 ring-orange-500/20 shadow-sm"
-                            : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/60"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="p-1.5 sm:p-2 rounded-xl bg-white shadow-2xs border border-slate-100 shrink-0">
-                            {getBidangIcon(b.kode)}
-                          </div>
-                          {isSelected && (
-                            <CheckCircle2 className="w-4 h-4 text-orange-600 shrink-0" />
-                          )}
-                        </div>
-                        <span className="text-[11px] sm:text-xs font-bold text-slate-900 leading-snug line-clamp-2">
-                          {b.nm_bidang}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* PILIH JENIS PENGADUAN DENGAN CHECKBOX */}
-                <div className="space-y-2.5 pt-2">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
+              <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-7 sm:space-y-8">
+                {/* BAGIAN 1: IDENTITAS PELAPOR */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
+                    <div className="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-sm shadow-blue-500/20">
+                      1
+                    </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">
-                        Kategori Masalah SPM <span className="text-rose-500">*</span>
+                      <h4 className="font-extrabold text-slate-900 text-sm">
+                        Identitas Pelapor
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        Data digunakan untuk verifikasi dan konfirmasi tindak lanjut oleh petugas
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        Nama Lengkap <span className="text-rose-500">*</span>
                       </label>
-                      <span className="text-[10px] sm:text-[11px] text-slate-500">
-                        Bisa pilih lebih dari satu ({selectedJenisIds.length} dipilih)
+                      <input
+                        type="text"
+                        required
+                        placeholder="Contoh: Siti Aisyah Daulay"
+                        value={nama}
+                        onChange={(e) => setNama(e.target.value)}
+                        className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        Nomor WhatsApp / HP Aktif <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="Contoh: 08126345xxxx"
+                        value={noHp}
+                        onChange={(e) => setNoHp(e.target.value)}
+                        className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium"
+                      />
+                      <span className="text-[10px] sm:text-[11px] text-slate-400 mt-1 block">
+                        Untuk konfirmasi jadwal kunjungan kader/petugas posyandu
                       </span>
                     </div>
 
-                    {jenisList.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={handleSelectAllJenis}
-                        className="text-[11px] text-orange-700 hover:text-orange-900 font-bold transition py-1 px-2.5 rounded-lg border border-orange-200 bg-orange-50/60 hover:bg-orange-100 cursor-pointer"
-                      >
-                        {selectedJenisIds.length === jenisList.length
-                          ? "Hapus Semua"
-                          : "Pilih Semua Kategori"}
-                      </button>
-                    )}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        NIK KTP <span className="text-slate-400 font-normal lowercase">(opsional)</span>
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={16}
+                        placeholder="16 digit NIK kepala keluarga / pelapor"
+                        value={nik}
+                        onChange={(e) => setNik(e.target.value)}
+                        className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        Alamat Domisili Lengkap <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Nama jalan, RT/RW, Dusun"
+                        value={alamat}
+                        onChange={(e) => setAlamat(e.target.value)}
+                        className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* BAGIAN 2: LOKASI & POSYANDU */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
+                    <div className="w-7 h-7 rounded-xl bg-purple-600 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-sm shadow-purple-500/20">
+                      2
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">
+                        Wilayah & Posyandu Sasaran
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        Pilih lokasi agar laporan langsung diteruskan ke Posyandu & Desa setempat
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                    {jenisList.map((j) => {
-                      const isChecked = selectedJenisIds.includes(j.id);
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        Kecamatan <span className="text-rose-500">*</span>
+                      </label>
+                      <select
+                        required
+                        value={selectedKecamatan}
+                        onChange={(e) => setSelectedKecamatan(e.target.value)}
+                        className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition bg-white font-medium"
+                      >
+                        <option value="">-- Pilih Kecamatan --</option>
+                        {kecamatans.map((kec) => (
+                          <option key={kec.kd_kecamatan} value={kec.kd_kecamatan}>
+                            {kec.nm_kecamatan}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        Desa / Kelurahan <span className="text-rose-500">*</span>
+                      </label>
+                      <select
+                        required
+                        disabled={!selectedKecamatan}
+                        value={selectedDesa}
+                        onChange={(e) => setSelectedDesa(e.target.value)}
+                        className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition bg-white disabled:bg-slate-100 disabled:text-slate-400 font-medium"
+                      >
+                        <option value="">
+                          {selectedKecamatan ? "-- Pilih Desa --" : "Pilih Kecamatan Dahulu"}
+                        </option>
+                        {desas.map((d) => (
+                          <option key={d.kd_desa} value={d.kd_desa}>
+                            {d.nm_desa}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        Posyandu Terdekat <span className="text-rose-500">*</span>
+                      </label>
+                      <select
+                        required
+                        disabled={!selectedDesa}
+                        value={selectedPosyandu}
+                        onChange={(e) => setSelectedPosyandu(e.target.value)}
+                        className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition bg-white disabled:bg-slate-100 disabled:text-slate-400 font-medium"
+                      >
+                        <option value="">
+                          {selectedDesa ? "-- Pilih Posyandu --" : "Pilih Desa Dahulu"}
+                        </option>
+                        {posyandus.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.nama_posyandu}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* BAGIAN 3: BIDANG SPM & PERMASALAHAN */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
+                    <div className="w-7 h-7 rounded-xl bg-orange-500 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-sm shadow-orange-500/20">
+                      3
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">
+                        Pilih Bidang SPM & Kategori Masalah
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        Tentukan jenis layanan dasar SPM yang membutuhkan penanganan
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* PILIHAN 6 BIDANG SPM (Grid 2 Kolom Mobile, 3 Kolom Desktop) */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
+                    {bidangs.map((b) => {
+                      const isSelected = selectedBidangId === b.id;
                       return (
-                        <div
-                          key={j.id}
-                          onClick={() => handleToggleJenis(j.id)}
-                          className={`p-3 sm:p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-3 select-none ${
-                            isChecked
-                              ? "border-orange-500 bg-orange-50/80 ring-1 ring-orange-500/30 shadow-2xs"
-                              : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/70"
-                          }`}
+                        <button
+                          type="button"
+                          key={b.id}
+                          onClick={() => setSelectedBidangId(b.id)}
+                          className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all relative flex flex-col justify-between cursor-pointer ${isSelected
+                            ? "border-orange-500 bg-orange-50/70 ring-2 ring-orange-500/20 shadow-sm"
+                            : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/60"
+                            }`}
                         >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => {}}
-                            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500 pointer-events-none accent-orange-600 shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <span
-                              className={`text-xs font-bold block leading-snug ${
-                                isChecked ? "text-orange-950 font-extrabold" : "text-slate-800"
-                              }`}
-                            >
-                              {j.nama}
-                            </span>
-                            {j.deskripsi && (
-                              <p className="text-[10px] sm:text-[11px] text-slate-500 mt-0.5 leading-snug">
-                                {j.deskripsi}
-                              </p>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="p-1.5 sm:p-2 rounded-xl bg-white shadow-2xs border border-slate-100 shrink-0">
+                              {getBidangIcon(b.kode)}
+                            </div>
+                            {isSelected && (
+                              <CheckCircle2 className="w-4 h-4 text-orange-600 shrink-0" />
                             )}
                           </div>
-                        </div>
+                          <span className="text-[11px] sm:text-xs font-bold text-slate-900 leading-snug line-clamp-2">
+                            {b.nm_bidang}
+                          </span>
+                        </button>
                       );
                     })}
                   </div>
 
-                  {selectedJenisIds.length === 0 && (
-                    <p className="text-[11px] text-amber-600 mt-1 flex items-center gap-1 font-medium">
-                      <span>⚠️ Harap pilih minimal satu kategori masalah di atas.</span>
-                    </p>
-                  )}
-                </div>
+                  {/* PILIH JENIS PENGADUAN DENGAN CHECKBOX */}
+                  <div className="space-y-2.5 pt-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">
+                          Kategori Masalah SPM <span className="text-rose-500">*</span>
+                        </label>
+                        <span className="text-[10px] sm:text-[11px] text-slate-500">
+                          Bisa pilih lebih dari satu ({selectedJenisIds.length} dipilih)
+                        </span>
+                      </div>
 
-                {/* DESKRIPSI PENGADUAN */}
-                <div className="pt-2">
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                    Uraian Masalah / Kebutuhan Bantuan <span className="text-rose-500">*</span>
-                  </label>
-                  <textarea
-                    required
-                    rows={4}
-                    placeholder="Jelaskan secara rinci kondisi di lapangan, nama warga/balita sasaran, alamat spesifik, dan bantuan yang mendesak dibutuhkan..."
-                    value={deskripsi}
-                    onChange={(e) => setDeskripsi(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition resize-y font-medium leading-relaxed"
-                  />
-                  <div className="flex justify-between items-center text-[10px] sm:text-[11px] text-slate-400 mt-1 font-medium">
-                    <span>Minimal 15 karakter</span>
-                    <span>{deskripsi.length} karakter</span>
-                  </div>
-                </div>
-              </div>
+                      {jenisList.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleSelectAllJenis}
+                          className="text-[11px] text-orange-700 hover:text-orange-900 font-bold transition py-1 px-2.5 rounded-lg border border-orange-200 bg-orange-50/60 hover:bg-orange-100 cursor-pointer"
+                        >
+                          {selectedJenisIds.length === jenisList.length
+                            ? "Hapus Semua"
+                            : "Pilih Semua Kategori"}
+                        </button>
+                      )}
+                    </div>
 
-              {/* BAGIAN 4: DOKUMEN PENDUKUNG (OPSIONAL) */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
-                  <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-sm shadow-emerald-500/20">
-                    4
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-slate-900 text-sm">
-                      Dokumen / Foto Lapangan (Opsional)
-                    </h4>
-                    <p className="text-[11px] text-slate-400">
-                      Lampirkan bukti foto untuk mempercepat verifikasi faktual kader desa
-                    </p>
-                  </div>
-                </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                      {jenisList.map((j) => {
+                        const isChecked = selectedJenisIds.includes(j.id);
+                        return (
+                          <div
+                            key={j.id}
+                            onClick={() => handleToggleJenis(j.id)}
+                            className={`p-3 sm:p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-3 select-none ${isChecked
+                              ? "border-orange-500 bg-orange-50/80 ring-1 ring-orange-500/30 shadow-2xs"
+                              : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/70"
+                              }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => { }}
+                              className="mt-0.5 h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500 pointer-events-none accent-orange-600 shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span
+                                className={`text-xs font-bold block leading-snug ${isChecked ? "text-orange-950 font-extrabold" : "text-slate-800"
+                                  }`}
+                              >
+                                {j.nama}
+                              </span>
+                              {j.deskripsi && (
+                                <p className="text-[10px] sm:text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                  {j.deskripsi}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="border border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-4 text-center transition bg-slate-50/60">
-                    <Upload className="w-6 h-6 text-slate-400 mx-auto mb-1.5" />
-                    <span className="text-xs font-bold text-slate-800 block">
-                      Foto KTP / KK Pelapor
-                    </span>
-                    <span className="text-[10px] sm:text-[11px] text-slate-400 block mb-2.5">
-                      Format JPG, PNG (Maks 3MB)
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleFileUpload(e, "KTP")}
-                      className="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                    {selectedJenisIds.length === 0 && (
+                      <p className="text-[11px] text-amber-600 mt-1 flex items-center gap-1 font-medium">
+                        <span>⚠️ Harap pilih minimal satu kategori masalah di atas.</span>
+                      </p>
+                    )}
+                  </div>
+
+                  {/* DESKRIPSI PENGADUAN */}
+                  <div className="pt-2">
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                      Uraian Masalah / Kebutuhan Bantuan <span className="text-rose-500">*</span>
+                    </label>
+                    <textarea
+                      required
+                      rows={4}
+                      placeholder="Jelaskan secara rinci kondisi di lapangan, nama warga/balita sasaran, alamat spesifik, dan bantuan yang mendesak dibutuhkan..."
+                      value={deskripsi}
+                      onChange={(e) => setDeskripsi(e.target.value)}
+                      className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition resize-y font-medium leading-relaxed"
                     />
-                  </div>
-
-                  <div className="border border-dashed border-slate-300 hover:border-purple-500 rounded-2xl p-4 text-center transition bg-slate-50/60">
-                    <Upload className="w-6 h-6 text-slate-400 mx-auto mb-1.5" />
-                    <span className="text-xs font-bold text-slate-800 block">
-                      Foto Kondisi / Bukti Lapangan
-                    </span>
-                    <span className="text-[10px] sm:text-[11px] text-slate-400 block mb-2.5">
-                      Foto anak/balita, kondisi rumah, sanitasi, dll.
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleFileUpload(e, "DOKUMEN_LAINNYA")}
-                      className="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer"
-                    />
+                    <div className="flex justify-between items-center text-[10px] sm:text-[11px] text-slate-400 mt-1 font-medium">
+                      <span>Minimal 15 karakter</span>
+                      <span>{deskripsi.length} karakter</span>
+                    </div>
                   </div>
                 </div>
 
-                {dokumenList.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {dokumenList.map((doc, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-medium"
-                      >
-                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span className="truncate max-w-[200px]">{doc.namaFile}</span>
+                {/* BAGIAN 4: DOKUMEN PENDUKUNG (OPSIONAL) */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2.5 border-b border-slate-100 pb-2.5">
+                    <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-sm shadow-emerald-500/20">
+                      4
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">
+                        Dokumen / Foto Lapangan (Opsional)
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        Lampirkan bukti foto untuk mempercepat verifikasi faktual kader desa
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="border border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-4 text-center transition bg-slate-50/60">
+                      <Upload className="w-6 h-6 text-slate-400 mx-auto mb-1.5" />
+                      <span className="text-xs font-bold text-slate-800 block">
+                        Foto KTP / KK Pelapor
                       </span>
-                    ))}
+                      <span className="text-[10px] sm:text-[11px] text-slate-400 block mb-2.5">
+                        Format JPG, PNG (Maks 3MB)
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileUpload(e, "KTP")}
+                        className="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="border border-dashed border-slate-300 hover:border-purple-500 rounded-2xl p-4 text-center transition bg-slate-50/60">
+                      <Upload className="w-6 h-6 text-slate-400 mx-auto mb-1.5" />
+                      <span className="text-xs font-bold text-slate-800 block">
+                        Foto Kondisi / Bukti Lapangan
+                      </span>
+                      <span className="text-[10px] sm:text-[11px] text-slate-400 block mb-2.5">
+                        Foto anak/balita, kondisi rumah, sanitasi, dll.
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileUpload(e, "DOKUMEN_LAINNYA")}
+                        className="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer"
+                      />
+                    </div>
                   </div>
-                )}
-              </div>
 
-              {/* TOMBOL SUBMIT RESPONSIF */}
-              <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p className="text-[11px] sm:text-xs text-slate-500 text-center sm:text-left leading-relaxed">
-                  Laporan akan diproses secara berjenjang oleh Posyandu, Desa, Kecamatan, dan Pemerintah Kabupaten.
-                </p>
-
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-blue-600/25 transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shrink-0"
-                >
-                  {submitting ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Sedang Mengirim...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Kirimkan Pengaduan</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>
+                  {dokumenList.length > 0 && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {dokumenList.map((doc, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-medium"
+                        >
+                          <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                          <span className="truncate max-w-[200px]">{doc.namaFile}</span>
+                        </span>
+                      ))}
+                    </div>
                   )}
-                </button>
-              </div>
-            </form>
-          </div>
-        )
-      )}
+                </div>
+
+                {/* TOMBOL SUBMIT RESPONSIF */}
+                <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <p className="text-[11px] sm:text-xs text-slate-500 text-center sm:text-left leading-relaxed">
+                    Laporan akan diproses secara berjenjang oleh Posyandu, Desa, Kecamatan, dan Pemerintah Kabupaten.
+                  </p>
+
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-blue-600/25 transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shrink-0"
+                  >
+                    {submitting ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Sedang Mengirim...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Kirimkan Pengaduan</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )
+        )}
 
         {/* ========================================================= */}
         {/* TAB 2: PELACAKAN STATUS PENGADUAN */}
@@ -1194,14 +1189,26 @@ function PengaduanMasyarakatContent() {
                         1
                       </div>
                       <span className="text-xs font-bold text-slate-900 block truncate">
-                        Pendaftaran
+                        Pelapor
                       </span>
                       <span className="text-[10px] text-blue-700 block">Oleh Warga</span>
                     </div>
 
                     <div
-                      className={`p-3 rounded-2xl border ${
-                        [
+                      className={`p-3 rounded-2xl border ${[
+                        "MENUNGGU_VERIFIKASI_DESA",
+                        "MENUNGGU_VERIFIKASI_KECAMATAN",
+                        "MENUNGGU_VERIFIKASI_KABUPATEN",
+                        "DISETUJUI",
+                        "DITINDAKLANJUTI",
+                        "SELESAI",
+                      ].includes(trackingResult.status)
+                        ? "border-purple-200 bg-purple-50/80 shadow-2xs"
+                        : "border-slate-200 bg-slate-50"
+                        }`}
+                    >
+                      <div
+                        className={`w-6 h-6 rounded-full text-xs font-bold mx-auto flex items-center justify-center mb-1 ${[
                           "MENUNGGU_VERIFIKASI_DESA",
                           "MENUNGGU_VERIFIKASI_KECAMATAN",
                           "MENUNGGU_VERIFIKASI_KABUPATEN",
@@ -1209,23 +1216,9 @@ function PengaduanMasyarakatContent() {
                           "DITINDAKLANJUTI",
                           "SELESAI",
                         ].includes(trackingResult.status)
-                          ? "border-purple-200 bg-purple-50/80 shadow-2xs"
-                          : "border-slate-200 bg-slate-50"
-                      }`}
-                    >
-                      <div
-                        className={`w-6 h-6 rounded-full text-xs font-bold mx-auto flex items-center justify-center mb-1 ${
-                          [
-                            "MENUNGGU_VERIFIKASI_DESA",
-                            "MENUNGGU_VERIFIKASI_KECAMATAN",
-                            "MENUNGGU_VERIFIKASI_KABUPATEN",
-                            "DISETUJUI",
-                            "DITINDAKLANJUTI",
-                            "SELESAI",
-                          ].includes(trackingResult.status)
-                            ? "bg-purple-600 text-white"
-                            : "bg-slate-300 text-slate-600"
-                        }`}
+                          ? "bg-purple-600 text-white"
+                          : "bg-slate-300 text-slate-600"
+                          }`}
                       >
                         2
                       </div>
@@ -1236,52 +1229,48 @@ function PengaduanMasyarakatContent() {
                     </div>
 
                     <div
-                      className={`p-3 rounded-2xl border ${
-                        [
+                      className={`p-3 rounded-2xl border ${[
+                        "MENUNGGU_VERIFIKASI_KECAMATAN",
+                        "MENUNGGU_VERIFIKASI_KABUPATEN",
+                        "DISETUJUI",
+                        "DITINDAKLANJUTI",
+                        "SELESAI",
+                      ].includes(trackingResult.status)
+                        ? "border-orange-200 bg-orange-50/80 shadow-2xs"
+                        : "border-slate-200 bg-slate-50"
+                        }`}
+                    >
+                      <div
+                        className={`w-6 h-6 rounded-full text-xs font-bold mx-auto flex items-center justify-center mb-1 ${[
                           "MENUNGGU_VERIFIKASI_KECAMATAN",
                           "MENUNGGU_VERIFIKASI_KABUPATEN",
                           "DISETUJUI",
                           "DITINDAKLANJUTI",
                           "SELESAI",
                         ].includes(trackingResult.status)
-                          ? "border-orange-200 bg-orange-50/80 shadow-2xs"
-                          : "border-slate-200 bg-slate-50"
-                      }`}
-                    >
-                      <div
-                        className={`w-6 h-6 rounded-full text-xs font-bold mx-auto flex items-center justify-center mb-1 ${
-                          [
-                            "MENUNGGU_VERIFIKASI_KECAMATAN",
-                            "MENUNGGU_VERIFIKASI_KABUPATEN",
-                            "DISETUJUI",
-                            "DITINDAKLANJUTI",
-                            "SELESAI",
-                          ].includes(trackingResult.status)
-                            ? "bg-orange-500 text-white"
-                            : "bg-slate-300 text-slate-600"
-                        }`}
+                          ? "bg-orange-500 text-white"
+                          : "bg-slate-300 text-slate-600"
+                          }`}
                       >
                         3
                       </div>
                       <span className="text-xs font-bold text-slate-900 block truncate">
-                        Verifikasi Camat
+                        Verifikasi Kecamatan
                       </span>
-                      <span className="text-[10px] text-orange-700 block">Kasi Kessos</span>
+                      <span className="text-[10px] text-orange-700 block">Admin Kecamatan</span>
                     </div>
 
                     <div
-                      className={`p-3 rounded-2xl border ${
-                        ["DITINDAKLANJUTI", "SELESAI"].includes(trackingResult.status)
-                          ? "border-emerald-200 bg-emerald-50/80 shadow-2xs"
-                          : "border-slate-200 bg-slate-50"
-                      }`}
+                      className={`p-3 rounded-2xl border ${["DITINDAKLANJUTI", "SELESAI"].includes(trackingResult.status)
+                        ? "border-emerald-200 bg-emerald-50/80 shadow-2xs"
+                        : "border-slate-200 bg-slate-50"
+                        }`}
                     >
                       <div
-                        className={`w-6 h-6 rounded-full text-xs font-bold mx-auto flex items-center justify-center mb-1 ${
-                          ["DITINDAKLANJUTI", "SELESAI"].includes(trackingResult.status)
-                            ? "bg-emerald-600 text-white"
-                            : "bg-slate-300 text-slate-600"
-                        }`}
+                        className={`w-6 h-6 rounded-full text-xs font-bold mx-auto flex items-center justify-center mb-1 ${["DITINDAKLANJUTI", "SELESAI"].includes(trackingResult.status)
+                          ? "bg-emerald-600 text-white"
+                          : "bg-slate-300 text-slate-600"
+                          }`}
                       >
                         4
                       </div>
