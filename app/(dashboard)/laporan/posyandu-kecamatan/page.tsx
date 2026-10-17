@@ -87,12 +87,13 @@ export default function LaporanPosyanduKecamatanPage() {
       .then((r) => r.json())
       .then((d) => {
         if (d.user) {
+          if (d.user.role === "ADMIN_DESA") {
+            window.location.href = "/unauthorized";
+            return;
+          }
           setCurrentUser(d.user);
           if (d.user.role === "ADMIN_KECAMATAN" && d.user.kecamatanId) {
             setSelectedKecamatan(d.user.kecamatanId);
-          } else if (d.user.role === "ADMIN_DESA") {
-            if (d.user.kecamatanId) setSelectedKecamatan(d.user.kecamatanId);
-            if (d.user.desaId) setSelectedDesa(d.user.desaId);
           }
         }
       })

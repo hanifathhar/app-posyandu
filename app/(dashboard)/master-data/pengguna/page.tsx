@@ -18,6 +18,8 @@ import {
   UserCheck,
   Edit,
   Trash2,
+  Lock,
+  Filter,
 } from "lucide-react";
 import { CustomPagination } from "@/components/CustomPagination";
 
@@ -30,7 +32,7 @@ interface PenggunaSPM {
   kecamatanId: string | null;
   desaId: string | null;
   kecamatan?: { nm_kecamatan: string };
-  desa?: { nm_desa: string };
+  desa?: { nm_desa: string; kd_kecamatan?: string };
   _count?: {
     verifikasiPengaduan: number;
     tindakLanjut: number;
@@ -39,12 +41,14 @@ interface PenggunaSPM {
 }
 
 export default function ManajemenPenggunaPage() {
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [users, setUsers] = useState<PenggunaSPM[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [kecamatanFilter, setKecamatanFilter] = useState("");
 
-  // Referensi Wilayah untuk Assignment Form
+  // Referensi Wilayah untuk Assignment Form & Filter
   const [kecamatanList, setKecamatanList] = useState<any[]>([]);
   const [desaList, setDesaList] = useState<any[]>([]);
 
@@ -85,14 +89,102 @@ export default function ManajemenPenggunaPage() {
   const [deleteSubmitting, setDeleteSubmitting] = useState(false);
   const [deleteFeedback, setDeleteFeedback] = useState<string | null>(null);
 
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/master-data/pengguna");
+      const json = await res.json();
+      if (json.success) {
+        setUsers(json.data);
+      }
+    } catch (e) {
+      console.error("Gagal load users:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Ambil info session user yang login
+    fetch("/api/me")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.user) {
+          setCurrentUser(d.user);
+          if (d.user.role === "ADMIN_KECAMATAN" && d.user.kecamatanId) {
+            setKecamatanFilter(d.user.kecamatanId);
+          }
+        }
+      })
+      .catch((err) => console.error("Gagal mengambil data user:", err));
+
+    fetchUsers();
+
+    // Load Wilayah for assignment and filtering
+    fetch("/api/admin/master-data/wilayah?type=kecamatan")
+      .then((r) => r.json())
+      .then((d) => d.success && setKecamatanList(d.data));
+    fetch("/api/admin/master-data/wilayah?type=desa")
+      .then((r) => r.json())
+      .then((d) => d.success && setDesaList(d.data));
+  }, []);
+
+  // Periksa apakah user yang sedang login boleh menambah user
+  // superadmin: boleh
+  // admin kabupaten: boleh
+  // admin kecamatan: boleh
+  // admin desa: tidak dapat menambah user
+  const canAddUser = currentUser && currentUser.role !== "ADMIN_DESA";
+
+  // Periksa apakah user yang sedang login boleh mengedit/menghapus user tertentu
+  const canManageTargetUser = (target: PenggunaSPM) => {
+    if (!currentUser) return false;
+    if (currentUser.role === "SUPERADMIN") return true;
+
+    if (currentUser.role === "ADMIN_KABUPATEN") {
+      return target.role === "ADMIN_KECAMATAN" || target.role === "ADMIN_DESA";
+    }
+
+    if (currentUser.role === "ADMIN_KECAMATAN") {
+      const targetKecId = target.kecamatanId || target.desa?.kd_kecamatan;
+      return target.role === "ADMIN_DESA" && targetKecId === currentUser.kecamatanId;
+    }
+
+    return false; // ADMIN_DESA atau role lain tidak boleh edit/hapus
+  };
+
+  const handleOpenCreateModal = () => {
+    setFeedback(null);
+    let defaultRole = "ADMIN_DESA";
+    let defaultKecamatan = "";
+
+    if (currentUser?.role === "ADMIN_KECAMATAN") {
+      defaultRole = "ADMIN_DESA";
+      defaultKecamatan = currentUser.kecamatanId || "";
+    } else if (currentUser?.role === "ADMIN_KABUPATEN") {
+      defaultRole = "ADMIN_KECAMATAN";
+    }
+
+    setFormData({
+      nama: "",
+      username: "",
+      password: "",
+      role: defaultRole,
+      kecamatanId: defaultKecamatan,
+      desaId: "",
+    });
+    setModalOpen(true);
+  };
+
   const handleOpenEditModal = (u: PenggunaSPM) => {
+    if (!canManageTargetUser(u)) return;
     setEditItem(u);
     setEditForm({
       nama: u.nama,
       username: u.username,
       password: "",
       role: u.role,
-      kecamatanId: u.kecamatanId || "",
+      kecamatanId: u.kecamatanId || u.desa?.kd_kecamatan || "",
       desaId: u.desaId || "",
     });
     setEditFeedback(null);
@@ -129,6 +221,7 @@ export default function ManajemenPenggunaPage() {
   };
 
   const handleOpenDeleteModal = (u: PenggunaSPM) => {
+    if (!canManageTargetUser(u)) return;
     setDeleteItem(u);
     setDeleteFeedback(null);
     setDeleteModalOpen(true);
@@ -153,38 +246,13 @@ export default function ManajemenPenggunaPage() {
     }
   };
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/master-data/pengguna");
-      const json = await res.json();
-      if (json.success) {
-        setUsers(json.data);
-      }
-    } catch (e) {
-      console.error("Gagal load users:", e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-    // Load Wilayah for assignment
-    fetch("/api/admin/master-data/wilayah?type=kecamatan")
-      .then((r) => r.json())
-      .then((d) => d.success && setKecamatanList(d.data));
-    fetch("/api/admin/master-data/wilayah?type=desa")
-      .then((r) => r.json())
-      .then((d) => d.success && setDesaList(d.data));
-  }, []);
-
-  const handleToggleAktif = async (id: string, currentAktif: boolean) => {
+  const handleToggleAktif = async (targetUser: PenggunaSPM) => {
+    if (!canManageTargetUser(targetUser)) return;
     try {
       const res = await fetch("/api/admin/master-data/pengguna", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, aktif: !currentAktif }),
+        body: JSON.stringify({ id: targetUser.id, aktif: !targetUser.aktif }),
       });
       const json = await res.json();
       if (json.success) {
@@ -249,6 +317,7 @@ export default function ManajemenPenggunaPage() {
     }
   };
 
+  // Filter daftar pengguna berdasarkan query teks, role, dan filter kecamatan
   const filteredUsers = users.filter((u) => {
     const q = searchQuery.toLowerCase();
     const matchQuery =
@@ -256,8 +325,13 @@ export default function ManajemenPenggunaPage() {
       u.username.toLowerCase().includes(q) ||
       (u.kecamatan?.nm_kecamatan || "").toLowerCase().includes(q) ||
       (u.desa?.nm_desa || "").toLowerCase().includes(q);
+
     const matchRole = !roleFilter || u.role === roleFilter;
-    return matchQuery && matchRole;
+
+    const userKecamatanId = u.kecamatanId || u.desa?.kd_kecamatan;
+    const matchKecamatan = !kecamatanFilter || userKecamatanId === kecamatanFilter;
+
+    return matchQuery && matchRole && matchKecamatan;
   });
 
   return (
@@ -274,23 +348,29 @@ export default function ManajemenPenggunaPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            setFeedback(null);
-            setModalOpen(true);
-          }}
-          className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-sm transition hover:shadow shrink-0"
-        >
-          <Plus size={16} />
-          <span>Tambah Akun Pengguna</span>
-        </button>
+        {/* Tombol Tambah Pengguna: Disembunyikan untuk ADMIN_DESA */}
+        {canAddUser ? (
+          <button
+            onClick={handleOpenCreateModal}
+            className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-sm transition hover:shadow shrink-0"
+          >
+            <Plus size={16} />
+            <span>Tambah Akun Pengguna</span>
+          </button>
+        ) : (
+          <div className="inline-flex items-center space-x-1.5 px-3 py-2 bg-slate-100 text-slate-500 rounded-xl text-xs font-semibold shrink-0 border border-slate-200">
+            <Lock size={14} />
+            <span>Mode Tinjau (Admin Desa)</span>
+          </div>
+        )}
       </div>
 
       {/* Main Table Card */}
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
         {/* Filters */}
-        <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/40">
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <div className="p-4 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 bg-slate-50/40">
+          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+            {/* Filter Peran / Role */}
             <select
               value={roleFilter}
               onChange={(e) => {
@@ -306,9 +386,52 @@ export default function ManajemenPenggunaPage() {
               <option value="ADMIN_DESA">ADMIN DESA / KADER</option>
               <option value="VERIFIKATOR">VERIFIKATOR</option>
             </select>
+
+            {/* Filter Kecamatan */}
+            <div className="relative w-full sm:w-auto">
+              <select
+                value={kecamatanFilter}
+                disabled={currentUser?.role === "ADMIN_KECAMATAN"}
+                onChange={(e) => {
+                  setKecamatanFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full sm:w-auto px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white shadow-2xs disabled:bg-slate-100 disabled:text-slate-600 disabled:cursor-not-allowed"
+              >
+                {currentUser?.role === "ADMIN_KECAMATAN" ? (
+                  <option value={currentUser.kecamatanId || ""}>
+                    Kec. {currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId} (Wilayah Anda)
+                  </option>
+                ) : (
+                  <>
+                    <option value="">Semua Kecamatan</option>
+                    {kecamatanList.map((k) => (
+                      <option key={k.kd_kecamatan} value={k.kd_kecamatan}>
+                        Kec. {k.nm_kecamatan}
+                      </option>
+                    ))}
+                  </>
+                )}
+              </select>
+            </div>
+
+            {(roleFilter || (kecamatanFilter && currentUser?.role !== "ADMIN_KECAMATAN")) && (
+              <button
+                onClick={() => {
+                  setRoleFilter("");
+                  if (currentUser?.role !== "ADMIN_KECAMATAN") {
+                    setKecamatanFilter("");
+                  }
+                  setCurrentPage(1);
+                }}
+                className="px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition"
+              >
+                Reset Filter
+              </button>
+            )}
           </div>
 
-          <div className="relative w-full sm:w-72">
+          <div className="relative w-full lg:w-72">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input
               type="text"
@@ -352,86 +475,106 @@ export default function ManajemenPenggunaPage() {
                 ) : (
                   filteredUsers
                     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                    .map((user) => (
-                    <tr key={user.id} className="hover:bg-slate-50/60 transition">
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-9 h-9 rounded-xl bg-blue-100/70 text-blue-800 flex items-center justify-center font-bold text-sm shrink-0">
-                            {user.nama.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <span className="font-bold text-slate-900 block">{user.nama}</span>
-                            <span className="text-[11px] font-mono text-slate-500">@{user.username}</span>
-                          </div>
-                        </div>
-                      </td>
+                    .map((user) => {
+                      const isManageable = canManageTargetUser(user);
+                      return (
+                        <tr key={user.id} className="hover:bg-slate-50/60 transition">
+                          <td className="px-5 py-3.5">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-9 h-9 rounded-xl bg-blue-100/70 text-blue-800 flex items-center justify-center font-bold text-sm shrink-0">
+                                {user.nama.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <span className="font-bold text-slate-900 block">{user.nama}</span>
+                                <span className="text-[11px] font-mono text-slate-500">@{user.username}</span>
+                              </div>
+                            </div>
+                          </td>
 
-                      <td className="px-5 py-3.5">{getRoleBadge(user.role)}</td>
+                          <td className="px-5 py-3.5">{getRoleBadge(user.role)}</td>
 
-                      <td className="px-5 py-3.5">
-                        {user.role === "SUPERADMIN" || user.role === "ADMIN_KABUPATEN" ? (
-                          <span className="text-slate-600 font-semibold flex items-center gap-1.5">
-                            <ShieldCheck size={14} className="text-blue-600" />
-                            Seluruh Kab. Tapanuli Selatan
-                          </span>
-                        ) : user.role === "ADMIN_KECAMATAN" ? (
-                          <span className="text-slate-700 font-medium flex items-center gap-1.5">
-                            <Building2 size={14} className="text-indigo-600" />
-                            Kec. {user.kecamatan?.nm_kecamatan || user.kecamatanId}
-                          </span>
-                        ) : user.role === "ADMIN_DESA" ? (
-                          <span className="text-slate-700 font-medium flex items-center gap-1.5">
-                            <Home size={14} className="text-emerald-600" />
-                            Desa {user.desa?.nm_desa || user.desaId}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400">-</span>
-                        )}
-                      </td>
+                          <td className="px-5 py-3.5">
+                            {user.role === "SUPERADMIN" || user.role === "ADMIN_KABUPATEN" ? (
+                              <span className="text-slate-600 font-semibold flex items-center gap-1.5">
+                                <ShieldCheck size={14} className="text-blue-600" />
+                                Seluruh Kab. Tapanuli Selatan
+                              </span>
+                            ) : user.role === "ADMIN_KECAMATAN" ? (
+                              <span className="text-slate-700 font-medium flex items-center gap-1.5">
+                                <Building2 size={14} className="text-indigo-600" />
+                                Kec. {user.kecamatan?.nm_kecamatan || user.kecamatanId}
+                              </span>
+                            ) : user.role === "ADMIN_DESA" ? (
+                              <div className="space-y-0.5">
+                                <span className="text-slate-700 font-medium flex items-center gap-1.5">
+                                  <Home size={14} className="text-emerald-600" />
+                                  Desa {user.desa?.nm_desa || user.desaId}
+                                </span>
+                                {user.kecamatan?.nm_kecamatan && (
+                                  <span className="text-[10px] text-slate-400 block pl-5">
+                                    Kec. {user.kecamatan.nm_kecamatan}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-slate-400">-</span>
+                            )}
+                          </td>
 
-                      <td className="px-5 py-3.5 text-center">
-                        <span className="font-bold text-slate-800">
-                          {user._count?.verifikasiPengaduan || 0} verifikasi
-                        </span>
-                      </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span className="font-bold text-slate-800">
+                              {user._count?.verifikasiPengaduan || 0} verifikasi
+                            </span>
+                          </td>
 
-                      <td className="px-5 py-3.5 text-center">
-                        <button
-                          onClick={() => handleToggleAktif(user.id, user.aktif)}
-                          className="inline-flex items-center space-x-1"
-                          title="Klik untuk ubah status aktif/nonaktif"
-                        >
-                          {user.aktif ? (
-                            <ToggleRight size={22} className="text-blue-600" />
-                          ) : (
-                            <ToggleLeft size={22} className="text-slate-300" />
-                          )}
-                          <span className={`text-[10px] font-bold ${user.aktif ? "text-blue-700" : "text-slate-400"}`}>
-                            {user.aktif ? "Aktif" : "Nonaktif"}
-                          </span>
-                        </button>
-                      </td>
+                          <td className="px-5 py-3.5 text-center">
+                            {isManageable ? (
+                              <button
+                                onClick={() => handleToggleAktif(user)}
+                                className="inline-flex items-center space-x-1"
+                                title="Klik untuk ubah status aktif/nonaktif"
+                              >
+                                {user.aktif ? (
+                                  <ToggleRight size={22} className="text-blue-600" />
+                                ) : (
+                                  <ToggleLeft size={22} className="text-slate-300" />
+                                )}
+                                <span className={`text-[10px] font-bold ${user.aktif ? "text-blue-700" : "text-slate-400"}`}>
+                                  {user.aktif ? "Aktif" : "Nonaktif"}
+                                </span>
+                              </button>
+                            ) : (
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${user.aktif ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+                                {user.aktif ? "Aktif" : "Nonaktif"}
+                              </span>
+                            )}
+                          </td>
 
-                      <td className="px-5 py-3.5 text-center">
-                        <div className="flex items-center justify-center space-x-1.5">
-                          <button
-                            onClick={() => handleOpenEditModal(user)}
-                            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-blue-700 transition"
-                            title="Edit Pengguna"
-                          >
-                            <Edit size={14} />
-                          </button>
-                          <button
-                            onClick={() => handleOpenDeleteModal(user)}
-                            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition"
-                            title="Hapus Pengguna"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                          <td className="px-5 py-3.5 text-center">
+                            {isManageable ? (
+                              <div className="flex items-center justify-center space-x-1.5">
+                                <button
+                                  onClick={() => handleOpenEditModal(user)}
+                                  className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-blue-700 transition"
+                                  title="Edit Pengguna"
+                                >
+                                  <Edit size={14} />
+                                </button>
+                                <button
+                                  onClick={() => handleOpenDeleteModal(user)}
+                                  className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition"
+                                  title="Hapus Pengguna"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-slate-300 text-[11px]">-</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
                 )}
               </tbody>
             </table>
@@ -456,7 +599,14 @@ export default function ManajemenPenggunaPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-              <h3 className="font-bold text-sm text-slate-900">Tambah Akun Pengguna Baru</h3>
+              <div>
+                <h3 className="font-bold text-sm text-slate-900">Tambah Akun Pengguna Baru</h3>
+                {currentUser?.role === "ADMIN_KECAMATAN" && (
+                  <p className="text-[11px] text-indigo-700 font-medium mt-0.5">
+                    Wilayah: Kec. {currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId}
+                  </p>
+                )}
+              </div>
               <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                 <X size={18} />
               </button>
@@ -515,67 +665,126 @@ export default function ManajemenPenggunaPage() {
 
               <div>
                 <label className="block text-slate-700 font-bold mb-1">Peran / Hak Akses (Role) *:</label>
-                <select
-                  required
-                  value={formData.role}
-                  onChange={(e) => {
-                    const r = e.target.value;
-                    setFormData({
-                      ...formData,
-                      role: r,
-                      kecamatanId: r === "SUPERADMIN" || r === "ADMIN_KABUPATEN" ? "" : formData.kecamatanId,
-                      desaId: r === "ADMIN_DESA" ? formData.desaId : "",
-                    });
-                  }}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
-                >
-                  <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
-                  <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
-                  <option value="ADMIN_KABUPATEN">ADMIN KABUPATEN (DINAS)</option>
-                  <option value="SUPERADMIN">SUPERADMIN (TEKNIS SISTEM)</option>
-                </select>
+                {currentUser?.role === "ADMIN_KECAMATAN" ? (
+                  // Admin Kecamatan hanya dapat menambahkan ADMIN_DESA
+                  <div className="px-3.5 py-2.5 rounded-xl border border-indigo-200 bg-indigo-50/60 text-indigo-900 font-semibold flex items-center justify-between">
+                    <span>ADMIN DESA / KADER POSYANDU</span>
+                    <span className="text-[10px] bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full font-bold">Otoritas Kecamatan</span>
+                  </div>
+                ) : (
+                  <select
+                    required
+                    value={formData.role}
+                    onChange={(e) => {
+                      const r = e.target.value;
+                      setFormData({
+                        ...formData,
+                        role: r,
+                        kecamatanId: r === "SUPERADMIN" || r === "ADMIN_KABUPATEN" ? "" : formData.kecamatanId,
+                        desaId: r === "ADMIN_DESA" ? formData.desaId : "",
+                      });
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
+                  >
+                    {currentUser?.role === "ADMIN_KABUPATEN" ? (
+                      // Admin Kabupaten: dapat menambah user admin kecamatan dan admin desa
+                      <>
+                        <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
+                        <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
+                      </>
+                    ) : (
+                      // Superadmin: sudah sesuai (semua role)
+                      <>
+                        <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
+                        <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
+                        <option value="ADMIN_KABUPATEN">ADMIN KABUPATEN (DINAS)</option>
+                        <option value="SUPERADMIN">SUPERADMIN (TEKNIS SISTEM)</option>
+                        <option value="VERIFIKATOR">VERIFIKATOR</option>
+                      </>
+                    )}
+                  </select>
+                )}
               </div>
 
-              {/* Otoritas Wilayah jika Kecamatan atau Desa */}
-              {(formData.role === "ADMIN_KECAMATAN" || formData.role === "ADMIN_DESA") && (
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Pilih Kecamatan Penugasan *:</label>
-                  <select
-                    required
-                    value={formData.kecamatanId}
-                    onChange={(e) => setFormData({ ...formData, kecamatanId: e.target.value, desaId: "" })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
-                  >
-                    <option value="">-- Pilih Kecamatan --</option>
-                    {kecamatanList.map((k) => (
-                      <option key={k.kd_kecamatan} value={k.kd_kecamatan}>
-                        {k.nm_kecamatan}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              {/* Otoritas Wilayah jika Admin Kecamatan yang sedang login: Kecamatan terkunci */}
+              {currentUser?.role === "ADMIN_KECAMATAN" ? (
+                <>
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Wilayah Kecamatan Penugasan:</label>
+                    <div className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-700 font-semibold flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Building2 size={14} className="text-indigo-600" />
+                        Kec. {currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-bold bg-slate-200/80 px-2 py-0.5 rounded-full">
+                        Terkunci
+                      </span>
+                    </div>
+                  </div>
 
-              {formData.role === "ADMIN_DESA" && (
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Pilih Desa Penugasan *:</label>
-                  <select
-                    required
-                    disabled={!formData.kecamatanId}
-                    value={formData.desaId}
-                    onChange={(e) => setFormData({ ...formData, desaId: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white disabled:bg-slate-100"
-                  >
-                    <option value="">-- Pilih Desa --</option>
-                    {desaList
-                      .filter((d) => !formData.kecamatanId || d.kd_kecamatan === formData.kecamatanId)
-                      .map((d) => (
-                        <option key={d.kd_desa} value={d.kd_desa}>
-                          {d.nm_desa}
-                        </option>
-                      ))}
-                  </select>
-                </div>
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Pilih Desa Penugasan *:</label>
+                    <select
+                      required
+                      value={formData.desaId}
+                      onChange={(e) => setFormData({ ...formData, desaId: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                    >
+                      <option value="">-- Pilih Desa --</option>
+                      {desaList
+                        .filter((d) => d.kd_kecamatan === currentUser.kecamatanId)
+                        .map((d) => (
+                          <option key={d.kd_desa} value={d.kd_desa}>
+                            {d.nm_desa}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Otoritas Wilayah jika Superadmin atau Admin Kabupaten */}
+                  {(formData.role === "ADMIN_KECAMATAN" || formData.role === "ADMIN_DESA") && (
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1">Pilih Kecamatan Penugasan *:</label>
+                      <select
+                        required
+                        value={formData.kecamatanId}
+                        onChange={(e) => setFormData({ ...formData, kecamatanId: e.target.value, desaId: "" })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                      >
+                        <option value="">-- Pilih Kecamatan --</option>
+                        {kecamatanList.map((k) => (
+                          <option key={k.kd_kecamatan} value={k.kd_kecamatan}>
+                            {k.nm_kecamatan}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {formData.role === "ADMIN_DESA" && (
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1">Pilih Desa Penugasan *:</label>
+                      <select
+                        required
+                        disabled={!formData.kecamatanId}
+                        value={formData.desaId}
+                        onChange={(e) => setFormData({ ...formData, desaId: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white disabled:bg-slate-100"
+                      >
+                        <option value="">-- Pilih Desa --</option>
+                        {desaList
+                          .filter((d) => !formData.kecamatanId || d.kd_kecamatan === formData.kecamatanId)
+                          .map((d) => (
+                            <option key={d.kd_desa} value={d.kd_desa}>
+                              {d.nm_desa}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  )}
+                </>
               )}
 
               <div className="pt-2 flex justify-end space-x-2">
@@ -599,6 +808,7 @@ export default function ManajemenPenggunaPage() {
           </div>
         </div>
       )}
+
       {/* Modal Edit User */}
       {editModalOpen && editItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
@@ -660,66 +870,121 @@ export default function ManajemenPenggunaPage() {
 
               <div>
                 <label className="block text-slate-700 font-bold mb-1">Peran / Hak Akses (Role) *:</label>
-                <select
-                  required
-                  value={editForm.role}
-                  onChange={(e) => {
-                    const r = e.target.value;
-                    setEditForm({
-                      ...editForm,
-                      role: r,
-                      kecamatanId: r === "SUPERADMIN" || r === "ADMIN_KABUPATEN" ? "" : editForm.kecamatanId,
-                      desaId: r === "ADMIN_DESA" ? editForm.desaId : "",
-                    });
-                  }}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
-                >
-                  <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
-                  <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
-                  <option value="ADMIN_KABUPATEN">ADMIN KABUPATEN (DINAS)</option>
-                  <option value="SUPERADMIN">SUPERADMIN (TEKNIS SISTEM)</option>
-                </select>
+                {currentUser?.role === "ADMIN_KECAMATAN" ? (
+                  <div className="px-3.5 py-2.5 rounded-xl border border-indigo-200 bg-indigo-50/60 text-indigo-900 font-semibold flex items-center justify-between">
+                    <span>ADMIN DESA / KADER POSYANDU</span>
+                    <span className="text-[10px] bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full font-bold">Terkunci</span>
+                  </div>
+                ) : (
+                  <select
+                    required
+                    value={editForm.role}
+                    onChange={(e) => {
+                      const r = e.target.value;
+                      setEditForm({
+                        ...editForm,
+                        role: r,
+                        kecamatanId: r === "SUPERADMIN" || r === "ADMIN_KABUPATEN" ? "" : editForm.kecamatanId,
+                        desaId: r === "ADMIN_DESA" ? editForm.desaId : "",
+                      });
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
+                  >
+                    {currentUser?.role === "ADMIN_KABUPATEN" ? (
+                      <>
+                        <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
+                        <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
+                        <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
+                        <option value="ADMIN_KABUPATEN">ADMIN KABUPATEN (DINAS)</option>
+                        <option value="SUPERADMIN">SUPERADMIN (TEKNIS SISTEM)</option>
+                        <option value="VERIFIKATOR">VERIFIKATOR</option>
+                      </>
+                    )}
+                  </select>
+                )}
               </div>
 
-              {(editForm.role === "ADMIN_KECAMATAN" || editForm.role === "ADMIN_DESA") && (
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Pilih Kecamatan Penugasan *:</label>
-                  <select
-                    required
-                    value={editForm.kecamatanId}
-                    onChange={(e) => setEditForm({ ...editForm, kecamatanId: e.target.value, desaId: "" })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
-                  >
-                    <option value="">-- Pilih Kecamatan --</option>
-                    {kecamatanList.map((k) => (
-                      <option key={k.kd_kecamatan} value={k.kd_kecamatan}>
-                        {k.nm_kecamatan}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              {currentUser?.role === "ADMIN_KECAMATAN" ? (
+                <>
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Wilayah Kecamatan Penugasan:</label>
+                    <div className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-700 font-semibold flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Building2 size={14} className="text-indigo-600" />
+                        Kec. {currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-bold bg-slate-200/80 px-2 py-0.5 rounded-full">
+                        Terkunci
+                      </span>
+                    </div>
+                  </div>
 
-              {editForm.role === "ADMIN_DESA" && (
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Pilih Desa Penugasan *:</label>
-                  <select
-                    required
-                    disabled={!editForm.kecamatanId}
-                    value={editForm.desaId}
-                    onChange={(e) => setEditForm({ ...editForm, desaId: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white disabled:bg-slate-100"
-                  >
-                    <option value="">-- Pilih Desa --</option>
-                    {desaList
-                      .filter((d) => !editForm.kecamatanId || d.kd_kecamatan === editForm.kecamatanId)
-                      .map((d) => (
-                        <option key={d.kd_desa} value={d.kd_desa}>
-                          {d.nm_desa}
-                        </option>
-                      ))}
-                  </select>
-                </div>
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Pilih Desa Penugasan *:</label>
+                    <select
+                      required
+                      value={editForm.desaId}
+                      onChange={(e) => setEditForm({ ...editForm, desaId: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                    >
+                      <option value="">-- Pilih Desa --</option>
+                      {desaList
+                        .filter((d) => d.kd_kecamatan === currentUser.kecamatanId)
+                        .map((d) => (
+                          <option key={d.kd_desa} value={d.kd_desa}>
+                            {d.nm_desa}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {(editForm.role === "ADMIN_KECAMATAN" || editForm.role === "ADMIN_DESA") && (
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1">Pilih Kecamatan Penugasan *:</label>
+                      <select
+                        required
+                        value={editForm.kecamatanId}
+                        onChange={(e) => setEditForm({ ...editForm, kecamatanId: e.target.value, desaId: "" })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                      >
+                        <option value="">-- Pilih Kecamatan --</option>
+                        {kecamatanList.map((k) => (
+                          <option key={k.kd_kecamatan} value={k.kd_kecamatan}>
+                            {k.nm_kecamatan}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {editForm.role === "ADMIN_DESA" && (
+                    <div>
+                      <label className="block text-slate-700 font-bold mb-1">Pilih Desa Penugasan *:</label>
+                      <select
+                        required
+                        disabled={!editForm.kecamatanId}
+                        value={editForm.desaId}
+                        onChange={(e) => setEditForm({ ...editForm, desaId: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white disabled:bg-slate-100"
+                      >
+                        <option value="">-- Pilih Desa --</option>
+                        {desaList
+                          .filter((d) => !editForm.kecamatanId || d.kd_kecamatan === editForm.kecamatanId)
+                          .map((d) => (
+                            <option key={d.kd_desa} value={d.kd_desa}>
+                              {d.nm_desa}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  )}
+                </>
               )}
 
               <div className="pt-2 flex justify-end space-x-2">

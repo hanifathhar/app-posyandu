@@ -145,12 +145,12 @@ export default function Sidebar({
         { label: "Data Pelapor", href: "/master-data/pelapor" },
       ],
     },
-    // Manajemen Pengguna hanya untuk SUPERADMIN dan ADMIN_KABUPATEN
+    // Manajemen Pengguna
     {
       title: "Manajemen Pengguna",
       icon: <Users size={18} />,
       href: "/master-data/pengguna",
-      roles: ["SUPERADMIN", "ADMIN_KABUPATEN"],
+      roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN"],
     },
     {
       title: "Laporan",
@@ -158,18 +158,27 @@ export default function Sidebar({
       href: "/laporan/posyandu-desa",
       roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN", "ADMIN_DESA"],
       children: [
-        { label: "Laporan Posyandu Desa", href: "/laporan/posyandu-desa" },
-        { label: "Laporan Posyandu Kecamatan", href: "/laporan/posyandu-kecamatan" },
-        { label: "Laporan Posyandu Kabupaten", href: "/laporan/posyandu-kabupaten" },
-        { label: "Rekapitulasi Capaian 6 SPM", href: "/laporan/rekap-spm" },
+        { label: "Laporan Posyandu Desa", href: "/laporan/posyandu-desa", roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN", "ADMIN_DESA"] },
+        { label: "Laporan Posyandu Kecamatan", href: "/laporan/posyandu-kecamatan", roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN"] },
+        { label: "Laporan Posyandu Kabupaten", href: "/laporan/posyandu-kabupaten", roles: ["SUPERADMIN", "ADMIN_KABUPATEN"] },
+        { label: "Rekapitulasi Capaian 6 SPM", href: "/laporan/rekap-spm", roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN", "ADMIN_DESA"] },
       ],
     },
   ];
 
   const menuItems = role
-    ? allMenus.filter((item) =>
-      item.roles.some((r) => r.toUpperCase() === role.toUpperCase())
-    )
+    ? allMenus
+      .filter((item) =>
+        item.roles.some((r) => r.toUpperCase() === role.toUpperCase())
+      )
+      .map((item) => ({
+        ...item,
+        children: item.children
+          ? item.children.filter((sub: any) =>
+            !sub.roles || sub.roles.some((r: string) => r.toUpperCase() === role.toUpperCase())
+          )
+          : undefined,
+      }))
     : allMenus;
 
   const isLinkActive = (href?: string) => {

@@ -65,11 +65,32 @@ export async function middleware(request: NextRequest) {
             return response;
         }
 
-        // Cek akses admin untuk route master data (hanya SUPERADMIN & ADMIN_KABUPATEN)
+        // Cek akses admin untuk route master data
         const masterDataRoles = ["SUPERADMIN", "ADMIN_KABUPATEN"];
-        if (adminOnlyRoutes.some((route) => pathname.startsWith(route))) {
+        if (pathname.startsWith("/master-data/pengguna")) {
+            const allowedPenggunaRoles = ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN", "ADMIN_DESA"];
+            if (!allowedPenggunaRoles.includes(payload.role)) {
+                console.log("⛔ Access denied - Manajemen Pengguna restricted for role:", payload.role);
+                return NextResponse.redirect(new URL("/unauthorized", request.url));
+            }
+        } else if (adminOnlyRoutes.some((route) => pathname.startsWith(route))) {
             if (!masterDataRoles.includes(payload.role)) {
                 console.log("⛔ Access denied - Master Data only for Kabupaten/Superadmin:", payload.role);
+                return NextResponse.redirect(new URL("/unauthorized", request.url));
+            }
+        }
+
+        // Cek akses rute laporan
+        if (pathname.startsWith("/laporan/posyandu-kabupaten")) {
+            const allowedRoles = ["SUPERADMIN", "ADMIN_KABUPATEN"];
+            if (!allowedRoles.includes(payload.role)) {
+                console.log("⛔ Access denied - Laporan Kabupaten restricted for role:", payload.role);
+                return NextResponse.redirect(new URL("/unauthorized", request.url));
+            }
+        } else if (pathname.startsWith("/laporan/posyandu-kecamatan")) {
+            const allowedRoles = ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN"];
+            if (!allowedRoles.includes(payload.role)) {
+                console.log("⛔ Access denied - Laporan Kecamatan restricted for role:", payload.role);
                 return NextResponse.redirect(new URL("/unauthorized", request.url));
             }
         }

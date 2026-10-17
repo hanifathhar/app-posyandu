@@ -2,10 +2,88 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { RolePengguna } from "@prisma/client";
+import jwt from "jsonwebtoken";
 
-export async function GET() {
+const JWT_SECRET = process.env.JWT_SECRET || "rahasia-super-aman";
+
+async function getAuthUser(request: Request) {
+  const cookieHeader = request.headers.get("cookie") || "";
+  const match = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
+  let token = match ? match[1] : request.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
+
+  if (!token) {
+    const authHeader = request.headers.get("authorization");
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.substring(7);
+    }
+  }
+
+  if (!token) return null;
+
   try {
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    if (!decoded?.id) return null;
+
+    return await prisma.pengguna.findUnique({
+      where: { id: decoded.id },
+      select: {
+        id: true,
+        role: true,
+        kecamatanId: true,
+        desaId: true,
+        nama: true,
+        kecamatan: { select: { kd_kecamatan: true, nm_kecamatan: true } },
+        desa: { select: { kd_desa: true, nm_desa: true } },
+      },
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function GET(request: Request) {
+  try {
+    const currentUser = await getAuthUser(request);
+    if (!currentUser) {
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    }
+
+    const allowedRoles: RolePengguna[] = [
+      RolePengguna.SUPERADMIN,
+      RolePengguna.ADMIN_KABUPATEN,
+      RolePengguna.ADMIN_KECAMATAN,
+      RolePengguna.ADMIN_DESA,
+    ];
+
+    if (!allowedRoles.includes(currentUser.role as RolePengguna)) {
+      return NextResponse.json({ success: false, message: "Akses ditolak" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const filterKecamatan = searchParams.get("kecamatanId");
+
+    const where: any = {};
+
+    // Filter per wilayah kewenangan
+    if (currentUser.role === RolePengguna.ADMIN_KECAMATAN) {
+      // Admin Kecamatan hanya melihat pengguna di wilayah kecamatannya
+      where.OR = [
+        { kecamatanId: currentUser.kecamatanId },
+        { desa: { kd_kecamatan: currentUser.kecamatanId } },
+      ];
+    } else if (currentUser.role === RolePengguna.ADMIN_DESA) {
+      // Admin Desa hanya melihat pengguna di desanya
+      where.desaId = currentUser.desaId;
+    } else if (filterKecamatan) {
+      // Superadmin / Admin Kabupaten filter per kecamatan jika diminta
+      where.OR = [
+        { kecamatanId: filterKecamatan },
+        { desa: { kd_kecamatan: filterKecamatan } },
+      ];
+    }
+
     const penggunaList = await prisma.pengguna.findMany({
+      where,
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -19,7 +97,7 @@ export async function GET() {
           select: { nm_kecamatan: true },
         },
         desa: {
-          select: { nm_desa: true },
+          select: { nm_desa: true, kd_kecamatan: true },
         },
         _count: {
           select: {
@@ -43,8 +121,101 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const currentUser = await getAuthUser(request);
+    if (!currentUser) {
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
-    const { nama, username, password, role, kecamatanId, desaId } = body;
+    const { nama, username, password, role } = body;
+    let { kecamatanId, desaId } = body;
+
+    // 1. Admin Desa: tidak dapat menambah user sama sekali
+    if (currentUser.role === RolePengguna.ADMIN_DESA) {
+      return NextResponse.json(
+        { success: false, message: "Admin Desa tidak memiliki izin untuk menambah akun pengguna." },
+        { status: 403 }
+      );
+    }
+
+    // 2. Admin Kecamatan: hanya dapat menambahkan user Admin Desa di wilayah kecamatannya
+    if (currentUser.role === RolePengguna.ADMIN_KECAMATAN) {
+      if (role !== "ADMIN_DESA") {
+        return NextResponse.json(
+          { success: false, message: "Admin Kecamatan hanya dapat menambahkan akun untuk Admin Desa." },
+          { status: 403 }
+        );
+      }
+
+      if (!currentUser.kecamatanId) {
+        return NextResponse.json(
+          { success: false, message: "Akun Admin Kecamatan Anda tidak terdaftar pada wilayah kecamatan tertentu." },
+          { status: 400 }
+        );
+      }
+
+      // Kunci wilayah kecamatan ke wilayah Admin Kecamatan yang sedang login
+      kecamatanId = currentUser.kecamatanId;
+
+      if (!desaId) {
+        return NextResponse.json(
+          { success: false, message: "Desa penugasan wajib dipilih untuk Admin Desa." },
+          { status: 400 }
+        );
+      }
+
+      const validDesa = await prisma.desa.findFirst({
+        where: {
+          kd_desa: desaId,
+          kd_kecamatan: currentUser.kecamatanId,
+        },
+      });
+
+      if (!validDesa) {
+        return NextResponse.json(
+          { success: false, message: "Desa yang dipilih tidak valid atau berada di luar wilayah kecamatan Anda." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 3. Admin Kabupaten: hanya dapat menambah user Admin Kecamatan dan Admin Desa
+    if (currentUser.role === RolePengguna.ADMIN_KABUPATEN) {
+      const allowedRoles = ["ADMIN_KECAMATAN", "ADMIN_DESA"];
+      if (!allowedRoles.includes(role)) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Admin Kabupaten hanya dapat menambah user Admin Kecamatan dan Admin Desa.",
+          },
+          { status: 403 }
+        );
+      }
+
+      if (role === "ADMIN_KECAMATAN" && !kecamatanId) {
+        return NextResponse.json(
+          { success: false, message: "Kecamatan penugasan wajib dipilih untuk Admin Kecamatan." },
+          { status: 400 }
+        );
+      }
+
+      if (role === "ADMIN_DESA" && (!kecamatanId || !desaId)) {
+        return NextResponse.json(
+          { success: false, message: "Kecamatan dan Desa penugasan wajib dipilih untuk Admin Desa." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 4. Superadmin: sudah sesuai (dapat menambah semua role)
+    if (currentUser.role !== RolePengguna.SUPERADMIN &&
+        currentUser.role !== RolePengguna.ADMIN_KABUPATEN &&
+        currentUser.role !== RolePengguna.ADMIN_KECAMATAN) {
+      return NextResponse.json(
+        { success: false, message: "Anda tidak memiliki hak akses untuk menambah pengguna." },
+        { status: 403 }
+      );
+    }
 
     if (!nama || !username || !password || !role) {
       return NextResponse.json(
@@ -53,8 +224,10 @@ export async function POST(request: Request) {
       );
     }
 
+    const normalizedUsername = username.toLowerCase().trim();
+
     const existing = await prisma.pengguna.findUnique({
-      where: { username },
+      where: { username: normalizedUsername },
     });
 
     if (existing) {
@@ -64,16 +237,27 @@ export async function POST(request: Request) {
       );
     }
 
+    // Pastikan jika role Admin Desa, kecamatanId terisi sesuai desa jika belum ada
+    if (role === "ADMIN_DESA" && desaId && !kecamatanId) {
+      const desaData = await prisma.desa.findUnique({
+        where: { kd_desa: desaId },
+        select: { kd_kecamatan: true },
+      });
+      if (desaData) {
+        kecamatanId = desaData.kd_kecamatan;
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const created = await prisma.pengguna.create({
       data: {
-        nama,
-        username,
+        nama: nama.trim(),
+        username: normalizedUsername,
         password: hashedPassword,
         role: role as RolePengguna,
-        kecamatanId: kecamatanId || null,
-        desaId: desaId || null,
+        kecamatanId: (role === "SUPERADMIN" || role === "ADMIN_KABUPATEN") ? null : (kecamatanId || null),
+        desaId: role === "ADMIN_DESA" ? (desaId || null) : null,
         aktif: true,
       },
       select: {
@@ -103,18 +287,90 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    const currentUser = await getAuthUser(request);
+    if (!currentUser) {
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    }
+
+    if (currentUser.role === RolePengguna.ADMIN_DESA) {
+      return NextResponse.json(
+        { success: false, message: "Admin Desa tidak memiliki izin untuk mengubah akun pengguna." },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
-    const { id, nama, username, role, kecamatanId, desaId, password, aktif, resetPassword } = body;
+    const { id, nama, username, role, password, aktif, resetPassword } = body;
+    let { kecamatanId, desaId } = body;
 
     if (!id) {
       return NextResponse.json({ success: false, message: "ID pengguna wajib diisi." }, { status: 400 });
     }
 
-    // Check if username is changed and already taken
+    const targetUser = await prisma.pengguna.findUnique({
+      where: { id },
+      include: { desa: true },
+    });
+
+    if (!targetUser) {
+      return NextResponse.json({ success: false, message: "Pengguna tidak ditemukan." }, { status: 404 });
+    }
+
+    // Validasi wewenang update:
+    // Admin Kecamatan hanya boleh mengedit Admin Desa di wilayahnya
+    if (currentUser.role === RolePengguna.ADMIN_KECAMATAN) {
+      const targetKecamatan = targetUser.kecamatanId || targetUser.desa?.kd_kecamatan;
+      if (targetUser.role !== RolePengguna.ADMIN_DESA || targetKecamatan !== currentUser.kecamatanId) {
+        return NextResponse.json(
+          { success: false, message: "Admin Kecamatan hanya dapat mengedit akun Admin Desa di wilayah kecamatan Anda." },
+          { status: 403 }
+        );
+      }
+      // Tidak boleh ubah role selain ADMIN_DESA
+      if (role && role !== "ADMIN_DESA") {
+        return NextResponse.json(
+          { success: false, message: "Admin Kecamatan tidak dapat mengubah peran selain Admin Desa." },
+          { status: 403 }
+        );
+      }
+      // Kunci kecamatan tetap di kecamatan Admin Kecamatan
+      kecamatanId = currentUser.kecamatanId;
+      if (desaId) {
+        const validDesa = await prisma.desa.findFirst({
+          where: { kd_desa: desaId, kd_kecamatan: currentUser.kecamatanId },
+        });
+        if (!validDesa) {
+          return NextResponse.json(
+            { success: false, message: "Desa berada di luar wilayah kecamatan Anda." },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
+    // Admin Kabupaten hanya boleh mengedit Admin Kecamatan & Admin Desa
+    if (currentUser.role === RolePengguna.ADMIN_KABUPATEN) {
+      const allowedRoles = ["ADMIN_KECAMATAN", "ADMIN_DESA"];
+      if (!allowedRoles.includes(targetUser.role)) {
+        return NextResponse.json(
+          { success: false, message: "Admin Kabupaten hanya dapat mengelola akun Admin Kecamatan dan Admin Desa." },
+          { status: 403 }
+        );
+      }
+      if (role && !allowedRoles.includes(role)) {
+        return NextResponse.json(
+          { success: false, message: "Admin Kabupaten tidak dapat mengubah peran menjadi tingkatan ini." },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Check username uniqueness
     if (username) {
+      const normalizedUsername = username.toLowerCase().trim();
       const existing = await prisma.pengguna.findFirst({
         where: {
-          username: username.toLowerCase().trim(),
+          username: normalizedUsername,
           NOT: { id },
         },
       });
@@ -127,7 +383,7 @@ export async function PATCH(request: Request) {
     }
 
     const updateData: any = {};
-    if (nama) updateData.nama = nama;
+    if (nama) updateData.nama = nama.trim();
     if (username) updateData.username = username.toLowerCase().trim();
     if (role) updateData.role = role as RolePengguna;
     if (kecamatanId !== undefined) updateData.kecamatanId = kecamatanId || null;
@@ -169,6 +425,18 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const currentUser = await getAuthUser(request);
+    if (!currentUser) {
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    }
+
+    if (currentUser.role === RolePengguna.ADMIN_DESA) {
+      return NextResponse.json(
+        { success: false, message: "Admin Desa tidak memiliki izin untuk menghapus akun pengguna." },
+        { status: 403 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -179,6 +447,7 @@ export async function DELETE(request: Request) {
     const user = await prisma.pengguna.findUnique({
       where: { id },
       include: {
+        desa: true,
         _count: {
           select: {
             verifikasiPengaduan: true,
@@ -193,14 +462,34 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: "Pengguna tidak ditemukan." }, { status: 404 });
     }
 
-    // If user has audit history, deactivate instead or inform
+    // Validasi wewenang delete:
+    if (currentUser.role === RolePengguna.ADMIN_KECAMATAN) {
+      const targetKecamatan = user.kecamatanId || user.desa?.kd_kecamatan;
+      if (user.role !== RolePengguna.ADMIN_DESA || targetKecamatan !== currentUser.kecamatanId) {
+        return NextResponse.json(
+          { success: false, message: "Admin Kecamatan hanya dapat menghapus akun Admin Desa di wilayahnya." },
+          { status: 403 }
+        );
+      }
+    }
+
+    if (currentUser.role === RolePengguna.ADMIN_KABUPATEN) {
+      const allowedRoles = ["ADMIN_KECAMATAN", "ADMIN_DESA"];
+      if (!allowedRoles.includes(user.role)) {
+        return NextResponse.json(
+          { success: false, message: "Admin Kabupaten hanya dapat menghapus akun Admin Kecamatan dan Admin Desa." },
+          { status: 403 }
+        );
+      }
+    }
+
+    // If user has audit history, deactivate instead to preserve audit logs
     const hasHistory =
       user._count.verifikasiPengaduan > 0 ||
       user._count.tindakLanjut > 0 ||
       user._count.pengaduanDibuat > 0;
 
     if (hasHistory) {
-      // Soft-delete / nonaktifkan akun agar histori audit verifikasi tetap utuh
       await prisma.pengguna.update({
         where: { id },
         data: { aktif: false },
@@ -225,4 +514,3 @@ export async function DELETE(request: Request) {
     );
   }
 }
-

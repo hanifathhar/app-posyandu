@@ -89,10 +89,11 @@ export default function LaporanPosyanduKabupatenPage() {
       .then((r) => r.json())
       .then((d) => {
         if (d.user) {
-          setCurrentUser(d.user);
-          if (d.user.role === "ADMIN_KECAMATAN" && d.user.kecamatanId) {
-            setSelectedKecamatan(d.user.kecamatanId);
+          if (d.user.role !== "SUPERADMIN" && d.user.role !== "ADMIN_KABUPATEN") {
+            window.location.href = "/unauthorized";
+            return;
           }
+          setCurrentUser(d.user);
         }
       })
       .catch((err) => console.error("Gagal load session user:", err));
