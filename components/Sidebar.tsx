@@ -229,7 +229,7 @@ export default function Sidebar({
                 </div>
 
                 <div>
-                  <h2 className="font-black text-base leading-tight tracking-tight">SIPANDU Ceria</h2>
+                  <h2 className="font-black text-base leading-tight tracking-tight">Si-Posyandu</h2>
                   <p className="text-[11px] text-blue-100/90 font-medium">Posyandu Cepat, Responsif, Integratif, Akuntabel.</p>
                 </div>
               </div>

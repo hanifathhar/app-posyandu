@@ -139,7 +139,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <Image
             src={bgBack}
-            alt="Pemandangan Alam dan Pemerintahan Kabupaten Tapanuli Selatan"
+            alt="Background"
             fill
             priority
             className="object-cover object-center"
