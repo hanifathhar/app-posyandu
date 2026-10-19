@@ -670,16 +670,14 @@ export default function SPMHomePage() {
               <button
                 key={slide.id}
                 onClick={() => setCurrentSlide(idx)}
-                className={`group flex items-center gap-2.5 px-3.5 sm:px-5 py-2 rounded-full transition-all duration-300 text-xs sm:text-sm font-bold cursor-pointer ${
-                  currentSlide === idx
-                    ? "bg-white text-slate-950 shadow-xl scale-105"
-                    : "bg-black/40 text-white/80 hover:bg-black/60 hover:text-white border border-white/15 backdrop-blur-md"
-                }`}
+                className={`group flex items-center gap-2.5 px-3.5 sm:px-5 py-2 rounded-full transition-all duration-300 text-xs sm:text-sm font-bold cursor-pointer ${currentSlide === idx
+                  ? "bg-white text-slate-950 shadow-xl scale-105"
+                  : "bg-black/40 text-white/80 hover:bg-black/60 hover:text-white border border-white/15 backdrop-blur-md"
+                  }`}
               >
                 <span
-                  className={`w-2 h-2 rounded-full transition-transform ${
-                    currentSlide === idx ? "bg-blue-600 scale-125" : "bg-white/50 group-hover:bg-white"
-                  }`}
+                  className={`w-2 h-2 rounded-full transition-transform ${currentSlide === idx ? "bg-blue-600 scale-125" : "bg-white/50 group-hover:bg-white"
+                    }`}
                 />
                 <span>0{slide.id}</span>
                 <span className="hidden sm:inline font-semibold">{slide.tabLabel}</span>
@@ -871,6 +869,15 @@ export default function SPMHomePage() {
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-white/10 border border-white/10">
+                    <span className="font-bold text-amber-300 block mb-1">
+                      Permendagri No. 13 Tahun 2024
+                    </span>
+                    <p className="text-slate-300 text-xs leading-relaxed">
+                      Tentang Pos Pelayanan Terpadu
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-white/10 border border-white/10">
                     <span className="font-bold text-blue-300 block mb-1">
                       Peraturan Daerah Pemkab Tapanuli Selatan
                     </span>
@@ -878,6 +885,7 @@ export default function SPMHomePage() {
                       Kebijakan Integrasi Transformasi Posyandu 6 Bidang SPM sebagai simpul pelayanan dasar di tingkat desa.
                     </p>
                   </div>
+
                 </div>
               </div>
             </div>
