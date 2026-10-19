@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { StatusPengaduan, JenisPeristiwa, JenisDokumen } from "@prisma/client";
+import {
+  containsSqlInjection,
+  sanitizeString,
+  validateNik,
+  validatePhone,
+  validateIdFormat,
+  scanBase64Upload,
+} from "@/lib/security";
 
 function generateTrackingCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -29,6 +37,24 @@ export async function POST(request: Request) {
       dokumen,
     } = body;
 
+    // 1. CEK KEAMANAN DARI SQL INJECTION
+    if (
+      containsSqlInjection(nama) ||
+      containsSqlInjection(nik || "") ||
+      containsSqlInjection(noHp) ||
+      containsSqlInjection(alamat) ||
+      containsSqlInjection(deskripsi)
+    ) {
+      console.warn("[SECURITY ALERT] Percobaan SQL Injection terdeteksi pada form pengaduan.");
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Permintaan ditolak: Terdeteksi pola karakter atau perintah tidak sah (SQL Injection).",
+        },
+        { status: 400 }
+      );
+    }
+
     // Normalisasi jenisPengaduanIds
     let selectedJenisIds: string[] = [];
     if (Array.isArray(jenisPengaduanIds) && jenisPengaduanIds.length > 0) {
@@ -37,10 +63,23 @@ export async function POST(request: Request) {
       selectedJenisIds = [jenisPengaduanId];
     }
 
-    // Validasi input utama
-    if (!nama || !noHp || !alamat || !kd_kecamatan || !kd_desa || !posyanduId || !bidangId || selectedJenisIds.length === 0 || !deskripsi) {
+    // Validasi input wajib
+    if (
+      !nama ||
+      !noHp ||
+      !alamat ||
+      !kd_kecamatan ||
+      !kd_desa ||
+      !posyanduId ||
+      !bidangId ||
+      selectedJenisIds.length === 0 ||
+      !deskripsi
+    ) {
       return NextResponse.json(
-        { success: false, message: "Semua field bertanda bintang wajib diisi, termasuk minimal satu kategori masalah SPM." },
+        {
+          success: false,
+          message: "Semua field bertanda bintang wajib diisi, termasuk minimal satu kategori masalah SPM.",
+        },
         { status: 400 }
       );
     }
@@ -52,10 +91,81 @@ export async function POST(request: Request) {
       );
     }
 
-    // 1. Simpan atau Temukan Data Pelapor
-    let pelapor;
-    const cleanNik = nik?.trim() ? nik.trim() : null;
+    // 2. VALIDASI & SANITASI DATA INPUT
+    const cleanNama = sanitizeString(nama, 100);
+    const cleanAlamat = sanitizeString(alamat, 500);
+    const cleanDeskripsi = sanitizeString(deskripsi, 5000);
 
+    // Validasi NIK jika diisi
+    const nikCheck = validateNik(nik);
+    if (!nikCheck.isValid) {
+      return NextResponse.json({ success: false, message: nikCheck.error }, { status: 400 });
+    }
+    const cleanNik = nikCheck.cleaned;
+
+    // Validasi Nomor HP
+    const phoneCheck = validatePhone(noHp);
+    if (!phoneCheck.isValid) {
+      return NextResponse.json({ success: false, message: phoneCheck.error }, { status: 400 });
+    }
+    const cleanNoHp = phoneCheck.cleaned;
+
+    // Validasi Format ID / Kode Wilayah
+    const checkKec = validateIdFormat(kd_kecamatan, "Kecamatan");
+    if (!checkKec.isValid) return NextResponse.json({ success: false, message: checkKec.error }, { status: 400 });
+
+    const checkDesa = validateIdFormat(kd_desa, "Desa");
+    if (!checkDesa.isValid) return NextResponse.json({ success: false, message: checkDesa.error }, { status: 400 });
+
+    const checkPos = validateIdFormat(posyanduId, "Posyandu");
+    if (!checkPos.isValid) return NextResponse.json({ success: false, message: checkPos.error }, { status: 400 });
+
+    const checkBid = validateIdFormat(bidangId, "Bidang SPM");
+    if (!checkBid.isValid) return NextResponse.json({ success: false, message: checkBid.error }, { status: 400 });
+
+    for (const id of selectedJenisIds) {
+      const checkJ = validateIdFormat(id, "Kategori Masalah SPM");
+      if (!checkJ.isValid) return NextResponse.json({ success: false, message: checkJ.error }, { status: 400 });
+    }
+
+    // 3. PINDAI FILE UPLOAD SECARA KETAT (Cegah File Executable & Berbahaya)
+    const dokumenData = [];
+    if (Array.isArray(dokumen)) {
+      if (dokumen.length > 5) {
+        return NextResponse.json(
+          { success: false, message: "Maksimal 5 dokumen/foto lampiran per pengaduan." },
+          { status: 400 }
+        );
+      }
+
+      for (const d of dokumen) {
+        if (!d.pathFile) continue;
+
+        // Pindai Magic Bytes & Ekstensi
+        const scanResult = scanBase64Upload(d.pathFile, d.namaFile || "Lampiran");
+        if (!scanResult.isSafe) {
+          console.warn(`[SECURITY ALERT] File ditolak: ${d.namaFile} - Alasan: ${scanResult.reason}`);
+          return NextResponse.json(
+            {
+              success: false,
+              message: `Dokumen '${d.namaFile || "Lampiran"}' ditolak: ${scanResult.reason}`,
+            },
+            { status: 400 }
+          );
+        }
+
+        dokumenData.push({
+          jenis: (d.jenis as JenisDokumen) || JenisDokumen.DOKUMEN_LAINNYA,
+          namaFile: scanResult.sanitizedName || "Lampiran",
+          pathFile: d.pathFile,
+          mimeType: scanResult.mimeType || d.mimeType || null,
+          ukuranFile: scanResult.bufferSize || (d.ukuranFile ? parseInt(d.ukuranFile) : null),
+        });
+      }
+    }
+
+    // 4. Simpan atau Temukan Data Pelapor (Prepared Statements via Prisma)
+    let pelapor;
     if (cleanNik) {
       pelapor = await prisma.pelapor.findUnique({
         where: { nik: cleanNik },
@@ -65,9 +175,9 @@ export async function POST(request: Request) {
         pelapor = await prisma.pelapor.update({
           where: { id: pelapor.id },
           data: {
-            nama: nama.trim(),
-            noHp: noHp.trim(),
-            alamat: alamat.trim(),
+            nama: cleanNama,
+            noHp: cleanNoHp,
+            alamat: cleanAlamat,
             kd_kecamatan,
             kd_desa,
           },
@@ -75,10 +185,10 @@ export async function POST(request: Request) {
       } else {
         pelapor = await prisma.pelapor.create({
           data: {
-            nama: nama.trim(),
+            nama: cleanNama,
             nik: cleanNik,
-            noHp: noHp.trim(),
-            alamat: alamat.trim(),
+            noHp: cleanNoHp,
+            alamat: cleanAlamat,
             kd_kecamatan,
             kd_desa,
           },
@@ -87,22 +197,22 @@ export async function POST(request: Request) {
     } else {
       pelapor = await prisma.pelapor.create({
         data: {
-          nama: nama.trim(),
-          noHp: noHp.trim(),
-          alamat: alamat.trim(),
+          nama: cleanNama,
+          noHp: cleanNoHp,
+          alamat: cleanAlamat,
           kd_kecamatan,
           kd_desa,
         },
       });
     }
 
-    // 2. Generate Nomor Pengaduan Unik
+    // 5. Generate Nomor Pengaduan Unik
     const today = new Date();
     const dateStr = today.toISOString().slice(0, 10).replace(/-/g, "");
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const nomorPengaduan = `SPM-${dateStr}-${randomSuffix}`;
 
-    // 3. Generate Token Pelacakan Unik
+    // 6. Generate Token Pelacakan Unik
     let tokenPelacakan = generateTrackingCode();
     let isTokenExists = await prisma.pengaduan.findUnique({ where: { tokenPelacakan } });
     while (isTokenExists) {
@@ -110,18 +220,7 @@ export async function POST(request: Request) {
       isTokenExists = await prisma.pengaduan.findUnique({ where: { tokenPelacakan } });
     }
 
-    // 4. Siapkan dokumen pendukung jika ada
-    const dokumenData = Array.isArray(dokumen)
-      ? dokumen.map((d: any) => ({
-          jenis: (d.jenis as JenisDokumen) || JenisDokumen.DOKUMEN_LAINNYA,
-          namaFile: d.namaFile || "Lampiran",
-          pathFile: d.pathFile || "",
-          mimeType: d.mimeType || null,
-          ukuranFile: d.ukuranFile ? parseInt(d.ukuranFile) : null,
-        }))
-      : [];
-
-    // 5. Simpan Pengaduan & Hubungkan Multiple JenisPengaduan
+    // 7. Simpan Pengaduan & Hubungkan Multiple JenisPengaduan
     const pengaduan = await prisma.pengaduan.create({
       data: {
         nomorPengaduan,
@@ -134,7 +233,7 @@ export async function POST(request: Request) {
         kd_kecamatan,
         kd_desa,
         posyanduId,
-        deskripsi: deskripsi.trim(),
+        deskripsi: cleanDeskripsi,
         status: StatusPengaduan.MENUNGGU_VERIFIKASI_DESA,
         dokumen: {
           create: dokumenData,

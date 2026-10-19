@@ -18,6 +18,7 @@ import {
   Clock,
   ArrowRight,
   ChevronRight,
+  ChevronLeft,
   ShieldCheck,
   AlertTriangle,
   HelpCircle,
@@ -43,6 +44,58 @@ import {
 import logoPic from "@/public/favicon.png";
 import tapselLogo from "@/public/images/logo-tapsel.png";
 import bgBack from "@/public/images/bg_back.png";
+
+// 3 Banner Dummy untuk Slider Bagian Judul (Hero)
+const HERO_SLIDES = [
+  {
+    id: 1,
+    image: "/images/banner-1.jpg",
+    tabLabel: "Posyandu & Kesehatan",
+    badge: "Transformasi Layanan Primer Posyandu",
+    badgeColors: ["bg-rose-400", "bg-sky-400", "bg-amber-400", "bg-emerald-400"],
+    title: "Penuhi Hak Layanan Dasar Masyarakat",
+    highlight: "Kabupaten Tapanuli Selatan",
+    highlightGradient: "from-sky-300 via-purple-300 via-amber-300 to-emerald-300",
+    deskripsi:
+      "Sistem integrasi pelayanan dan pengaduan 6 Bidang SPM (Kesehatan, Pendidikan, Sosial, Pekerjaan Umum, Perumahan Rakyat, dan Trantibum Linmas) langsung dari simpul Posyandu dan Desa hingga ke Pemerintah Kabupaten.",
+    actionText: "Ajukan Pengaduan",
+    actionHref: "/pengaduan",
+    secondaryText: "Eksplorasi 6 Bidang SPM",
+    secondaryHref: "#bidang",
+  },
+  {
+    id: 2,
+    image: "/images/banner-2.jpg",
+    tabLabel: "Pendidikan & Anak",
+    badge: "Jaminan Belajar 12 Tahun & Hak Pendidikan",
+    badgeColors: ["bg-sky-400", "bg-blue-400", "bg-indigo-400", "bg-teal-400"],
+    title: "Wujudkan Generasi Cerdas & Berkualitas",
+    highlight: "Bebas Hambatan Biaya",
+    highlightGradient: "from-amber-300 via-orange-300 via-yellow-200 to-emerald-300",
+    deskripsi:
+      "Memastikan hak belajar anak usia dini hingga menengah, penanganan anak putus sekolah (ATS), dan penyediaan sarana pendidikan inklusif merata di seluruh pelosok desa.",
+    actionText: "Layanan SPM Pendidikan",
+    actionHref: "#bidang",
+    secondaryText: "Lihat Alur Layanan",
+    secondaryHref: "#alur",
+  },
+  {
+    id: 3,
+    image: "/images/banner-3.jpg",
+    tabLabel: "Kesejahteraan Sosial",
+    badge: "Perlindungan Sosial & Lingkungan Sehat",
+    badgeColors: ["bg-emerald-400", "bg-teal-400", "bg-amber-400", "bg-sky-400"],
+    title: "Gotong Royong Lindungi Warga Rentan",
+    highlight: "Menuju Desa Sejahtera",
+    highlightGradient: "from-emerald-300 via-teal-300 via-sky-300 to-amber-300",
+    deskripsi:
+      "Akses air minum aman, jamban sehat mandiri, rehabilitasi rumah tidak layak huni (RTLH), serta santunan sosial bagi warga yang membutuhkan uluran tangan secara nyata.",
+    actionText: "Pelajari SPM Terpadu",
+    actionHref: "#tentang",
+    secondaryText: "Buat Pengaduan Warga",
+    secondaryHref: "/pengaduan",
+  },
+];
 
 // Definisi 6 Bidang SPM
 const BIDANG_SPM_DATA = [
@@ -286,6 +339,27 @@ export default function SPMHomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  // State untuk Sliding Banner Hero
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Auto-play interval slider banner (6 detik)
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+  };
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+  };
+
   // Data Statistik Wilayah & Posyandu dari Database
   const [stats, setStats] = useState({
     bidang: 6,
@@ -486,152 +560,188 @@ export default function SPMHomePage() {
         </AnimatePresence>
       </header>
 
-      {/* 3. HERO SECTION */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#0c3b5e] via-[#093250] to-[#062137] text-white pt-14 pb-24 lg:pt-20 lg:pb-32">
-        {/* Background Image & Texture Overlay */}
-        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none mix-blend-overlay">
-          <Image
-            src={bgBack}
-            alt="Latar Belakang SPM Tapsel"
-            fill
-            className="object-cover object-center"
-            priority
-          />
-        </div>
+      {/* 3. HERO SECTION - SLIDING BANNER CAROUSEL */}
+      <section
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        className="relative overflow-hidden bg-slate-950 text-white pt-12 pb-20 lg:pt-16 lg:pb-28"
+      >
+        {/* Dynamic Sliding Background Images */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="absolute inset-0 z-0"
+          >
+            <Image
+              src={HERO_SLIDES[currentSlide].image}
+              alt={HERO_SLIDES[currentSlide].title}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+            {/* Subtle, minimal gradient overlay so banner photos remain bright, vibrant, and clear */}
+            <div className="absolute inset-0 bg-slate-950/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/25" />
+          </motion.div>
+        </AnimatePresence>
 
-        {/* Ambient Gradient Glows in 4 Brand Colors: Biru, Ungu, Orange, Hijau */}
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[350px] bg-blue-500/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute top-1/3 right-1/4 w-[500px] h-[350px] bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-10 left-10 w-[400px] h-[400px] bg-orange-500/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-10 right-10 w-[400px] h-[400px] bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        {/* Carousel Navigation Arrows */}
+        <button
+          onClick={handlePrevSlide}
+          aria-label="Banner Sebelumnya"
+          className="hidden md:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-slate-900/70 hover:bg-white hover:text-slate-950 backdrop-blur-md border border-white/25 text-white items-center justify-center transition-all duration-200 shadow-xl hover:scale-110 active:scale-95 cursor-pointer"
+        >
+          <ChevronLeft size={24} />
+        </button>
+        <button
+          onClick={handleNextSlide}
+          aria-label="Banner Berikutnya"
+          className="hidden md:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-slate-900/70 hover:bg-white hover:text-slate-950 backdrop-blur-md border border-white/25 text-white items-center justify-center transition-all duration-200 shadow-xl hover:scale-110 active:scale-95 cursor-pointer"
+        >
+          <ChevronRight size={24} />
+        </button>
 
+        {/* Main Content Area */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Pill Badge */}
+          <AnimatePresence mode="wait">
             <motion.div
-              initial={{ opacity: 0, y: -15 }}
+              key={currentSlide}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs sm:text-sm font-bold text-white mb-6 shadow-inner"
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.4 }}
+              className="text-center max-w-4xl mx-auto py-4 px-4 sm:px-8 rounded-3xl bg-slate-950/35 backdrop-blur-[2px] border border-white/10 shadow-2xl"
             >
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-sky-400" />
-                <span className="w-2 h-2 rounded-full bg-purple-400" />
-                <span className="w-2 h-2 rounded-full bg-orange-400" />
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              {/* Pill Badge */}
+              <div className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 text-xs sm:text-sm font-bold text-white mb-6 shadow-md">
+                <div className="flex items-center gap-1.5">
+                  {HERO_SLIDES[currentSlide].badgeColors.map((color, i) => (
+                    <span key={i} className={`w-2 h-2 rounded-full ${color}`} />
+                  ))}
+                </div>
+                <span className="text-white">{HERO_SLIDES[currentSlide].badge}</span>
               </div>
-              <span className="text-blue-100">Standar Pelayanan Minimal Terpadu Berbasis Posyandu</span>
-            </motion.div>
 
-            {/* Main Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight sm:leading-tight"
-            >
-              Penuhi Hak Layanan Dasar Masyarakat{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-purple-300 via-amber-300 to-emerald-300">
-                Kabupaten Tapanuli Selatan
-              </span>
-            </motion.h1>
+              {/* Main Headline */}
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight sm:leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
+                {HERO_SLIDES[currentSlide].title}{" "}
+                <span
+                  className={`text-transparent bg-clip-text bg-gradient-to-r ${HERO_SLIDES[currentSlide].highlightGradient} drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]`}
+                >
+                  {HERO_SLIDES[currentSlide].highlight}
+                </span>
+              </h1>
 
-            {/* Subhead Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="mt-6 text-base sm:text-lg lg:text-xl text-slate-200 font-normal leading-relaxed max-w-3xl mx-auto"
-            >
-              Sistem integrasi pelayanan dan pengaduan <strong>6 Bidang SPM</strong> (Kesehatan, Pendidikan, Sosial, Pekerjaan Umum, Perumahan Rakyat, dan Trantibum Linmas) langsung dari simpul Posyandu dan Desa hingga ke Pemerintah Kabupaten.
-            </motion.p>
+              {/* Subhead Description */}
+              <p className="mt-6 text-base sm:text-lg lg:text-xl text-white font-medium leading-relaxed max-w-3xl mx-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+                {HERO_SLIDES[currentSlide].deskripsi}
+              </p>
 
-            {/* Quick Actions Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4"
-            >
-              <Link
-                href="/pengaduan"
-                className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-base shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-3 transform hover:-translate-y-0.5 cursor-pointer"
-              >
-                <FileText size={20} />
-                <span>Ajukan Pengaduan</span>
-                <ArrowRight size={18} />
-              </Link>
+              {/* Quick Actions Buttons */}
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link
+                  href={HERO_SLIDES[currentSlide].actionHref}
+                  className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-base shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-3 transform hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <FileText size={20} />
+                  <span>{HERO_SLIDES[currentSlide].actionText}</span>
+                  <ArrowRight size={18} />
+                </Link>
 
-              <a
-                href="#bidang"
-                className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-base border border-white/20 backdrop-blur-md transition flex items-center justify-center gap-2"
-              >
-                <Layers size={18} className="text-sky-300" />
-                <span>Eksplorasi 6 Bidang SPM</span>
-              </a>
-            </motion.div>
-
-            {/* 4. QUICK TRACKING WIDGET IN HERO */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-12 max-w-2xl mx-auto"
-            >
-              <div className="bg-white/95 backdrop-blur-md rounded-2xl p-2 sm:p-3 shadow-2xl border border-white/90 text-slate-800">
-                <form onSubmit={handleTrackSubmit} className="flex flex-col sm:flex-row gap-2">
-                  <div className="relative flex-1">
-                    <Search
-                      size={18}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Lacak laporan Anda? Masukkan Kode Token (misal: TRK-7A9B2C)..."
-                      value={trackingInput}
-                      onChange={(e) => setTrackingInput(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="py-3 px-6 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900 text-white text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-md"
-                  >
-                    <Search size={16} />
-                    <span>Lacak Aduan</span>
-                  </button>
-                </form>
-                <p className="text-[11px] text-slate-500 mt-2 text-center sm:text-left px-2">
-                  *Gunakan kode pelacakan unik yang diberikan saat mendaftarkan laporan pengaduan secara online.
-                </p>
+                <a
+                  href={HERO_SLIDES[currentSlide].secondaryHref}
+                  className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-base border border-white/20 backdrop-blur-md transition flex items-center justify-center gap-2"
+                >
+                  <Layers size={18} className="text-sky-300" />
+                  <span>{HERO_SLIDES[currentSlide].secondaryText}</span>
+                </a>
               </div>
             </motion.div>
+          </AnimatePresence>
+
+          {/* Interactive Slide Tabs / Indicators */}
+          <div className="mt-8 flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+            {HERO_SLIDES.map((slide, idx) => (
+              <button
+                key={slide.id}
+                onClick={() => setCurrentSlide(idx)}
+                className={`group flex items-center gap-2.5 px-3.5 sm:px-5 py-2 rounded-full transition-all duration-300 text-xs sm:text-sm font-bold cursor-pointer ${
+                  currentSlide === idx
+                    ? "bg-white text-slate-950 shadow-xl scale-105"
+                    : "bg-black/40 text-white/80 hover:bg-black/60 hover:text-white border border-white/15 backdrop-blur-md"
+                }`}
+              >
+                <span
+                  className={`w-2 h-2 rounded-full transition-transform ${
+                    currentSlide === idx ? "bg-blue-600 scale-125" : "bg-white/50 group-hover:bg-white"
+                  }`}
+                />
+                <span>0{slide.id}</span>
+                <span className="hidden sm:inline font-semibold">{slide.tabLabel}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* 4. QUICK TRACKING WIDGET IN HERO */}
+          <div className="mt-10 max-w-2xl mx-auto">
+            <div className="bg-white/95 backdrop-blur-md rounded-2xl p-2 sm:p-3 shadow-2xl border border-white/90 text-slate-800">
+              <form onSubmit={handleTrackSubmit} className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
+                  <Search
+                    size={18}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Lacak laporan Anda? Masukkan Kode Token (misal: TRK-7A9B2C)..."
+                    value={trackingInput}
+                    onChange={(e) => setTrackingInput(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="py-3 px-6 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900 text-white text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-md"
+                >
+                  <Search size={16} />
+                  <span>Lacak Aduan</span>
+                </button>
+              </form>
+              <p className="text-[11px] text-slate-500 mt-2 text-center sm:text-left px-2">
+                *Gunakan kode pelacakan unik yang diberikan saat mendaftarkan laporan pengaduan secara online.
+              </p>
+            </div>
           </div>
 
           {/* Quick Metrics Cards */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 text-center">
+          <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
+            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 text-center shadow-lg">
               <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-amber-300">
                 {stats.loading ? "-" : stats.bidang}
               </div>
               <div className="text-xs sm:text-sm font-bold text-white mt-1">Bidang Pelayanan SPM</div>
               <p className="text-[11px] text-slate-300 mt-0.5">Urusan Wajib Pelayanan Dasar</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 text-center">
+            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 text-center shadow-lg">
               <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-purple-300">
                 {stats.loading ? "-" : stats.kecamatan}
               </div>
               <div className="text-xs sm:text-sm font-bold text-white mt-1">Kecamatan Wilayah</div>
               <p className="text-[11px] text-slate-300 mt-0.5">Terintegrasi Sistem SPM</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 text-center">
+            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 text-center shadow-lg">
               <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-emerald-300">
                 {stats.loading ? "-" : stats.desa}
               </div>
               <div className="text-xs sm:text-sm font-bold text-white mt-1">Desa & Kelurahan</div>
               <p className="text-[11px] text-slate-300 mt-0.5">Verifikasi Lapangan Faktual</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 text-center">
+            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 text-center shadow-lg">
               <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-sky-300">
                 {stats.loading ? "-" : stats.posyandu}
               </div>

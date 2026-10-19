@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { containsSqlInjection } from "@/lib/security";
 
 export async function GET(request: Request) {
   try {
@@ -9,6 +10,20 @@ export async function GET(request: Request) {
     if (!query) {
       return NextResponse.json(
         { success: false, message: "Nomor pengaduan atau token pelacakan wajib diisi." },
+        { status: 400 }
+      );
+    }
+
+    if (containsSqlInjection(query)) {
+      return NextResponse.json(
+        { success: false, message: "Permintaan tidak valid: Karakter berbahaya terdeteksi (SQL Injection)." },
+        { status: 400 }
+      );
+    }
+
+    if (!/^[A-Za-z0-9-]{3,40}$/.test(query)) {
+      return NextResponse.json(
+        { success: false, message: "Format nomor pengaduan atau token pelacakan tidak valid." },
         { status: 400 }
       );
     }

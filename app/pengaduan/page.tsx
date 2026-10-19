@@ -36,6 +36,12 @@ import {
   PlusCircle,
 } from "lucide-react";
 import tapselLogo from "@/public/images/logo-tapsel.png";
+import {
+  containsSqlInjection,
+  validateNik,
+  validatePhone,
+  scanFileName,
+} from "@/lib/security";
 
 interface Kecamatan {
   kd_kecamatan: string;
@@ -210,10 +216,62 @@ function PengaduanMasyarakatContent() {
     }
   };
 
-  // Handle Mock Upload Dokumen
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, jenisDok: string) => {
+  // Handle Upload Dokumen dengan Pemindaian Keamanan Lengkap
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, jenisDok: string) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setErrorMsg(null);
+
+    // 1. Pindai Nama File & Ekstensi (Cegah file .exe dan file berbahaya)
+    const nameScan = scanFileName(file.name);
+    if (!nameScan.isSafe) {
+      setErrorMsg(`Peringatan Keamanan File: ${nameScan.reason}`);
+      e.target.value = "";
+      return;
+    }
+
+    // 2. Batas Ukuran File (Maksimal 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrorMsg("Ukuran file terlalu besar. Batas maksimal lampiran adalah 5MB.");
+      e.target.value = "";
+      return;
+    }
+
+    // 3. Pemindaian Biner / Magic Bytes di Browser (Deteksi file .exe dan binary berbahaya)
+    try {
+      const slice = file.slice(0, 16);
+      const arrayBuffer = await slice.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+
+      // Cek apakah file Windows Executable (.exe, .dll, .com, .scr, .sys): 0x4D 0x5A ("MZ")
+      if (bytes[0] === 0x4d && bytes[1] === 0x5a) {
+        setErrorMsg("PERINGATAN KEAMANAN: File terdeteksi sebagai file executable Windows (.exe/program). File ditolak demi keamanan!");
+        e.target.value = "";
+        return;
+      }
+
+      // Cek Linux ELF Executable: 0x7F 0x45 0x4C 0x46
+      if (bytes[0] === 0x7f && bytes[1] === 0x45 && bytes[2] === 0x4c && bytes[3] === 0x46) {
+        setErrorMsg("PERINGATAN KEAMANAN: File terdeteksi sebagai Linux Executable Binary. File ditolak!");
+        e.target.value = "";
+        return;
+      }
+
+      // Verifikasi Magic Bytes Format Legal: JPEG, PNG, WEBP, PDF
+      const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+      const isPng = bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
+      const isPdf = bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
+      const isRiff = bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46;
+
+      if (!isJpeg && !isPng && !isPdf && !isRiff) {
+        setErrorMsg("Format file tidak sah: Header biner file tidak cocok dengan format gambar (JPG/PNG/WEBP) atau PDF resmi.");
+        e.target.value = "";
+        return;
+      }
+    } catch (err) {
+      console.error("Gagal membaca byte file:", err);
+    }
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -221,7 +279,7 @@ function PengaduanMasyarakatContent() {
         ...prev.filter((d) => d.jenis !== jenisDok),
         {
           jenis: jenisDok,
-          namaFile: file.name,
+          namaFile: nameScan.sanitizedName,
           pathFile: reader.result as string,
           ukuranFile: file.size,
         },
@@ -234,6 +292,34 @@ function PengaduanMasyarakatContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+
+    // 1. Pengecekan SQL Injection di Sisi Klien
+    if (
+      containsSqlInjection(nama) ||
+      containsSqlInjection(nik || "") ||
+      containsSqlInjection(noHp) ||
+      containsSqlInjection(alamat) ||
+      containsSqlInjection(deskripsi)
+    ) {
+      setErrorMsg("Karakter atau kata kunci tidak diizinkan terdeteksi (pola SQL Injection). Mohon periksa kembali formulir Anda.");
+      return;
+    }
+
+    // 2. Validasi NIK jika diisi
+    if (nik && nik.trim()) {
+      const nikCheck = validateNik(nik);
+      if (!nikCheck.isValid) {
+        setErrorMsg(nikCheck.error || "NIK tidak valid.");
+        return;
+      }
+    }
+
+    // 3. Validasi No HP
+    const phoneCheck = validatePhone(noHp);
+    if (!phoneCheck.isValid) {
+      setErrorMsg(phoneCheck.error || "Nomor HP tidak valid.");
+      return;
+    }
 
     if (
       !nama ||
@@ -1017,6 +1103,17 @@ function PengaduanMasyarakatContent() {
                     </div>
                   </div>
 
+                  {/* Security scanning notice badge */}
+                  <div className="flex items-center gap-2.5 p-3 bg-emerald-50/80 border border-emerald-200 rounded-2xl text-emerald-900 text-xs shadow-sm">
+                    <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+                    <div>
+                      <span className="font-bold block text-emerald-950">Pemindaian Keamanan File Aktif (Anti-Malware)</span>
+                      <span className="text-[11px] text-emerald-700 block leading-tight">
+                        Pemeriksaan Magic Bytes biner aktif. File executable (.exe, .bat, script) akan diblokir otomatis. Format aman: JPG, PNG, WEBP, PDF.
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="border border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-4 text-center transition bg-slate-50/60">
                       <Upload className="w-6 h-6 text-slate-400 mx-auto mb-1.5" />
@@ -1024,11 +1121,11 @@ function PengaduanMasyarakatContent() {
                         Foto KTP / KK Pelapor
                       </span>
                       <span className="text-[10px] sm:text-[11px] text-slate-400 block mb-2.5">
-                        Format JPG, PNG (Maks 3MB)
+                        Format JPG, PNG, WEBP, PDF (Maks 5MB)
                       </span>
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/webp,application/pdf"
                         onChange={(e) => handleFileUpload(e, "KTP")}
                         className="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                       />
@@ -1044,7 +1141,7 @@ function PengaduanMasyarakatContent() {
                       </span>
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/webp,application/pdf"
                         onChange={(e) => handleFileUpload(e, "DOKUMEN_LAINNYA")}
                         className="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer"
                       />
