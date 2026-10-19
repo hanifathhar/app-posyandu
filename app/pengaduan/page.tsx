@@ -1103,16 +1103,6 @@ function PengaduanMasyarakatContent() {
                     </div>
                   </div>
 
-                  {/* Security scanning notice badge */}
-                  <div className="flex items-center gap-2.5 p-3 bg-emerald-50/80 border border-emerald-200 rounded-2xl text-emerald-900 text-xs shadow-sm">
-                    <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-                    <div>
-                      <span className="font-bold block text-emerald-950">Pemindaian Keamanan File Aktif (Anti-Malware)</span>
-                      <span className="text-[11px] text-emerald-700 block leading-tight">
-                        Pemeriksaan Magic Bytes biner aktif. File executable (.exe, .bat, script) akan diblokir otomatis. Format aman: JPG, PNG, WEBP, PDF.
-                      </span>
-                    </div>
-                  </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="border border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-4 text-center transition bg-slate-50/60">
