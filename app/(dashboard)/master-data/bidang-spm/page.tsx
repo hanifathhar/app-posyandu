@@ -273,7 +273,7 @@ export default function MasterBidangSPMPage() {
           <span>Memuat 6 Bidang SPM...</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {bidangList.map((bidang) => {
             const displayCategories = (bidang.jenisPengaduan || []).filter((j: any) =>
               searchFilter ? j.nama.toLowerCase().includes(searchFilter.toLowerCase()) : true
@@ -335,66 +335,66 @@ export default function MasterBidangSPMPage() {
                     ) : (
                       <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
                         {displayCategories.map((jenis: any) => (
-                        <div
-                          key={jenis.id}
-                          className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 hover:bg-slate-50 transition text-xs"
-                        >
-                          <div className="pr-2">
-                            <span className={`font-semibold ${jenis.aktif ? "text-slate-800" : "text-slate-400 line-through"}`}>
-                              {jenis.nama}
-                            </span>
-                            {jenis._count?.pengaduan > 0 && (
-                              <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-bold">
-                                {jenis._count.pengaduan}x dipilih
+                          <div
+                            key={jenis.id}
+                            className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 hover:bg-slate-50 transition text-xs"
+                          >
+                            <div className="pr-2">
+                              <span className={`font-semibold ${jenis.aktif ? "text-slate-800" : "text-slate-400 line-through"}`}>
+                                {jenis.nama}
                               </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center space-x-1 shrink-0">
-                            <button
-                              onClick={() => handleToggleAktif(jenis.id, jenis.aktif)}
-                              title={jenis.aktif ? "Klik untuk nonaktifkan" : "Klik untuk aktifkan"}
-                              className="p-1 hover:opacity-80 transition"
-                            >
-                              {jenis.aktif ? (
-                                <ToggleRight size={20} className="text-blue-600" />
-                              ) : (
-                                <ToggleLeft size={20} className="text-slate-300" />
+                              {jenis._count?.pengaduan > 0 && (
+                                <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-bold">
+                                  {jenis._count.pengaduan}x dipilih
+                                </span>
                               )}
-                            </button>
-                            <button
-                              onClick={() => handleOpenEditModal(jenis)}
-                              className="p-1 rounded-md border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-blue-700 transition"
-                              title="Edit Kategori"
-                            >
-                              <Edit size={12} />
-                            </button>
-                            <button
-                              onClick={() => handleOpenDeleteModal(jenis)}
-                              className="p-1 rounded-md border border-slate-200 bg-white hover:bg-rose-50 text-slate-500 hover:rose-600 transition"
-                              title="Hapus Kategori"
-                            >
-                              <Trash2 size={12} />
-                            </button>
+                            </div>
+
+                            <div className="flex items-center space-x-1 shrink-0">
+                              <button
+                                onClick={() => handleToggleAktif(jenis.id, jenis.aktif)}
+                                title={jenis.aktif ? "Klik untuk nonaktifkan" : "Klik untuk aktifkan"}
+                                className="p-1 hover:opacity-80 transition"
+                              >
+                                {jenis.aktif ? (
+                                  <ToggleRight size={20} className="text-blue-600" />
+                                ) : (
+                                  <ToggleLeft size={20} className="text-slate-300" />
+                                )}
+                              </button>
+                              <button
+                                onClick={() => handleOpenEditModal(jenis)}
+                                className="p-1 rounded-md border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-blue-700 transition"
+                                title="Edit Kategori"
+                              >
+                                <Edit size={12} />
+                              </button>
+                              <button
+                                onClick={() => handleOpenDeleteModal(jenis)}
+                                className="p-1 rounded-md border border-slate-200 bg-white hover:bg-rose-50 text-slate-500 hover:rose-600 transition"
+                                title="Hapus Kategori"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Card Footer */}
+                <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span>Kode: <strong className="font-mono">{bidang.kode}</strong></span>
+                  <span className="text-emerald-700 font-bold flex items-center gap-1">
+                    <CheckCircle2 size={13} /> Status Aktif
+                  </span>
                 </div>
               </div>
-
-              {/* Card Footer */}
-              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-                <span>Kode: <strong className="font-mono">{bidang.kode}</strong></span>
-                <span className="text-emerald-700 font-bold flex items-center gap-1">
-                  <CheckCircle2 size={13} /> Status Aktif
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
       )}
 
       {/* Modal Add Jenis */}
@@ -411,11 +411,10 @@ export default function MasterBidangSPMPage() {
             <form onSubmit={handleCreateJenis} className="p-6 space-y-4 text-xs">
               {feedback && (
                 <div
-                  className={`p-3 rounded-xl border text-xs font-semibold ${
-                    feedback.type === "success"
+                  className={`p-3 rounded-xl border text-xs font-semibold ${feedback.type === "success"
                       ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                       : "bg-rose-50 border-rose-200 text-rose-800"
-                  }`}
+                    }`}
                 >
                   {feedback.message}
                 </div>
@@ -495,11 +494,10 @@ export default function MasterBidangSPMPage() {
             <form onSubmit={handleSaveEdit} className="p-6 space-y-4 text-xs">
               {editFeedback && (
                 <div
-                  className={`p-3 rounded-xl border text-xs font-semibold ${
-                    editFeedback.type === "success"
+                  className={`p-3 rounded-xl border text-xs font-semibold ${editFeedback.type === "success"
                       ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                       : "bg-rose-50 border-rose-200 text-rose-800"
-                  }`}
+                    }`}
                 >
                   {editFeedback.message}
                 </div>
