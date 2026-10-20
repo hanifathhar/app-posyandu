@@ -206,7 +206,7 @@ export default function ProfilePage() {
               </h1>
 
               <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Informasi akun personal dan pengaturan kata sandi sistem BPHTB Online.
+                Informasi akun personal dan pengaturan kata sandi.
               </p>
             </div>
 
