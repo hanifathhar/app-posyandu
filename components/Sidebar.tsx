@@ -239,7 +239,7 @@ export default function Sidebar({
 
                 <div>
                   <h2 className="font-black text-base leading-tight tracking-tight">SAPA Posyandu</h2>
-                  <p className="text-[11px] text-blue-100/90 font-medium">Saluran Aspirasi dan Pengaduan Atif Posyandu Tapanuli Selatan</p>
+                  <p className="text-[11px] text-blue-100/90 font-medium">Saluran Aspirasi dan Pengaduan Aktif Posyandu Tapanuli Selatan</p>
                 </div>
               </div>
 
