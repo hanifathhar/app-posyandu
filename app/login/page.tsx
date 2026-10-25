@@ -172,7 +172,7 @@ export default function LoginPage() {
                 Pemerintah Kabupaten Tapanuli Selatan
               </h1>
               <p className="text-xs text-slate-300 font-medium">
-                Saluran Aspirasi dan Pengaduan Atif Posyandu Tapanuli Selatan
+                Saluran Aspirasi dan Pengaduan Aktif Posyandu Tapanuli Selatan
               </p>
             </div>
           </Link>

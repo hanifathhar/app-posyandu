@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "SAPA Posyandu Tapanuli Selatan",
-  description: "Saluran Aspirasi dan Pengaduan Atif Posyandu Tapanuli Selatan",
+  description: "Saluran Aspirasi dan Pengaduan Aktif Posyandu Tapanuli Selatan",
   icons: {
     icon: "/favicon.png",
   },

@@ -1348,7 +1348,7 @@ export default function SPMHomePage() {
                   </h4>
                   <h3 className="text-base font-black text-blue-400">Tapanuli Selatan</h3>
                   <span className="text-[11px] text-slate-400">
-                    Saluran Aspirasi dan Pengaduan Atif Posyandu Tapanuli Selatan
+                    Saluran Aspirasi dan Pengaduan Aktif Posyandu Tapanuli Selatan
                   </span>
                 </div>
               </div>

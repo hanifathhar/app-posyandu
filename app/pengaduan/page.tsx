@@ -556,10 +556,10 @@ function PengaduanMasyarakatContent() {
             </div>
             <div className="min-w-0 hidden sm:block border-l border-slate-200 pl-2.5">
               <h1 className="text-xs sm:text-sm font-black text-slate-900 leading-tight group-hover:text-blue-700 transition-colors truncate">
-                Pengaduan SPM Terpadu
+                Saluran Aspirasi dan Pengaduan Aktif Posyandu
               </h1>
               <p className="text-[10px] sm:text-xs text-slate-500 font-medium truncate">
-                Kabupaten Tapanuli Selatan
+                SAPA Posyandu Tapanuli Selatan
               </p>
             </div>
           </Link>
