@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Si-Posyandu Tapanuli Selatan",
-  description: "Sistem Informasi Posyandu Cepat, Responsif, Integratif, Akuntabel",
+  title: "SAPA Posyandu Tapanuli Selatan",
+  description: "Saluran Aspirasi dan Pengaduan Atif Posyandu Tapanuli Selatan",
   icons: {
     icon: "/favicon.png",
   },

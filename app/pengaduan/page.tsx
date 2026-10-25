@@ -36,6 +36,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import tapselLogo from "@/public/images/logo-tapsel.png";
+import tapselBangkitLogo from "@/public/tapselbangkit.png";
 import {
   containsSqlInjection,
   validateNik,
@@ -533,16 +534,27 @@ function PengaduanMasyarakatContent() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           {/* Logo & Identitas Singkat */}
           <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group min-w-0">
-            <div className="w-9 h-11 sm:w-10 sm:h-12 relative shrink-0 transition-transform group-hover:scale-105">
-              <Image
-                src={tapselLogo}
-                alt="Logo Pemkab Tapanuli Selatan"
-                fill
-                className="object-contain"
-                priority
-              />
+            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+              <div className="w-8 h-10 sm:w-10 sm:h-12 relative shrink-0 transition-transform group-hover:scale-105">
+                <Image
+                  src={tapselLogo}
+                  alt="Logo Pemkab Tapanuli Selatan"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <div className="h-7 sm:h-9 w-24 sm:w-32 relative shrink-0 transition-transform group-hover:scale-105">
+                <Image
+                  src={tapselBangkitLogo}
+                  alt="Logo Tapsel Bangkit"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 hidden sm:block border-l border-slate-200 pl-2.5">
               <h1 className="text-xs sm:text-sm font-black text-slate-900 leading-tight group-hover:text-blue-700 transition-colors truncate">
                 Pengaduan SPM Terpadu
               </h1>

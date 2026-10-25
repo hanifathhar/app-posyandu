@@ -172,7 +172,7 @@ export default function LoginPage() {
                 Pemerintah Kabupaten Tapanuli Selatan
               </h1>
               <p className="text-xs text-slate-300 font-medium">
-                Sistem Pemantauan Standar Pelayanan Minimal (SPM) Terpadu
+                Saluran Aspirasi dan Pengaduan Atif Posyandu Tapanuli Selatan
               </p>
             </div>
           </Link>
@@ -272,7 +272,7 @@ export default function LoginPage() {
               Pemerintah Kabupaten Tapanuli Selatan
             </span>
             <span className="block text-xs sm:text-sm font-bold truncate">
-              Sistem Informasi SPM Terpadu Posyandu
+              Saluran Aspirasi dan Pengaduan Atif Posyandu Tapanuli Selatan
             </span>
           </div>
         </div>
@@ -297,7 +297,7 @@ export default function LoginPage() {
                 Masuk ke Akun Petugas
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-snug">
-                Silakan masukkan kredensial akun Anda untuk mengakses sistem SPM Terpadu.
+                Silakan masukkan kredensial akun Anda untuk mengakses sistem SAPA Posyandu.
               </p>
             </div>
 

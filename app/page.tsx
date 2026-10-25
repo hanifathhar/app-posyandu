@@ -43,6 +43,7 @@ import {
 
 import logoPic from "@/public/favicon.png";
 import tapselLogo from "@/public/images/logo-tapsel.png";
+import tapselBangkitLogo from "@/public/tapselbangkit.png";
 import bgBack from "@/public/images/bg_back.png";
 
 // 3 Banner Dummy untuk Slider Bagian Judul (Hero)
@@ -415,17 +416,28 @@ export default function SPMHomePage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* Logo & Identity */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-12 relative shrink-0 transition-transform group-hover:scale-105">
-              <Image
-                src={tapselLogo}
-                alt="Logo Pemkab Tapanuli Selatan"
-                fill
-                className="object-contain"
-                priority
-              />
+          <Link href="/" className="flex items-center gap-3 sm:gap-4 group">
+            <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+              <div className="w-9 h-11 sm:w-10 sm:h-12 relative shrink-0 transition-transform group-hover:scale-105">
+                <Image
+                  src={tapselLogo}
+                  alt="Logo Pemkab Tapanuli Selatan"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <div className="h-8 sm:h-10 w-28 sm:w-36 relative shrink-0 transition-transform group-hover:scale-105">
+                <Image
+                  src={tapselBangkitLogo}
+                  alt="Logo Tapsel Bangkit"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </div>
-            <div className="leading-tight">
+            <div className="leading-tight hidden sm:block border-l border-slate-200 pl-3">
               <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
                 Pemerintah Kabupaten
               </div>
@@ -433,7 +445,7 @@ export default function SPMHomePage() {
                 Tapanuli Selatan
               </div>
               <div className="text-[10px] font-semibold text-blue-700 uppercase tracking-widest flex items-center gap-1">
-                <span>SPM Terpadu Posyandu</span>
+                <span>SAPA POSYANDU TAPSEL</span>
               </div>
             </div>
           </Link>
@@ -441,7 +453,7 @@ export default function SPMHomePage() {
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-700">
             <a href="#tentang" className="hover:text-[#0c3b5e] transition">
-              SPM
+              Home
             </a>
             <a href="#bidang" className="hover:text-[#0c3b5e] transition">
               6 Bidang Pelayanan
@@ -462,13 +474,7 @@ export default function SPMHomePage() {
 
           {/* Action CTAs */}
           <div className="hidden sm:flex items-center gap-3">
-            <Link
-              href="/pengaduan"
-              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-600/20 transition flex items-center gap-2"
-            >
-              <FileText size={16} />
-              <span>Buat Pengaduan</span>
-            </Link>
+
             <Link
               href="/login"
               className="py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-[#0c3b5e] text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center gap-2"
@@ -1342,7 +1348,7 @@ export default function SPMHomePage() {
                   </h4>
                   <h3 className="text-base font-black text-blue-400">Tapanuli Selatan</h3>
                   <span className="text-[11px] text-slate-400">
-                    Sistem SPM Terpadu Berbasis Posyandu
+                    Saluran Aspirasi dan Pengaduan Atif Posyandu Tapanuli Selatan
                   </span>
                 </div>
               </div>
