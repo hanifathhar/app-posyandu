@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import tapselLogo from "@/public/images/logo-tapsel.png";
 import tapselBangkitLogo from "@/public/tapselbangkit.png";
+import pkklogo from "@/public/pkk.png";
 import {
   containsSqlInjection,
   validateNik,
@@ -539,6 +540,15 @@ function PengaduanMasyarakatContent() {
                 <Image
                   src={tapselLogo}
                   alt="Logo Pemkab Tapanuli Selatan"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <div className="w-9 h-11 sm:w-10 sm:h-12 relative shrink-0 transition-transform group-hover:scale-105">
+                <Image
+                  src={pkklogo}
+                  alt="Logo Tapsel Bangkit"
                   fill
                   className="object-contain"
                   priority
