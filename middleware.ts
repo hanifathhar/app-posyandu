@@ -28,11 +28,11 @@ export async function middleware(request: NextRequest) {
     if (
         pathname.startsWith("/_next") ||
         pathname.startsWith("/static") ||
-        pathname.startsWith("/favicon.ico") ||
-        pathname.startsWith("/favicon.png") ||
+        pathname.startsWith("/favicon") ||
         pathname.startsWith("/icons") ||
         pathname.startsWith("/images") ||
-        pathname.startsWith("/uploads")
+        pathname.startsWith("/uploads") ||
+        Boolean(pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot)$/))
     ) {
         return NextResponse.next();
     }
