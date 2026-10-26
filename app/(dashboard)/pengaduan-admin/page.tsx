@@ -91,6 +91,8 @@ interface PengaduanAdminItem {
     kd_kecamatan?: string;
   };
   deskripsi: string;
+  jumlahTanggungan?: number | null;
+  penghasilan?: string | null;
   status: string;
   alasanPenolakan?: string;
   catatan?: string;
@@ -151,6 +153,8 @@ function PengaduanAdminContent() {
     namaPelapor: "",
     noHpPelapor: "",
     alamatPelapor: "",
+    jumlahTanggungan: "",
+    penghasilan: "",
     deskripsi: "",
     catatan: "",
     status: "",
@@ -177,6 +181,8 @@ function PengaduanAdminContent() {
       namaPelapor: item.pelapor.nama || "",
       noHpPelapor: item.pelapor.noHp || "",
       alamatPelapor: item.pelapor.alamat || "",
+      jumlahTanggungan: item.jumlahTanggungan !== null && item.jumlahTanggungan !== undefined ? String(item.jumlahTanggungan) : "",
+      penghasilan: item.penghasilan || "",
       deskripsi: item.deskripsi || "",
       catatan: item.catatan || "",
       status: item.status || "MENUNGGU_VERIFIKASI_DESA",
@@ -211,6 +217,8 @@ function PengaduanAdminContent() {
           deskripsi: editForm.deskripsi,
           catatan: editForm.catatan,
           hasilPenyelesaian: editForm.hasilPenyelesaian,
+          jumlahTanggungan: editForm.jumlahTanggungan ? parseInt(editForm.jumlahTanggungan, 10) : null,
+          penghasilan: editForm.penghasilan || null,
           pelapor: {
             ...prev.pelapor,
             nama: editForm.namaPelapor,
@@ -1236,6 +1244,22 @@ function PengaduanAdminContent() {
                     <span className="text-slate-500 block">Alamat Domisili:</span>
                     <span className="text-slate-700">{selectedItem.pelapor.alamat}</span>
                   </div>
+                  <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-slate-200/70 mt-1.5">
+                    <div>
+                      <span className="text-slate-500 block text-[10px] uppercase font-bold">Jml Tanggungan:</span>
+                      <span className="font-semibold text-slate-800">
+                        {selectedItem.jumlahTanggungan !== null && selectedItem.jumlahTanggungan !== undefined
+                          ? `${selectedItem.jumlahTanggungan} Orang`
+                          : "-"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[10px] uppercase font-bold">Penghasilan / Bulan:</span>
+                      <span className="font-semibold text-slate-800">
+                        {selectedItem.penghasilan || "-"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-2">
@@ -1827,6 +1851,33 @@ function PengaduanAdminContent() {
                   onChange={(e) => setEditForm({ ...editForm, alamatPelapor: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Jumlah Tanggungan:</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editForm.jumlahTanggungan}
+                    onChange={(e) => setEditForm({ ...editForm, jumlahTanggungan: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Penghasilan / Bulan:</label>
+                  <select
+                    value={editForm.penghasilan}
+                    onChange={(e) => setEditForm({ ...editForm, penghasilan: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                  >
+                    <option value="">-- Pilih Penghasilan --</option>
+                    <option value="< 1 jt /bulan">&lt; 1 jt /bulan</option>
+                    <option value="1 jt s/d. 2.5 juta">1 jt s/d. 2.5 juta</option>
+                    <option value="2.6 jt sd 5 jt">2.6 jt sd 5 jt</option>
+                    <option value="> 5 jt">&gt; 5 jt</option>
+                  </select>
+                </div>
               </div>
 
               <div>

@@ -45,6 +45,7 @@ import logoPic from "@/public/favicon.png";
 import tapselLogo from "@/public/images/logo-tapsel.png";
 import tapselBangkitLogo from "@/public/tapselbangkit.png";
 import pkklogo from "@/public/pkk.png";
+import posyandu from "@/public/posyandu.png";
 import bgBack from "@/public/images/bg_back.png";
 
 // 3 Banner Dummy untuk Slider Bagian Judul (Hero)
@@ -430,7 +431,7 @@ export default function SPMHomePage() {
               </div>
               <div className="w-9 h-11 sm:w-10 sm:h-12 relative shrink-0 transition-transform group-hover:scale-105">
                 <Image
-                  src={pkklogo}
+                  src={posyandu}
                   alt="Logo Tapsel Bangkit"
                   fill
                   className="object-contain"

@@ -205,6 +205,9 @@ model Pelapor {
   kd_desa      String?
   kd_kecamatan String?
 
+  jumlahTanggungan Int?
+  penghasilan      String?
+
   desa Desa? @relation(fields: [kd_desa], references: [kd_desa], onDelete: Restrict)
 
   kecamatan Kecamatan? @relation(fields: [kd_kecamatan], references: [kd_kecamatan], onDelete: Restrict)
@@ -285,6 +288,10 @@ model Pengaduan {
 
   posyanduId String
   posyandu   Posyandu @relation(fields: [posyanduId], references: [id], onDelete: Restrict)
+
+  // Kondisi Sosial Ekonomi Pemohon
+  jumlahTanggungan Int?
+  penghasilan      String?
 
   deskripsi String @db.Text
 

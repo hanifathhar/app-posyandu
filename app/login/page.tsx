@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import logoPic from "@/public/logo.png";
+import logoPic from "@/public/logo1.png";
 import tapselLogo from "@/public/images/logo-tapsel.png";
 import bgBack from "@/public/images/bg_log.png";
 
@@ -282,11 +282,11 @@ export default function LoginPage() {
           <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-200/90 p-6 sm:p-9 transition-all">
             {/* Header Kartu Login */}
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center p-3 sm:p-4 rounded-3xl bg-slate-50 border border-slate-200/80 shadow-sm mb-4 transition-transform hover:scale-105 duration-200">
-                <div className="relative w-24 h-24 sm:w-28 sm:h-28">
+              <div className="inline-flex items-center justify-center p-4 sm:p-5 rounded-3xl bg-slate-50 border border-slate-200/80 shadow-sm mb-4 transition-transform hover:scale-105 duration-200">
+                <div className="relative w-36 h-36 sm:w-44 sm:h-44">
                   <Image
                     src={logoPic}
-                    alt="Logo SPM Posyandu"
+                    alt="Logo SAPA Posyandu Tapanuli Selatan"
                     fill
                     className="object-contain"
                     priority

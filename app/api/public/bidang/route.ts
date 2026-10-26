@@ -19,7 +19,19 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json({ success: true, data: bidangList });
+    // Urutkan jenis pengaduan agar opsi 'Lainnya' selalu berada di urutan paling akhir
+    const sortedData = bidangList.map((b) => ({
+      ...b,
+      jenis: [...b.jenis].sort((a, b) => {
+        const isALainnya = /lainnya|lain-lain/i.test(a.nama.trim());
+        const isBLainnya = /lainnya|lain-lain/i.test(b.nama.trim());
+        if (isALainnya && !isBLainnya) return 1;
+        if (!isALainnya && isBLainnya) return -1;
+        return a.nama.localeCompare(b.nama, "id");
+      }),
+    }));
+
+    return NextResponse.json({ success: true, data: sortedData });
   } catch (error: any) {
     console.error("Error fetching bidang:", error);
     return NextResponse.json(

@@ -27,6 +27,8 @@ export async function POST(request: Request) {
       nik,
       noHp,
       alamat,
+      jumlahTanggungan,
+      penghasilan,
       kd_kecamatan,
       kd_desa,
       posyanduId,
@@ -43,7 +45,8 @@ export async function POST(request: Request) {
       containsSqlInjection(nik || "") ||
       containsSqlInjection(noHp) ||
       containsSqlInjection(alamat) ||
-      containsSqlInjection(deskripsi)
+      containsSqlInjection(deskripsi) ||
+      containsSqlInjection(penghasilan || "")
     ) {
       console.warn("[SECURITY ALERT] Percobaan SQL Injection terdeteksi pada form pengaduan.");
       return NextResponse.json(
@@ -68,6 +71,10 @@ export async function POST(request: Request) {
       !nama ||
       !noHp ||
       !alamat ||
+      jumlahTanggungan === undefined ||
+      jumlahTanggungan === null ||
+      jumlahTanggungan === "" ||
+      !penghasilan ||
       !kd_kecamatan ||
       !kd_desa ||
       !posyanduId ||
@@ -78,7 +85,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          message: "Semua field bertanda bintang wajib diisi, termasuk minimal satu kategori masalah SPM.",
+          message: "Semua field bertanda bintang wajib diisi, termasuk jumlah tanggungan, penghasilan, dan minimal satu kategori masalah SPM.",
         },
         { status: 400 }
       );
@@ -95,6 +102,34 @@ export async function POST(request: Request) {
     const cleanNama = sanitizeString(nama, 100);
     const cleanAlamat = sanitizeString(alamat, 500);
     const cleanDeskripsi = sanitizeString(deskripsi, 5000);
+
+    // Validasi & Sanitasi Jumlah Tanggungan
+    const parsedTanggungan = parseInt(String(jumlahTanggungan), 10);
+    if (isNaN(parsedTanggungan) || parsedTanggungan < 0 || parsedTanggungan > 50) {
+      return NextResponse.json(
+        { success: false, message: "Jumlah tanggungan harus berupa angka valid (minimal 0)." },
+        { status: 400 }
+      );
+    }
+
+    // Validasi Pilihan Penghasilan
+    const ALLOWED_PENGHASILAN = [
+      "< 1 jt /bulan",
+      "1 jt s/d. 2.5 juta",
+      "2.6 jt sd 5 jt",
+      "> 5 jt",
+      "< 1 juta",
+      "1 juta s/d. 2.5 juta",
+      "2.6 juta sd 5 juta",
+      "> 5 juta",
+    ];
+    const cleanPenghasilan = String(penghasilan).trim();
+    if (!ALLOWED_PENGHASILAN.includes(cleanPenghasilan)) {
+      return NextResponse.json(
+        { success: false, message: "Pilihan rentang penghasilan tidak valid." },
+        { status: 400 }
+      );
+    }
 
     // Validasi NIK jika diisi
     const nikCheck = validateNik(nik);
@@ -178,6 +213,8 @@ export async function POST(request: Request) {
             nama: cleanNama,
             noHp: cleanNoHp,
             alamat: cleanAlamat,
+            jumlahTanggungan: parsedTanggungan,
+            penghasilan: cleanPenghasilan,
             kd_kecamatan,
             kd_desa,
           },
@@ -189,6 +226,8 @@ export async function POST(request: Request) {
             nik: cleanNik,
             noHp: cleanNoHp,
             alamat: cleanAlamat,
+            jumlahTanggungan: parsedTanggungan,
+            penghasilan: cleanPenghasilan,
             kd_kecamatan,
             kd_desa,
           },
@@ -200,6 +239,8 @@ export async function POST(request: Request) {
           nama: cleanNama,
           noHp: cleanNoHp,
           alamat: cleanAlamat,
+          jumlahTanggungan: parsedTanggungan,
+          penghasilan: cleanPenghasilan,
           kd_kecamatan,
           kd_desa,
         },
@@ -227,6 +268,8 @@ export async function POST(request: Request) {
         tokenPelacakan,
         pelaporId: pelapor.id,
         bidangId,
+        jumlahTanggungan: parsedTanggungan,
+        penghasilan: cleanPenghasilan,
         jenisPengaduan: {
           connect: selectedJenisIds.map((id) => ({ id })),
         },

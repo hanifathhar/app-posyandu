@@ -137,6 +137,8 @@ export async function GET(request: Request) {
           kd_kecamatan: p.kd_kecamatan,
         },
         deskripsi: p.deskripsi,
+        jumlahTanggungan: p.jumlahTanggungan ?? p.pelapor?.jumlahTanggungan ?? null,
+        penghasilan: p.penghasilan ?? p.pelapor?.penghasilan ?? null,
         status: p.status,
         alasanPenolakan: p.alasanPenolakan,
         catatan: p.catatan,
@@ -180,7 +182,18 @@ export async function GET(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
-    const { id, deskripsi, catatan, status, hasilPenyelesaian, namaPelapor, noHpPelapor, alamatPelapor } = body;
+    const {
+      id,
+      deskripsi,
+      catatan,
+      status,
+      hasilPenyelesaian,
+      namaPelapor,
+      noHpPelapor,
+      alamatPelapor,
+      jumlahTanggungan,
+      penghasilan,
+    } = body;
 
     if (!id) {
       return NextResponse.json({ success: false, message: "ID pengaduan wajib diisi." }, { status: 400 });
@@ -227,13 +240,21 @@ export async function PATCH(request: Request) {
     }
 
     // Update Pelapor if provided
-    if (namaPelapor || noHpPelapor !== undefined || alamatPelapor !== undefined) {
+    if (
+      namaPelapor ||
+      noHpPelapor !== undefined ||
+      alamatPelapor !== undefined ||
+      jumlahTanggungan !== undefined ||
+      penghasilan !== undefined
+    ) {
       await prisma.pelapor.update({
         where: { id: current.pelaporId },
         data: {
           ...(namaPelapor ? { nama: namaPelapor } : {}),
           ...(noHpPelapor !== undefined ? { noHp: noHpPelapor } : {}),
           ...(alamatPelapor !== undefined ? { alamat: alamatPelapor } : {}),
+          ...(jumlahTanggungan !== undefined ? { jumlahTanggungan: parseInt(String(jumlahTanggungan), 10) || 0 } : {}),
+          ...(penghasilan !== undefined ? { penghasilan } : {}),
         },
       });
     }
@@ -243,6 +264,8 @@ export async function PATCH(request: Request) {
     if (catatan !== undefined) updateData.catatan = catatan;
     if (status !== undefined) updateData.status = status as StatusPengaduan;
     if (hasilPenyelesaian !== undefined) updateData.hasilPenyelesaian = hasilPenyelesaian;
+    if (jumlahTanggungan !== undefined) updateData.jumlahTanggungan = parseInt(String(jumlahTanggungan), 10) || 0;
+    if (penghasilan !== undefined) updateData.penghasilan = penghasilan;
 
     const updated = await prisma.pengaduan.update({
       where: { id },

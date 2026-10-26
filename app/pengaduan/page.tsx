@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -38,6 +38,7 @@ import {
 import tapselLogo from "@/public/images/logo-tapsel.png";
 import tapselBangkitLogo from "@/public/tapselbangkit.png";
 import pkklogo from "@/public/pkk.png";
+import posyandu from "@/public/posyandu.png";
 import {
   containsSqlInjection,
   validateNik,
@@ -95,6 +96,8 @@ function PengaduanMasyarakatContent() {
   const [nik, setNik] = useState("");
   const [noHp, setNoHp] = useState("");
   const [alamat, setAlamat] = useState("");
+  const [jumlahTanggungan, setJumlahTanggungan] = useState("");
+  const [penghasilan, setPenghasilan] = useState("");
   const [selectedKecamatan, setSelectedKecamatan] = useState("");
   const [selectedDesa, setSelectedDesa] = useState("");
   const [selectedPosyandu, setSelectedPosyandu] = useState("");
@@ -195,9 +198,18 @@ function PengaduanMasyarakatContent() {
     }
   }, [initialToken]);
 
-  // Jenis pengaduan berdasarkan bidang terpilih
+  // Jenis pengaduan berdasarkan bidang terpilih (opsi "Lainnya" selalu di urutan terakhir)
   const activeBidang = bidangs.find((b) => b.id === selectedBidangId);
-  const jenisList = activeBidang ? activeBidang.jenis : [];
+  const jenisList = useMemo(() => {
+    if (!activeBidang || !activeBidang.jenis) return [];
+    return [...activeBidang.jenis].sort((a, b) => {
+      const isALainnya = /lainnya|lain-lain/i.test(a.nama.trim());
+      const isBLainnya = /lainnya|lain-lain/i.test(b.nama.trim());
+      if (isALainnya && !isBLainnya) return 1;
+      if (!isALainnya && isBLainnya) return -1;
+      return a.nama.localeCompare(b.nama, "id");
+    });
+  }, [activeBidang]);
 
   // Reset jenis pengaduan saat bidang berganti
   useEffect(() => {
@@ -327,6 +339,8 @@ function PengaduanMasyarakatContent() {
       !nama ||
       !noHp ||
       !alamat ||
+      !jumlahTanggungan ||
+      !penghasilan ||
       !selectedKecamatan ||
       !selectedDesa ||
       !selectedPosyandu ||
@@ -335,7 +349,7 @@ function PengaduanMasyarakatContent() {
       !deskripsi
     ) {
       setErrorMsg(
-        "Harap lengkapi semua isian yang wajib diisi (*), serta pilih minimal 1 Kategori Masalah SPM."
+        "Harap lengkapi semua isian yang wajib diisi (*), termasuk jumlah tanggungan, penghasilan, dan minimal 1 Kategori Masalah SPM."
       );
       return;
     }
@@ -355,6 +369,8 @@ function PengaduanMasyarakatContent() {
           nik,
           noHp,
           alamat,
+          jumlahTanggungan: parseInt(jumlahTanggungan, 10),
+          penghasilan,
           kd_kecamatan: selectedKecamatan,
           kd_desa: selectedDesa,
           posyanduId: selectedPosyandu,
@@ -382,6 +398,8 @@ function PengaduanMasyarakatContent() {
       setNik("");
       setNoHp("");
       setAlamat("");
+      setJumlahTanggungan("");
+      setPenghasilan("");
       setSelectedJenisIds([]);
       setDeskripsi("");
       setDokumenList([]);
@@ -398,6 +416,8 @@ function PengaduanMasyarakatContent() {
     setNik("");
     setNoHp("");
     setAlamat("");
+    setJumlahTanggungan("");
+    setPenghasilan("");
     setSelectedKecamatan("");
     setSelectedDesa("");
     setSelectedPosyandu("");
@@ -547,7 +567,7 @@ function PengaduanMasyarakatContent() {
               </div>
               <div className="w-9 h-11 sm:w-10 sm:h-12 relative shrink-0 transition-transform group-hover:scale-105">
                 <Image
-                  src={pkklogo}
+                  src={posyandu}
                   alt="Logo Tapsel Bangkit"
                   fill
                   className="object-contain"
@@ -889,6 +909,46 @@ function PengaduanMasyarakatContent() {
                         onChange={(e) => setAlamat(e.target.value)}
                         className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        Jumlah Tanggungan <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        min={0}
+                        max={30}
+                        placeholder="Contoh: 3 (orang)"
+                        value={jumlahTanggungan}
+                        onChange={(e) => setJumlahTanggungan(e.target.value)}
+                        className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium"
+                      />
+                      <span className="text-[10px] sm:text-[11px] text-slate-400 mt-1 block">
+                        Jumlah anggota keluarga yang menjadi tanggungan
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        Penghasilan per Bulan <span className="text-rose-500">*</span>
+                      </label>
+                      <select
+                        required
+                        value={penghasilan}
+                        onChange={(e) => setPenghasilan(e.target.value)}
+                        className="w-full px-3.5 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition bg-white font-medium"
+                      >
+                        <option value="">-- Pilih Rentang Penghasilan/Bulan --</option>
+                        <option value="< 1 juta">&lt; 1 juta</option>
+                        <option value="1 jt s/d. 2.5 juta">1 juta s/d. 2.5 juta</option>
+                        <option value="2.6 juta sd 5 juta">2.6 juta sd 5 juta</option>
+                        <option value="> 5 juta">&gt; 5 juta</option>
+                      </select>
+                      <span className="text-[10px] sm:text-[11px] text-slate-400 mt-1 block">
+                        Pilihan rentang rata-rata penghasilan per bulan
+                      </span>
                     </div>
                   </div>
                 </div>
