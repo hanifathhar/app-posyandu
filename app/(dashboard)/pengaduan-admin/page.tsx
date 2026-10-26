@@ -101,6 +101,7 @@ interface PengaduanAdminItem {
   dokumenCount: number;
   dokumen?: DokumenItem[];
   verifikasiCount: number;
+  latestVerifikasiTahap?: string | null;
   tindakLanjutCount: number;
   tindakLanjutList?: TindakLanjutItem[];
 }
@@ -145,6 +146,13 @@ function PengaduanAdminContent() {
   const [tlHasil, setTlHasil] = useState<string>("");
   const [tlSelesai, setTlSelesai] = useState<boolean>(false);
   const [tlSubmitting, setTlSubmitting] = useState<boolean>(false);
+
+  // Form Penanganan Langsung (Bypass Verifikasi Berjenjang di Desa / Kecamatan)
+  const [showDirectAction, setShowDirectAction] = useState<boolean>(false);
+  const [directStatusAkhir, setDirectStatusAkhir] = useState<"DITINDAKLANJUTI" | "SELESAI">("SELESAI");
+  const [directJenisTindakan, setDirectJenisTindakan] = useState<string>("TINDAKAN_LAINNYA");
+  const [directUraian, setDirectUraian] = useState<string>("");
+  const [directHasil, setDirectHasil] = useState<string>("");
 
   // Modal Edit State
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -515,7 +523,51 @@ function PengaduanAdminContent() {
     }
 
     if (item.status === "DITINDAKLANJUTI" || item.status === "DISETUJUI") {
-      // Diverifikasi oleh Kabupaten -> Batal ke MENUNGGU_VERIFIKASI_KABUPATEN
+      const originTahap = item.latestVerifikasiTahap || "KABUPATEN";
+
+      if (originTahap === "DESA") {
+        const isDesaMatch = user.role === "ADMIN_DESA" && (!item.lokasi.kd_desa || user.desaId === item.lokasi.kd_desa);
+        const isKab = ["SUPERADMIN", "ADMIN_KABUPATEN"].includes(user.role);
+
+        if (isDesaMatch || isKab) {
+          return {
+            canRollback: true,
+            targetTier: "Desa",
+            targetStatus: "MENUNGGU_VERIFIKASI_DESA",
+            targetLabel: "Penanganan Langsung Tingkat Desa",
+            reason: "",
+          };
+        }
+
+        return {
+          canRollback: false,
+          targetTier: "Desa",
+          reason: `Akses Ditolak: Pengaduan ini ditangani langsung di tingkat Desa. Hanya Admin Desa asal atau Admin Kabupaten yang dapat membatalkannya.`,
+        };
+      }
+
+      if (originTahap === "KECAMATAN") {
+        const isKecMatch = user.role === "ADMIN_KECAMATAN" && (!item.lokasi.kd_kecamatan || user.kecamatanId === item.lokasi.kd_kecamatan);
+        const isKab = ["SUPERADMIN", "ADMIN_KABUPATEN"].includes(user.role);
+
+        if (isKecMatch || isKab) {
+          return {
+            canRollback: true,
+            targetTier: "Kecamatan",
+            targetStatus: "MENUNGGU_VERIFIKASI_KECAMATAN",
+            targetLabel: "Penanganan Langsung Tingkat Kecamatan",
+            reason: "",
+          };
+        }
+
+        return {
+          canRollback: false,
+          targetTier: "Kecamatan",
+          reason: `Akses Ditolak: Pengaduan ini ditangani langsung di tingkat Kecamatan. Hanya Admin Kecamatan asal atau Admin Kabupaten yang dapat membatalkannya.`,
+        };
+      }
+
+      // Asal verifikasi Kabupaten
       if (user.role === "ADMIN_DESA" || user.role === "ADMIN_KECAMATAN") {
         return {
           canRollback: false,
@@ -542,12 +594,22 @@ function PengaduanAdminContent() {
     }
 
     if (item.status === "SELESAI") {
-      if (["SUPERADMIN", "ADMIN_KABUPATEN"].includes(user.role)) {
+      const originTahap = item.latestVerifikasiTahap || "KABUPATEN";
+      const isKab = ["SUPERADMIN", "ADMIN_KABUPATEN"].includes(user.role);
+      const isDesaMatch = user.role === "ADMIN_DESA" && (!item.lokasi.kd_desa || user.desaId === item.lokasi.kd_desa);
+      const isKecMatch = user.role === "ADMIN_KECAMATAN" && (!item.lokasi.kd_kecamatan || user.kecamatanId === item.lokasi.kd_kecamatan);
+
+      if (isKab || (originTahap === "DESA" && isDesaMatch) || (originTahap === "KECAMATAN" && isKecMatch)) {
         return {
           canRollback: true,
           targetTier: "Penyelesaian",
-          targetStatus: "DITINDAKLANJUTI",
-          targetLabel: "Status Selesai (Buka Kembali Kasus)",
+          targetStatus:
+            originTahap === "DESA"
+              ? "MENUNGGU_VERIFIKASI_DESA"
+              : originTahap === "KECAMATAN"
+                ? "MENUNGGU_VERIFIKASI_KECAMATAN"
+                : "DITINDAKLANJUTI",
+          targetLabel: `Status Selesai (${originTahap === "DESA" ? "Tingkat Desa" : originTahap === "KECAMATAN" ? "Tingkat Kecamatan" : "Buka Kembali Kasus"})`,
           reason: "",
         };
       }
@@ -555,7 +617,7 @@ function PengaduanAdminContent() {
       return {
         canRollback: false,
         targetTier: "",
-        reason: "Pengaduan telah berstatus SELESAI. Hanya Superadmin atau Admin Kabupaten yang dapat membuka kembali kasus ini.",
+        reason: "Pengaduan telah berstatus SELESAI. Hanya pihak yang memproses penyelesaian pengaduan ini atau Admin Kabupaten/Superadmin yang dapat membukanya kembali.",
       };
     }
 
@@ -719,6 +781,83 @@ function PengaduanAdminContent() {
     }
   };
 
+  // Handle Penanganan Langsung di Desa / Kecamatan (Bypass Verifikasi Berjenjang)
+  const handleProcessDirectHandling = async () => {
+    if (!selectedItem) return;
+
+    const authCheck = getVerificationAuth(selectedItem, currentUser);
+    if (!authCheck.canVerify) {
+      setVerifFeedback({
+        type: "error",
+        message: authCheck.reason,
+      });
+      return;
+    }
+
+    if (!directUraian.trim()) {
+      setVerifFeedback({
+        type: "error",
+        message: "Uraian tindakan penanganan wajib diisi.",
+      });
+      return;
+    }
+
+    let tahap: "DESA" | "KECAMATAN" | "KABUPATEN" = "DESA";
+    if (selectedItem.status === "MENUNGGU_VERIFIKASI_KECAMATAN") tahap = "KECAMATAN";
+    if (selectedItem.status === "MENUNGGU_VERIFIKASI_KABUPATEN") tahap = "KABUPATEN";
+
+    setVerifSubmitting(true);
+    setVerifFeedback(null);
+
+    try {
+      const res = await fetch("/api/admin/pengaduan/verifikasi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pengaduanId: selectedItem.id,
+          tahap,
+          keputusan: "DISETUJUI",
+          tindakanLangsung: true,
+          statusAkhir: directStatusAkhir,
+          jenisTindakan: directJenisTindakan,
+          uraianTindakan: directUraian,
+          hasilTindakan: directHasil,
+          catatan: verifCatatan,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Gagal memproses penanganan langsung.");
+      }
+
+      setVerifFeedback({
+        type: "success",
+        message: json.message,
+      });
+
+      // Update state item lokal & refresh list
+      setSelectedItem((prev: any) => ({
+        ...prev,
+        status: json.data.status,
+        latestVerifikasiTahap: tahap,
+      }));
+
+      fetchList();
+      setShowDirectAction(false);
+      setDirectUraian("");
+      setDirectHasil("");
+      setVerifCatatan("");
+    } catch (err: any) {
+      setVerifFeedback({
+        type: "error",
+        message: err.message || "Terjadi kendala saat penanganan langsung.",
+      });
+    } finally {
+      setVerifSubmitting(false);
+    }
+  };
+
   // Handle Tindak Lanjut Action
   const handleProcessTindakLanjut = async () => {
     if (!selectedItem) return;
@@ -863,8 +1002,8 @@ function PengaduanAdminContent() {
                 {currentUser.role === "ADMIN_DESA"
                   ? `Wilayah: Desa ${currentUser.desa?.nm_desa || currentUser.desaId || "-"}`
                   : currentUser.role === "ADMIN_KECAMATAN"
-                  ? `Wilayah: Kec. ${currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId || "-"}`
-                  : `Wilayah: Kab. Tapanuli Selatan`}
+                    ? `Wilayah: Kec. ${currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId || "-"}`
+                    : `Wilayah: Kab. Tapanuli Selatan`}
               </span>
             )}
           </div>
@@ -893,11 +1032,10 @@ function PengaduanAdminContent() {
                 setActiveStatus(tab.value);
                 setPage(1);
               }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                isActive
-                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-2xs"
-                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-2xs"
-              }`}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${isActive
+                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-2xs"
+                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-2xs"
+                }`}
             >
               {tab.label}
             </button>
@@ -1194,11 +1332,10 @@ function PengaduanAdminContent() {
             <div className="p-6 overflow-y-auto space-y-6 text-xs flex-1">
               {verifFeedback && (
                 <div
-                  className={`p-3.5 rounded-xl border flex items-start space-x-2 ${
-                    verifFeedback.type === "success"
-                      ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-                      : "bg-rose-50 border-rose-200 text-rose-800"
-                  }`}
+                  className={`p-3.5 rounded-xl border flex items-start space-x-2 ${verifFeedback.type === "success"
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                    : "bg-rose-50 border-rose-200 text-rose-800"
+                    }`}
                 >
                   {verifFeedback.type === "success" ? (
                     <CheckCircle2 size={16} className="text-emerald-600 shrink-0 mt-0.5" />
@@ -1440,25 +1577,22 @@ function PengaduanAdminContent() {
                 const isSuperAdmin = currentUser?.role === "SUPERADMIN";
                 return (
                   <div
-                    className={`p-4 rounded-xl border text-xs space-y-2.5 ${
-                      isSuperAdmin
-                        ? "border-indigo-200 bg-indigo-50/70"
-                        : "border-amber-200 bg-amber-50/70"
-                    }`}
+                    className={`p-4 rounded-xl border text-xs space-y-2.5 ${isSuperAdmin
+                      ? "border-indigo-200 bg-indigo-50/70"
+                      : "border-amber-200 bg-amber-50/70"
+                      }`}
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                       <div className="flex items-start space-x-2.5 text-slate-800">
                         <Lock
                           size={18}
-                          className={`shrink-0 mt-0.5 ${
-                            isSuperAdmin ? "text-indigo-600" : "text-amber-600"
-                          }`}
+                          className={`shrink-0 mt-0.5 ${isSuperAdmin ? "text-indigo-600" : "text-amber-600"
+                            }`}
                         />
                         <div>
                           <span
-                            className={`font-bold block ${
-                              isSuperAdmin ? "text-indigo-950" : "text-amber-950"
-                            }`}
+                            className={`font-bold block ${isSuperAdmin ? "text-indigo-950" : "text-amber-950"
+                              }`}
                           >
                             {isSuperAdmin
                               ? "Superadmin Override: Hak Akses Penuh (Edit / Hapus / Batalkan)"
@@ -1479,11 +1613,10 @@ function PengaduanAdminContent() {
                             setBatalAlasan("");
                             setBatalModalOpen(true);
                           }}
-                          className={`inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto ${
-                            isSuperAdmin
-                              ? "bg-indigo-600 hover:bg-indigo-700"
-                              : "bg-amber-600 hover:bg-amber-700"
-                          }`}
+                          className={`inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto ${isSuperAdmin
+                            ? "bg-indigo-600 hover:bg-indigo-700"
+                            : "bg-amber-600 hover:bg-amber-700"
+                            }`}
                           title={`Batalkan verifikasi ${rollbackAuth.targetLabel}`}
                         >
                           <Undo2 size={14} />
@@ -1537,8 +1670,8 @@ function PengaduanAdminContent() {
                         {selectedItem.status === "MENUNGGU_VERIFIKASI_DESA"
                           ? "Tahap Desa"
                           : selectedItem.status === "MENUNGGU_VERIFIKASI_KECAMATAN"
-                          ? "Tahap Kecamatan"
-                          : "Tahap Kabupaten"}
+                            ? "Tahap Kecamatan"
+                            : "Tahap Kabupaten"}
                       </h4>
                     </div>
 
@@ -1561,7 +1694,7 @@ function PengaduanAdminContent() {
                           type="button"
                           disabled={verifSubmitting}
                           onClick={() => handleProcessVerifikasi("PERLU_PERBAIKAN")}
-                          className="px-3.5 py-2 rounded-xl border border-yellow-300 bg-yellow-50 hover:bg-yellow-100 text-yellow-800 font-bold transition disabled:opacity-50"
+                          className="px-3.5 py-2 rounded-xl border border-yellow-300 bg-yellow-50 hover:bg-yellow-100 text-yellow-800 font-bold transition disabled:opacity-50 text-xs"
                         >
                           Minta Perbaikan Berkas
                         </button>
@@ -1570,28 +1703,188 @@ function PengaduanAdminContent() {
                           type="button"
                           disabled={verifSubmitting}
                           onClick={() => handleProcessVerifikasi("DITOLAK")}
-                          className="px-3.5 py-2 rounded-xl border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold transition disabled:opacity-50"
+                          className="px-3.5 py-2 rounded-xl border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold transition disabled:opacity-50 text-xs"
                         >
                           Tolak Pengaduan
                         </button>
                       </div>
 
-                      <button
-                        type="button"
-                        disabled={verifSubmitting}
-                        onClick={() => handleProcessVerifikasi("DISETUJUI")}
-                        className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-sm disabled:opacity-50 flex items-center space-x-1.5"
-                      >
-                        {verifSubmitting ? <RefreshCw size={14} className="animate-spin" /> : <Check size={14} />}
-                        <span>
-                          {selectedItem.status === "MENUNGGU_VERIFIKASI_DESA"
-                            ? "Setujui & Teruskan ke Kecamatan"
-                            : selectedItem.status === "MENUNGGU_VERIFIKASI_KECAMATAN"
-                            ? "Setujui & Teruskan ke Kabupaten"
-                            : "Setujui & Terbitkan Tindak Lanjut"}
-                        </span>
-                      </button>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* Tombol Opsi Baru: Tangani Langsung di Desa / Kecamatan */}
+                        {["MENUNGGU_VERIFIKASI_DESA", "MENUNGGU_VERIFIKASI_KECAMATAN"].includes(selectedItem.status) && (
+                          <button
+                            type="button"
+                            disabled={verifSubmitting}
+                            onClick={() => setShowDirectAction((prev) => !prev)}
+                            className={`px-4 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 shadow-sm text-xs cursor-pointer ${showDirectAction
+                              ? "bg-emerald-800 text-white ring-2 ring-emerald-500"
+                              : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                              }`}
+                          >
+                            <HeartHandshake size={14} />
+                            <span>
+                              {selectedItem.status === "MENUNGGU_VERIFIKASI_DESA"
+                                ? "Tangani Langsung di Desa"
+                                : "Tangani Langsung di Kecamatan"}
+                            </span>
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          disabled={verifSubmitting}
+                          onClick={() => handleProcessVerifikasi("DISETUJUI")}
+                          className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-sm disabled:opacity-50 flex items-center space-x-1.5 text-xs"
+                        >
+                          {verifSubmitting ? <RefreshCw size={14} className="animate-spin" /> : <Check size={14} />}
+                          <span>
+                            {selectedItem.status === "MENUNGGU_VERIFIKASI_DESA"
+                              ? "Setujui & Teruskan ke Kecamatan"
+                              : selectedItem.status === "MENUNGGU_VERIFIKASI_KECAMATAN"
+                                ? "Setujui & Teruskan ke Kabupaten"
+                                : "Setujui & Terbitkan Tindak Lanjut"}
+                          </span>
+                        </button>
+                      </div>
                     </div>
+
+                    {/* SUB-PANEL FORM PENANGANAN LANGSUNG (BYPASS JENJANG) */}
+                    {showDirectAction && (
+                      <div className="p-4 sm:p-5 rounded-2xl border-2 border-emerald-500/50 bg-emerald-50/70 space-y-3.5 text-xs animate-in fade-in duration-200">
+                        <div className="flex items-center justify-between border-b border-emerald-200 pb-2.5">
+                          <div className="flex items-center space-x-2 text-emerald-950">
+                            <HeartHandshake size={18} className="text-emerald-700 shrink-0" />
+                            <span className="font-extrabold text-xs sm:text-sm">
+                              Tindakan Penanganan Langsung Tingkat {selectedItem.status === "MENUNGGU_VERIFIKASI_DESA" ? "Desa" : "Kecamatan"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <p className="text-[11px] text-emerald-800 leading-relaxed">
+                          Gunakan formulir ini jika permasalahan warga dapat ditangani/diselesaikan langsung oleh pihak{" "}
+                          <strong>{selectedItem.status === "MENUNGGU_VERIFIKASI_DESA" ? "Pemerintah Desa / Posyandu" : "Pemerintah Kecamatan"}</strong>{" "}
+                          tanpa perlu menunggu proses verifikasi berjenjang ke dinas tingkat atasnya.
+                        </p>
+
+                        {/* Pilihan Status Akhir */}
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1.5">
+                            Status Akhir Pengaduan *:
+                          </label>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <label
+                              className={`p-3 rounded-xl border flex items-start space-x-2.5 cursor-pointer transition ${directStatusAkhir === "DITINDAKLANJUTI"
+                                ? "border-emerald-600 bg-white ring-2 ring-emerald-500/30 text-emerald-950 shadow-xs"
+                                : "border-slate-200 bg-white/70 hover:bg-white text-slate-700"
+                                }`}
+                            >
+                              <input
+                                type="radio"
+                                name="directStatusAkhir"
+                                value="DITINDAKLANJUTI"
+                                checked={directStatusAkhir === "DITINDAKLANJUTI"}
+                                onChange={() => setDirectStatusAkhir("DITINDAKLANJUTI")}
+                                className="mt-0.5 text-emerald-600 focus:ring-emerald-500"
+                              />
+                              <div>
+                                <span className="block font-bold text-xs">Sedang Ditindaklanjuti</span>
+                                <span className="text-[10px] text-slate-500 font-normal block leading-tight">
+                                  Tindakan lapangan sedang diproses di tingkat {selectedItem.status === "MENUNGGU_VERIFIKASI_DESA" ? "Desa" : "Kecamatan"}
+                                </span>
+                              </div>
+                            </label>
+
+                            <label
+                              className={`p-3 rounded-xl border flex items-start space-x-2.5 cursor-pointer transition ${directStatusAkhir === "SELESAI"
+                                ? "border-emerald-600 bg-white ring-2 ring-emerald-500/30 text-emerald-950 shadow-xs"
+                                : "border-slate-200 bg-white/70 hover:bg-white text-slate-700"
+                                }`}
+                            >
+                              <input
+                                type="radio"
+                                name="directStatusAkhir"
+                                value="SELESAI"
+                                checked={directStatusAkhir === "SELESAI"}
+                                onChange={() => setDirectStatusAkhir("SELESAI")}
+                                className="mt-0.5 text-emerald-600 focus:ring-emerald-500"
+                              />
+                              <div>
+                                <span className="block font-bold text-xs">Langsung Selesai</span>
+                                <span className="text-[10px] text-slate-500 font-normal block leading-tight">
+                                  Masalah telah berhasil diselesaikan secara mandiri dan tuntas
+                                </span>
+                              </div>
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* Jenis Tindakan & Uraian */}
+                        <div className="grid grid-cols-1 sm:grid-cols-1 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                              Jenis Tindakan *:
+                            </label>
+                            <select
+                              value={directJenisTindakan}
+                              onChange={(e) => setDirectJenisTindakan(e.target.value)}
+                              className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white font-medium"
+                            >
+                              <option value="KUNJUNGAN_RUMAH">Kunjungan Rumah / Survei</option>
+                              <option value="EDUKASI">Edukasi / Konseling</option>
+                              <option value="VERIFIKASI_DATA">Verifikasi Data Lapangan</option>
+                              <option value="PELAPORAN_PEMERINTAH_DESA">Pelaporan ke Pemerintah Desa</option>
+                              <option value="TINDAKAN_LAINNYA">Pemberian Bantuan / Lainnya</option>
+                            </select>
+                          </div>
+
+                          <div className="sm:col-span-2">
+                            <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                              Uraian Tindakan Penanganan *:
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="Contoh: Bantuan makanan tambahan dan pendampingan gizi telah disalurkan langsung..."
+                              value={directUraian}
+                              onChange={(e) => setDirectUraian(e.target.value)}
+                              className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white font-medium"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                            Hasil Penanganan / Catatan Dampak (Opsional):
+                          </label>
+                          <textarea
+                            rows={2}
+                            placeholder="Contoh: Warga telah menerima paket bantuan, masalah terselesaikan dengan musyawarah desa..."
+                            value={directHasil}
+                            onChange={(e) => setDirectHasil(e.target.value)}
+                            className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-end space-x-2 pt-2 border-t border-emerald-200">
+                          <button
+                            type="button"
+                            onClick={() => setShowDirectAction(false)}
+                            className="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition cursor-pointer"
+                          >
+                            Tutup Form
+                          </button>
+                          <button
+                            type="button"
+                            disabled={verifSubmitting}
+                            onClick={handleProcessDirectHandling}
+                            className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center space-x-1.5 shadow-sm disabled:opacity-50 cursor-pointer"
+                          >
+                            {verifSubmitting ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
+                            <span>Simpan Tindakan & Terapkan Status Langsung</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })()}
@@ -1759,28 +2052,7 @@ function PengaduanAdminContent() {
               <div className="flex items-center space-x-2">
                 {(currentUser?.role === "SUPERADMIN" || (!isItemVerified(selectedItem) && canManageItem(selectedItem))) && (
                   <>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleOpenEditModal(selectedItem);
-                      }}
-                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 font-semibold text-xs transition"
-                      title="Edit Data Pengaduan"
-                    >
-                      <Edit size={13} />
-                      <span>Edit Data</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleOpenDeleteModal(selectedItem);
-                      }}
-                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-semibold text-xs transition"
-                      title="Hapus Pengaduan"
-                    >
-                      <Trash2 size={13} />
-                      <span>Hapus Permanen</span>
-                    </button>
+
                   </>
                 )}
               </div>
@@ -1811,11 +2083,10 @@ function PengaduanAdminContent() {
             <form onSubmit={handleSaveEdit} className="p-6 space-y-3.5 text-xs overflow-y-auto">
               {editFeedback && (
                 <div
-                  className={`p-3 rounded-xl border text-xs font-semibold ${
-                    editFeedback.type === "success"
-                      ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-                      : "bg-rose-50 border-rose-200 text-rose-800"
-                  }`}
+                  className={`p-3 rounded-xl border text-xs font-semibold ${editFeedback.type === "success"
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                    : "bg-rose-50 border-rose-200 text-rose-800"
+                    }`}
                 >
                   {editFeedback.message}
                 </div>
@@ -1987,15 +2258,6 @@ function PengaduanAdminContent() {
               >
                 Batal
               </button>
-              <button
-                type="button"
-                disabled={deleteSubmitting}
-                onClick={handleConfirmDelete}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
-              >
-                {deleteSubmitting && <RefreshCw size={14} className="animate-spin" />}
-                <span>Ya, Hapus Permanen</span>
-              </button>
             </div>
           </div>
         </div>
@@ -2021,11 +2283,10 @@ function PengaduanAdminContent() {
 
               {batalFeedback && (
                 <div
-                  className={`p-3 rounded-xl border text-xs font-semibold ${
-                    batalFeedback.type === "success"
-                      ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-                      : "bg-rose-50 border-rose-200 text-rose-800"
-                  }`}
+                  className={`p-3 rounded-xl border text-xs font-semibold ${batalFeedback.type === "success"
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                    : "bg-rose-50 border-rose-200 text-rose-800"
+                    }`}
                 >
                   {batalFeedback.message}
                 </div>
@@ -2091,10 +2352,10 @@ function PengaduanAdminContent() {
                     {previewDoc.jenis === "KTP"
                       ? "KTP Pelapor"
                       : previewDoc.jenis === "KARTU_KELUARGA"
-                      ? "Kartu Keluarga (KK)"
-                      : previewDoc.jenis === "SURAT_KETERANGAN_TIDAK_MAMPU"
-                      ? "Surat Keterangan Tidak Mampu"
-                      : "Dokumen Lampiran Pendukung"}
+                        ? "Kartu Keluarga (KK)"
+                        : previewDoc.jenis === "SURAT_KETERANGAN_TIDAK_MAMPU"
+                          ? "Surat Keterangan Tidak Mampu"
+                          : "Dokumen Lampiran Pendukung"}
                   </span>
                 </div>
               </div>
@@ -2123,7 +2384,7 @@ function PengaduanAdminContent() {
 
             <div className="p-4 sm:p-6 flex-1 overflow-auto flex items-center justify-center bg-slate-100/60 min-h-[320px]">
               {previewDoc.pathFile?.startsWith("data:image/") ||
-              /\.(jpg|jpeg|png|webp|gif)$/i.test(previewDoc.namaFile || previewDoc.pathFile) ? (
+                /\.(jpg|jpeg|png|webp|gif)$/i.test(previewDoc.namaFile || previewDoc.pathFile) ? (
                 <div className="max-w-full max-h-[70vh] flex items-center justify-center p-2 bg-white rounded-xl shadow-xs border border-slate-200">
                   <img
                     src={previewDoc.pathFile}

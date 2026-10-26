@@ -132,44 +132,94 @@ export async function POST(request: Request) {
       statusSesudah = StatusPengaduan.MENUNGGU_VERIFIKASI_KECAMATAN;
       keterangan = `Pembatalan verifikasi tahap Kecamatan oleh ${currentUser.nama} (${currentUser.role}). Alasan: ${alasan?.trim() || "Koreksi data oleh verifikator kecamatan"}`;
     } else if (currentStatus === StatusPengaduan.DITINDAKLANJUTI || currentStatus === StatusPengaduan.DISETUJUI) {
-      // Telah diverifikasi oleh Kabupaten / OPD Pengampu.
-      if (currentUser.role === "ADMIN_DESA" || currentUser.role === "ADMIN_KECAMATAN") {
-        return NextResponse.json(
-          {
-            success: false,
-            message: "Pembatalan harus dilakukan secara berjenjang: Verifikasi tahap Kabupaten harus dibatalkan terlebih dahulu oleh Admin Kabupaten sebelum tahap sebelumnya dapat dibatalkan.",
-          },
-          { status: 403 }
-        );
-      }
+      const latestVerif = pengaduan.verifikasi[0];
+      const originTahap = latestVerif?.tahap || TahapVerifikasi.KABUPATEN;
 
-      const isAuthorized = currentUser.role === "ADMIN_KABUPATEN" || currentUser.role === "SUPERADMIN";
-      if (!isAuthorized) {
-        return NextResponse.json(
-          { success: false, message: "Akses ditolak: Hanya Admin Kabupaten atau Superadmin yang dapat membatalkan verifikasi tahap Kabupaten." },
-          { status: 403 }
-        );
-      }
+      if (originTahap === TahapVerifikasi.DESA) {
+        const isAuthorized =
+          (currentUser.role === "ADMIN_DESA" && currentUser.desaId === pengaduan.kd_desa) ||
+          currentUser.role === "ADMIN_KABUPATEN" ||
+          currentUser.role === "SUPERADMIN";
 
-      tahapYangDibatalkan = TahapVerifikasi.KABUPATEN;
-      statusSesudah = StatusPengaduan.MENUNGGU_VERIFIKASI_KABUPATEN;
-      keterangan = `Pembatalan verifikasi tahap Kabupaten oleh ${currentUser.nama} (${currentUser.role}). Alasan: ${alasan?.trim() || "Koreksi verifikasi dinas"}`;
+        if (!isAuthorized) {
+          return NextResponse.json(
+            { success: false, message: "Akses ditolak: Hanya Admin Desa asal atau Admin Kabupaten/Superadmin yang dapat membatalkan penanganan langsung tahap Desa." },
+            { status: 403 }
+          );
+        }
+
+        tahapYangDibatalkan = TahapVerifikasi.DESA;
+        statusSesudah = StatusPengaduan.MENUNGGU_VERIFIKASI_DESA;
+        keterangan = `Pembatalan penanganan langsung tahap Desa oleh ${currentUser.nama} (${currentUser.role}). Alasan: ${alasan?.trim() || "Koreksi oleh verifikator desa"}`;
+      } else if (originTahap === TahapVerifikasi.KECAMATAN) {
+        const isAuthorized =
+          (currentUser.role === "ADMIN_KECAMATAN" && currentUser.kecamatanId === pengaduan.kd_kecamatan) ||
+          currentUser.role === "ADMIN_KABUPATEN" ||
+          currentUser.role === "SUPERADMIN";
+
+        if (!isAuthorized) {
+          return NextResponse.json(
+            { success: false, message: "Akses ditolak: Hanya Admin Kecamatan asal atau Admin Kabupaten/Superadmin yang dapat membatalkan penanganan langsung tahap Kecamatan." },
+            { status: 403 }
+          );
+        }
+
+        tahapYangDibatalkan = TahapVerifikasi.KECAMATAN;
+        statusSesudah = StatusPengaduan.MENUNGGU_VERIFIKASI_KECAMATAN;
+        keterangan = `Pembatalan penanganan langsung tahap Kecamatan oleh ${currentUser.nama} (${currentUser.role}). Alasan: ${alasan?.trim() || "Koreksi oleh verifikator kecamatan"}`;
+      } else {
+        // Asal verifikasi Kabupaten
+        if (currentUser.role === "ADMIN_DESA" || currentUser.role === "ADMIN_KECAMATAN") {
+          return NextResponse.json(
+            {
+              success: false,
+              message: "Pembatalan harus dilakukan secara berjenjang: Verifikasi tahap Kabupaten harus dibatalkan terlebih dahulu oleh Admin Kabupaten sebelum tahap sebelumnya dapat dibatalkan.",
+            },
+            { status: 403 }
+          );
+        }
+
+        const isAuthorized = currentUser.role === "ADMIN_KABUPATEN" || currentUser.role === "SUPERADMIN";
+        if (!isAuthorized) {
+          return NextResponse.json(
+            { success: false, message: "Akses ditolak: Hanya Admin Kabupaten atau Superadmin yang dapat membatalkan verifikasi tahap Kabupaten." },
+            { status: 403 }
+          );
+        }
+
+        tahapYangDibatalkan = TahapVerifikasi.KABUPATEN;
+        statusSesudah = StatusPengaduan.MENUNGGU_VERIFIKASI_KABUPATEN;
+        keterangan = `Pembatalan verifikasi tahap Kabupaten oleh ${currentUser.nama} (${currentUser.role}). Alasan: ${alasan?.trim() || "Koreksi verifikasi dinas"}`;
+      }
     } else if (currentStatus === StatusPengaduan.SELESAI) {
-      // Superadmin atau Admin Kabupaten dapat membuka kembali pengaduan yang sudah Selesai
-      const isAuthorized = currentUser.role === "ADMIN_KABUPATEN" || currentUser.role === "SUPERADMIN";
+      const latestVerif = pengaduan.verifikasi[0];
+      const originTahap = latestVerif?.tahap || TahapVerifikasi.KABUPATEN;
+
+      let isAuthorized = currentUser.role === "ADMIN_KABUPATEN" || currentUser.role === "SUPERADMIN";
+      if (!isAuthorized && originTahap === TahapVerifikasi.DESA && currentUser.role === "ADMIN_DESA" && currentUser.desaId === pengaduan.kd_desa) {
+        isAuthorized = true;
+      }
+      if (!isAuthorized && originTahap === TahapVerifikasi.KECAMATAN && currentUser.role === "ADMIN_KECAMATAN" && currentUser.kecamatanId === pengaduan.kd_kecamatan) {
+        isAuthorized = true;
+      }
+
       if (!isAuthorized) {
         return NextResponse.json(
           {
             success: false,
-            message: "Akses ditolak: Hanya Superadmin atau Admin Kabupaten yang dapat membatalkan status SELESAI dan membuka kembali kasus ini.",
+            message: "Akses ditolak: Anda tidak memiliki wewenang untuk membuka kembali kasus yang telah diselesaikan ini.",
           },
           { status: 403 }
         );
       }
 
-      tahapYangDibatalkan = TahapVerifikasi.KABUPATEN;
+      tahapYangDibatalkan = originTahap;
       statusSesudah =
-        pengaduan.tindakLanjut && pengaduan.tindakLanjut.length > 0
+        originTahap === TahapVerifikasi.DESA
+          ? StatusPengaduan.MENUNGGU_VERIFIKASI_DESA
+          : originTahap === TahapVerifikasi.KECAMATAN
+          ? StatusPengaduan.MENUNGGU_VERIFIKASI_KECAMATAN
+          : pengaduan.tindakLanjut && pengaduan.tindakLanjut.length > 0
           ? StatusPengaduan.DITINDAKLANJUTI
           : StatusPengaduan.MENUNGGU_VERIFIKASI_KABUPATEN;
 

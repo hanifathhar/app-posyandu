@@ -30,11 +30,28 @@ export async function POST(request: Request) {
     const penggunaId = currentUser.id;
 
     const body = await request.json();
-    const { pengaduanId, tahap, keputusan, catatan } = body;
+    const {
+      pengaduanId,
+      tahap,
+      keputusan,
+      catatan,
+      tindakanLangsung,
+      statusAkhir,
+      jenisTindakan,
+      uraianTindakan,
+      hasilTindakan,
+    } = body;
 
     if (!pengaduanId || !tahap || !keputusan) {
       return NextResponse.json(
         { success: false, message: "Parameter pengaduanId, tahap, dan keputusan wajib diisi." },
+        { status: 400 }
+      );
+    }
+
+    if (tindakanLangsung && !uraianTindakan?.trim()) {
+      return NextResponse.json(
+        { success: false, message: "Uraian tindakan penanganan wajib diisi untuk penanganan langsung." },
         { status: 400 }
       );
     }
@@ -102,7 +119,10 @@ export async function POST(request: Request) {
     let statusSesudah: StatusPengaduan = statusSebelum;
     let keterangan = "";
 
-    if (keputusan === "DITOLAK") {
+    if (tindakanLangsung && keputusan === "DISETUJUI") {
+      statusSesudah = statusAkhir === "SELESAI" ? StatusPengaduan.SELESAI : StatusPengaduan.DITINDAKLANJUTI;
+      keterangan = `Pengaduan disetujui dan ditangani langsung di tingkat ${tahap} oleh ${currentUser.nama}. Status: ${statusSesudah}. Tindakan: ${uraianTindakan.trim()}`;
+    } else if (keputusan === "DITOLAK") {
       statusSesudah = StatusPengaduan.DITOLAK;
       keterangan = `Pengaduan ditolak pada tahap verifikasi ${tahap}. Catatan: ${catatan || "-"}`;
     } else if (keputusan === "PERLU_PERBAIKAN") {
@@ -126,15 +146,19 @@ export async function POST(request: Request) {
       where: { pengaduanId, tahap: tahap as TahapVerifikasi },
     });
 
-    // Simpan Verifikasi & Update Pengaduan
-    const [verifRecord, updatedPengaduan] = await prisma.$transaction([
+    const isSelesaiDirect = tindakanLangsung && statusSesudah === StatusPengaduan.SELESAI;
+
+    // Transaksi Database: Simpan Verifikasi + (Opsional Tindak Lanjut Langsung) + Update Pengaduan
+    const txOperations: any[] = [
       prisma.verifikasiPengaduan.create({
         data: {
           pengaduanId,
           penggunaId,
           tahap: tahap as TahapVerifikasi,
           keputusan: keputusan as KeputusanVerifikasi,
-          catatan: catatan?.trim() || null,
+          catatan: tindakanLangsung
+            ? `[Penanganan Langsung ${tahap}]: ${uraianTindakan.trim()}${catatan ? ` - ${catatan.trim()}` : ""}`
+            : catatan?.trim() || null,
           putaran: prevVerifCount + 1,
         },
       }),
@@ -145,11 +169,23 @@ export async function POST(request: Request) {
           alasanPenolakan: keputusan === "DITOLAK" ? catatan?.trim() || "Ditolak oleh verifikator" : pengaduan.alasanPenolakan,
           catatan: catatan?.trim() || pengaduan.catatan,
           tahapPerbaikanKe: keputusan === "PERLU_PERBAIKAN" ? (tahap as TahapVerifikasi) : null,
-          tanggalDisetujui: keputusan === "DISETUJUI" && tahap === "KABUPATEN" ? new Date() : pengaduan.tanggalDisetujui,
+          tanggalDisetujui: keputusan === "DISETUJUI" ? new Date() : pengaduan.tanggalDisetujui,
+          tanggalSelesai: isSelesaiDirect ? new Date() : pengaduan.tanggalSelesai,
+          hasilPenyelesaian: isSelesaiDirect
+            ? hasilTindakan?.trim() || uraianTindakan.trim()
+            : hasilTindakan?.trim() || pengaduan.hasilPenyelesaian,
           riwayatStatus: {
             create: {
               penggunaId,
-              peristiwa: keputusan === "DISETUJUI" ? JenisPeristiwa.VERIFIKASI : keputusan === "PERLU_PERBAIKAN" ? JenisPeristiwa.PERBAIKAN_DIMINTA : JenisPeristiwa.STATUS_DIUBAH,
+              peristiwa: isSelesaiDirect
+                ? JenisPeristiwa.PENGADUAN_DISELESAIKAN
+                : tindakanLangsung
+                  ? JenisPeristiwa.TINDAK_LANJUT
+                  : keputusan === "DISETUJUI"
+                    ? JenisPeristiwa.VERIFIKASI
+                    : keputusan === "PERLU_PERBAIKAN"
+                      ? JenisPeristiwa.PERBAIKAN_DIMINTA
+                      : JenisPeristiwa.STATUS_DIUBAH,
               statusSebelum,
               statusSesudah,
               keterangan,
@@ -171,11 +207,31 @@ export async function POST(request: Request) {
           },
         },
       }),
-    ]);
+    ];
+
+    if (tindakanLangsung && uraianTindakan?.trim()) {
+      txOperations.push(
+        prisma.tindakLanjut.create({
+          data: {
+            pengaduanId,
+            jenis: jenisTindakan || "TINDAKAN_LAINNYA",
+            uraian: uraianTindakan.trim(),
+            hasil: hasilTindakan?.trim() || null,
+            petugasId: penggunaId,
+            tanggal: new Date(),
+          },
+        })
+      );
+    }
+
+    const txResults = await prisma.$transaction(txOperations);
+    const updatedPengaduan = txResults[1];
 
     return NextResponse.json({
       success: true,
-      message: `Verifikasi tahap ${tahap} berhasil diproses: ${keputusan}`,
+      message: tindakanLangsung
+        ? `Pengaduan berhasil ditangani langsung di tingkat ${tahap} dengan status ${statusSesudah}. `
+        : `Verifikasi tahap ${tahap} berhasil diproses: ${keputusan}`,
       data: {
         id: updatedPengaduan.id,
         nomorPengaduan: updatedPengaduan.nomorPengaduan,

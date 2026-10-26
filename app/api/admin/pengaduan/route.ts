@@ -96,6 +96,17 @@ export async function GET(request: Request) {
             },
             orderBy: { tanggal: "desc" },
           },
+          verifikasi: {
+            orderBy: { tanggal: "desc" },
+            select: {
+              id: true,
+              tahap: true,
+              keputusan: true,
+              catatan: true,
+              tanggal: true,
+              putaran: true,
+            },
+          },
           _count: {
             select: {
               verifikasi: true,
@@ -153,6 +164,8 @@ export async function GET(request: Request) {
           terverifikasi: d.terverifikasi,
         })),
         verifikasiCount: p._count.verifikasi,
+        latestVerifikasiTahap: p.verifikasi[0]?.tahap || null,
+        verifikasiList: p.verifikasi || [],
         tindakLanjutCount: p._count.tindakLanjut,
         tindakLanjutList: p.tindakLanjut.map((tl) => ({
           id: tl.id,
