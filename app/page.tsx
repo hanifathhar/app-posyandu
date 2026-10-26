@@ -60,7 +60,7 @@ const HERO_SLIDES = [
     highlight: "Kabupaten Tapanuli Selatan",
     highlightGradient: "from-sky-300 via-purple-300 via-amber-300 to-emerald-300",
     deskripsi:
-      "Sistem integrasi pelayanan dan pengaduan 6 Bidang SPM (Kesehatan, Pendidikan, Sosial, Pekerjaan Umum, Perumahan Rakyat, dan Trantibum Linmas) langsung dari simpul Posyandu dan Desa hingga ke Pemerintah Kabupaten.",
+      "SAPA Posyandu sebagai platform integrasi pelayanan dan pengaduan 6 Bidang SPM (Kesehatan, Pendidikan, Sosial, Pekerjaan Umum, Perumahan Rakyat, dan Trantibum Linmas) langsung dari simpul Posyandu dan Desa hingga ke Pemerintah Kabupaten.",
     actionText: "Ajukan Pengaduan",
     actionHref: "/pengaduan",
     secondaryText: "Eksplorasi 6 Bidang SPM",
@@ -69,10 +69,10 @@ const HERO_SLIDES = [
   {
     id: 2,
     image: "/images/banner-2.jpg",
-    tabLabel: "Pendidikan & Anak",
-    badge: "Jaminan Belajar 12 Tahun & Hak Pendidikan",
+    tabLabel: "Melayani Masyarakat",
+    badge: "Melayani Masyarakat",
     badgeColors: ["bg-sky-400", "bg-blue-400", "bg-indigo-400", "bg-teal-400"],
-    title: "Wujudkan Generasi Cerdas & Berkualitas",
+    title: "Aduan Tersampaikan, Kebutuhan Ditindaklanjuti",
     highlight: "Bebas Hambatan Biaya",
     highlightGradient: "from-amber-300 via-orange-300 via-yellow-200 to-emerald-300",
     deskripsi:
