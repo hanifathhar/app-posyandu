@@ -601,6 +601,36 @@ export default function LaporanRekapSPMPage() {
           )}
         </div>
 
+        {/* LEMBAR PENGESAHAN / TANDA TANGAN RESMI */}
+        <div className="pt-8 p-6 grid grid-cols-2 text-xs sm:text-sm text-slate-800 print:text-black print:pt-6 print:p-0">
+          <div></div>
+          <div className="text-center space-y-16">
+            <div>
+              <p className="font-medium">
+                {selectedDesa
+                  ? (namaDesaDisplay.includes("Desa") ? namaDesaDisplay : `Desa ${namaDesaDisplay}`)
+                  : selectedKecamatan
+                    ? `Kecamatan ${namaKecamatanDisplay}`
+                    : "Sipirok"}
+                ,{" "}
+                {new Date().toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
+              <p className="font-bold uppercase tracking-wide mt-1">
+                Ketua TP. Posyandu Setempat
+              </p>
+            </div>
+            <div>
+              <p className="font-bold underline uppercase">
+                ( .................................................. )
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Pagination for Rekap */}
         <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between print:hidden">
           <span className="text-xs text-slate-500 font-medium">

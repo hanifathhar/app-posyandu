@@ -432,160 +432,145 @@ export default function LaporanPosyanduDesaPage() {
           </div>
         </div>
       ) : (
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6 print:border-none print:shadow-none print:p-0 print:space-y-4">
-        {/* Header Format A Sesuai Template Dinas */}
-        <div className="space-y-3 font-sans">
-          <h2 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-wide">
-            A. DARI TP. POSYANDU DESA KE TP. POSYANDU KECAMATAN
-          </h2>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6 print:border-none print:shadow-none print:p-0 print:space-y-4">
+          {/* Header Format A Sesuai Template Dinas */}
+          <div className="space-y-3 font-sans">
+            <h2 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-wide">
+              A. DARI TP. POSYANDU DESA KE TP. POSYANDU KECAMATAN
+            </h2>
 
-          <div className="space-y-1.5 text-xs sm:text-sm font-semibold text-slate-800">
-            <div className="grid grid-cols-12 max-w-xl">
-              <span className="col-span-4 uppercase">POSYANDU DESA</span>
-              <span className="col-span-1">:</span>
-              <span className="col-span-7 font-bold border-b border-dotted border-slate-400 pb-0.5">
-                {namaDesaDisplay}
-              </span>
-            </div>
-            <div className="grid grid-cols-12 max-w-xl">
-              <span className="col-span-4 uppercase">KECAMATAN</span>
-              <span className="col-span-1">:</span>
-              <span className="col-span-7 font-bold border-b border-dotted border-slate-400 pb-0.5">
-                {namaKecamatanDisplay}
-              </span>
+            <div className="space-y-1.5 text-xs sm:text-sm font-semibold text-slate-800">
+              <div className="grid grid-cols-12 max-w-xl">
+                <span className="col-span-4 uppercase">POSYANDU DESA</span>
+                <span className="col-span-1">:</span>
+                <span className="col-span-7 font-bold border-b border-dotted border-slate-400 pb-0.5">
+                  {namaDesaDisplay}
+                </span>
+              </div>
+              <div className="grid grid-cols-12 max-w-xl">
+                <span className="col-span-4 uppercase">KECAMATAN</span>
+                <span className="col-span-1">:</span>
+                <span className="col-span-7 font-bold border-b border-dotted border-slate-400 pb-0.5">
+                  {namaKecamatanDisplay}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* TABEL FORMAT A */}
-        <div className="overflow-x-auto">
-          {loading ? (
-            <div className="p-12 text-center text-slate-400 text-xs flex items-center justify-center space-x-2">
-              <RefreshCw size={18} className="animate-spin text-emerald-600" />
-              <span>Memuat data laporan format A...</span>
-            </div>
-          ) : (
-            <table className="w-full text-left border-collapse border border-black text-xs text-black">
-              <thead>
-                <tr className="bg-slate-50 print:bg-transparent text-center font-black uppercase text-[11px] tracking-wide">
-                  <th className="border border-black px-2.5 py-3 w-12">NO</th>
-                  <th className="border border-black px-3 py-3 w-28">
-                    TANGGAL
-                    <br />
-                    PENGADUAN
-                  </th>
-                  <th className="border border-black px-4 py-3 w-44">NAMA SASARAN</th>
-                  <th className="border border-black px-4 py-3">TEMUAN</th>
-                  <th className="border border-black px-3 py-3 w-36">BIDANG SPM</th>
-                  <th className="border border-black px-4 py-3 w-52">
-                    TINDAKLANJUT
-                    <br />
-                    (DESA)
-                  </th>
-                  <th className="border border-black px-3 py-3 w-36">
-                    KETERANGAN
-                    <br />
-                    (SELESAI/DITERUSKAN)
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {reportData.detailList.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="border border-black text-center py-10 text-slate-400 italic">
-                      Belum ada data pengaduan pada Posyandu/Desa ini untuk periode yang dipilih.
-                    </td>
+          {/* TABEL FORMAT A */}
+          <div className="overflow-x-auto">
+            {loading ? (
+              <div className="p-12 text-center text-slate-400 text-xs flex items-center justify-center space-x-2">
+                <RefreshCw size={18} className="animate-spin text-emerald-600" />
+                <span>Memuat data laporan format A...</span>
+              </div>
+            ) : (
+              <table className="w-full text-left border-collapse border border-black text-xs text-black">
+                <thead>
+                  <tr className="bg-slate-50 print:bg-transparent text-center font-black uppercase text-[11px] tracking-wide">
+                    <th className="border border-black px-2.5 py-3 w-12">NO</th>
+                    <th className="border border-black px-3 py-3 w-28">
+                      TANGGAL
+                      <br />
+                      PENGADUAN
+                    </th>
+                    <th className="border border-black px-4 py-3 w-44">NAMA SASARAN</th>
+                    <th className="border border-black px-4 py-3">TEMUAN</th>
+                    <th className="border border-black px-3 py-3 w-36">BIDANG SPM</th>
+                    <th className="border border-black px-4 py-3 w-52">
+                      TINDAKLANJUT
+                      <br />
+                      (DESA)
+                    </th>
+                    <th className="border border-black px-3 py-3 w-36">
+                      KETERANGAN
+                      <br />
+                      (SELESAI/DITERUSKAN)
+                    </th>
                   </tr>
-                ) : (
-                  reportData.detailList.map((row, idx) => (
-                    <tr key={row.id} className="hover:bg-slate-50/50 print:hover:bg-transparent align-top">
-                      <td className="border border-black px-2.5 py-2.5 text-center font-bold">
-                        {idx + 1}
+                </thead>
+                <tbody>
+                  {reportData.detailList.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="border border-black text-center py-10 text-slate-400 italic">
+                        Belum ada data pengaduan pada Posyandu/Desa ini untuk periode yang dipilih.
                       </td>
-                      <td className="border border-black px-3 py-2.5 text-center whitespace-nowrap">
-                        {new Date(row.tanggal).toLocaleDateString("id-ID", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="border border-black px-4 py-2.5">
-                        <span className="font-bold block uppercase">{row.namaSasaran}</span>
-                        {row.nik && (
-                          <span className="text-[10px] text-slate-500 print:text-black block">
-                            NIK: {row.nik}
-                          </span>
-                        )}
-                      </td>
-                      <td className="border border-black px-4 py-2.5 whitespace-pre-wrap leading-relaxed">
-                        {row.temuan}
-                      </td>
-                      <td className="border border-black px-3 py-2.5 font-semibold text-center sm:text-left">
-                        {row.bidang}
-                      </td>
-                      <td className="border border-black px-4 py-2.5 whitespace-pre-wrap leading-relaxed">
-                        {row.tindakLanjutDesa}
-                      </td>
-                      <td className="border border-black px-3 py-2.5 text-center font-bold">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded text-[11px] print:p-0 print:border-none ${row.keterangan === "SELESAI"
+                    </tr>
+                  ) : (
+                    reportData.detailList.map((row, idx) => (
+                      <tr key={row.id} className="hover:bg-slate-50/50 print:hover:bg-transparent align-top">
+                        <td className="border border-black px-2.5 py-2.5 text-center font-bold">
+                          {idx + 1}
+                        </td>
+                        <td className="border border-black px-3 py-2.5 text-center whitespace-nowrap">
+                          {new Date(row.tanggal).toLocaleDateString("id-ID", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="border border-black px-4 py-2.5">
+                          <span className="font-bold block uppercase">{row.namaSasaran}</span>
+                          {row.nik && (
+                            <span className="text-[10px] text-slate-500 print:text-black block">
+                              NIK: {row.nik}
+                            </span>
+                          )}
+                        </td>
+                        <td className="border border-black px-4 py-2.5 whitespace-pre-wrap leading-relaxed">
+                          {row.temuan}
+                        </td>
+                        <td className="border border-black px-3 py-2.5 font-semibold text-center sm:text-left">
+                          {row.bidang}
+                        </td>
+                        <td className="border border-black px-4 py-2.5 whitespace-pre-wrap leading-relaxed">
+                          {row.tindakLanjutDesa}
+                        </td>
+                        <td className="border border-black px-3 py-2.5 text-center font-bold">
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded text-[11px] print:p-0 print:border-none ${row.keterangan === "SELESAI"
                               ? "bg-emerald-100 text-emerald-800 print:bg-transparent print:text-black"
                               : row.keterangan === "DITERUSKAN"
                                 ? "bg-blue-100 text-blue-800 print:bg-transparent print:text-black"
                                 : "bg-slate-100 text-slate-800 print:bg-transparent print:text-black"
-                            }`}
-                        >
-                          {row.keterangan}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          )}
-        </div>
-
-        {/* LEMBAR PENGESAHAN / TANDA TANGAN RESMI */}
-        <div className="pt-8 grid grid-cols-2 text-xs sm:text-sm text-slate-800 print:text-black print:pt-6">
-          <div className="text-center space-y-16">
-            <div>
-              <p className="font-medium">Mengetahui,</p>
-              <p className="font-bold uppercase tracking-wide">
-                Ketua TP. Posyandu / Bidan Desa
-              </p>
-            </div>
-            <div>
-              <p className="font-bold underline uppercase">( .................................................. )</p>
-              <p className="text-[11px] text-slate-500 print:text-black mt-0.5">NIP / Penanggung Jawab</p>
-            </div>
+                              }`}
+                          >
+                            {row.keterangan}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
 
-          <div className="text-center space-y-16">
-            <div>
-              <p className="font-medium">
-                {namaDesaDisplay.includes("Desa") ? namaDesaDisplay : `Tapanuli Selatan`},{" "}
-                {new Date().toLocaleDateString("id-ID", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </p>
-              <p className="font-bold uppercase tracking-wide">
-                Petugas Verifikator / Admin Desa
-              </p>
-            </div>
-            <div>
-              <p className="font-bold underline uppercase">
-                ( {currentUser?.nama || ".................................................."} )
-              </p>
-              <p className="text-[11px] text-slate-500 print:text-black mt-0.5">
-                Admin TP. Posyandu Desa
-              </p>
+          {/* LEMBAR PENGESAHAN / TANDA TANGAN RESMI */}
+          <div className="pt-8 grid grid-cols-2 text-xs sm:text-sm text-slate-800 print:text-black print:pt-6">
+            <div></div>
+            <div className="text-center space-y-16">
+              <div>
+                <p className="font-medium">
+                  {namaDesaDisplay.includes("Desa") ? namaDesaDisplay : `Desa ${namaDesaDisplay}`},{" "}
+                  {new Date().toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
+                <p className="font-bold uppercase tracking-wide mt-1">
+                  Ketua TP. Posyandu
+                </p>
+              </div>
+              <div>
+                <p className="font-bold underline uppercase">
+                  ( .................................................. )
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       )}
     </div>
   );
