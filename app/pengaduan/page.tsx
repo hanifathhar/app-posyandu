@@ -636,7 +636,7 @@ function PengaduanMasyarakatContent() {
             <span className="text-blue-100">Kanal Resmi 6 Standar Pelayanan Minimal (SPM) Posyandu</span>
           </div>
           <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight leading-snug">
-            Sampaikan Pengaduan Pelayanan Dasar
+            Sampaikan Pengaduan Anda
           </h2>
           <p className="mt-2 text-xs sm:text-sm md:text-base text-slate-200 max-w-2xl mx-auto leading-relaxed">
             Pengawalan pemenuhan hak pelayanan dasar masyarakat secara transparan dan berjenjang dari Desa, Kecamatan, hingga Dinas Terkait.
@@ -942,8 +942,8 @@ function PengaduanMasyarakatContent() {
                       >
                         <option value="">-- Pilih Rentang Penghasilan/Bulan --</option>
                         <option value="< 1 juta">&lt; 1 juta</option>
-                        <option value="1 jt s/d. 2.5 juta">1 juta s/d. 2.5 juta</option>
-                        <option value="2.6 juta sd 5 juta">2.6 juta sd 5 juta</option>
+                        <option value="1 jt - 2.5 juta">1 juta - 2.5 juta</option>
+                        <option value="2.6 juta - 5 juta">2.6 juta - 5 juta</option>
                         <option value="> 5 juta">&gt; 5 juta</option>
                       </select>
                       <span className="text-[10px] sm:text-[11px] text-slate-400 mt-1 block">
@@ -1569,7 +1569,7 @@ function PengaduanMasyarakatContent() {
       {/* 5. FOOTER */}
       <footer className="mt-14 sm:mt-16 text-center text-xs text-slate-500 border-t border-slate-200 pt-8 max-w-4xl mx-auto px-4">
         <p className="font-bold text-slate-700">
-          Sistem Informasi Pengaduan Pelayanan Dasar SPM Berbasis Posyandu
+          SAPA Posyandu (Saluran Aspirasi dan Pengaduan Aktif Posyandu Tapanuli Selatan)
         </p>
         <p className="mt-1 text-slate-400 text-[11px]">
           Pemerintah Kabupaten Tapanuli Selatan • Terhubung langsung dengan Kader Desa, Kecamatan, dan Dinas Pengampu SPM
