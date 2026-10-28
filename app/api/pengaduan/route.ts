@@ -112,19 +112,40 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validasi Pilihan Penghasilan
-    const ALLOWED_PENGHASILAN = [
-      "< 1 jt /bulan",
-      "1 jt s/d. 2.5 juta",
-      "2.6 jt sd 5 jt",
-      "> 5 jt",
-      "< 1 juta",
-      "1 juta s/d. 2.5 juta",
-      "2.6 juta sd 5 juta",
-      "> 5 juta",
-    ];
-    const cleanPenghasilan = String(penghasilan).trim();
-    if (!ALLOWED_PENGHASILAN.includes(cleanPenghasilan)) {
+    // Normalisasi & Validasi Pilihan Penghasilan
+    let cleanPenghasilan = String(penghasilan).trim();
+    if (["< 1 jt /bulan", "< 1 juta /bulan", "< 1 juta", "< 1 jt"].includes(cleanPenghasilan)) {
+      cleanPenghasilan = "< 1 juta";
+    } else if (
+      [
+        "1 jt s/d. 2.5 juta",
+        "1 jt s/d 2.5 jt",
+        "1 jt s/d 2.5 juta",
+        "1 juta s/d. 2.5 juta",
+        "1 juta s/d 2.5 juta",
+        "1 jt - 2.5 juta",
+        "1 juta - 2.5 juta",
+        "1 jt - 2.5 jt",
+      ].includes(cleanPenghasilan)
+    ) {
+      cleanPenghasilan = "1 juta - 2.5 juta";
+    } else if (
+      [
+        "2.6 jt sd 5 jt",
+        "2.6 jt sd 5 juta",
+        "2.6 jt s/d 5 jt",
+        "2.6 jt s/d 5 juta",
+        "2.6 juta sd 5 juta",
+        "2.6 juta s/d 5 juta",
+        "2.6 jt - 5 jt",
+        "2.6 jt - 5 juta",
+        "2.6 juta - 5 juta",
+      ].includes(cleanPenghasilan)
+    ) {
+      cleanPenghasilan = "2.6 juta - 5 juta";
+    } else if (["> 5 jt", "> 5 juta", "> 5 jt /bulan", "> 5 juta /bulan"].includes(cleanPenghasilan)) {
+      cleanPenghasilan = "> 5 juta";
+    } else {
       return NextResponse.json(
         { success: false, message: "Pilihan rentang penghasilan tidak valid." },
         { status: 400 }

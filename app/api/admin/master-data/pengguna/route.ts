@@ -31,9 +31,11 @@ async function getAuthUser(request: Request) {
         role: true,
         kecamatanId: true,
         desaId: true,
+        dinasId: true,
         nama: true,
         kecamatan: { select: { kd_kecamatan: true, nm_kecamatan: true } },
         desa: { select: { kd_desa: true, nm_desa: true } },
+        dinas: { select: { id: true, kode: true, nama: true } },
       },
     });
   } catch {
@@ -51,6 +53,7 @@ export async function GET(request: Request) {
     const allowedRoles: RolePengguna[] = [
       RolePengguna.SUPERADMIN,
       RolePengguna.ADMIN_KABUPATEN,
+      RolePengguna.ADMIN_DINAS,
       RolePengguna.ADMIN_KECAMATAN,
       RolePengguna.ADMIN_DESA,
     ];
@@ -61,11 +64,15 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const filterKecamatan = searchParams.get("kecamatanId");
+    const filterDinas = searchParams.get("dinasId");
 
     const where: any = {};
 
     // Filter per wilayah kewenangan
-    if (currentUser.role === RolePengguna.ADMIN_KECAMATAN) {
+    if (currentUser.role === RolePengguna.ADMIN_DINAS) {
+      // Admin Dinas hanya melihat pengguna di dinasnya
+      where.dinasId = currentUser.dinasId;
+    } else if (currentUser.role === RolePengguna.ADMIN_KECAMATAN) {
       // Admin Kecamatan hanya melihat pengguna di wilayah kecamatannya
       where.OR = [
         { kecamatanId: currentUser.kecamatanId },
@@ -74,12 +81,17 @@ export async function GET(request: Request) {
     } else if (currentUser.role === RolePengguna.ADMIN_DESA) {
       // Admin Desa hanya melihat pengguna di desanya
       where.desaId = currentUser.desaId;
-    } else if (filterKecamatan) {
-      // Superadmin / Admin Kabupaten filter per kecamatan jika diminta
-      where.OR = [
-        { kecamatanId: filterKecamatan },
-        { desa: { kd_kecamatan: filterKecamatan } },
-      ];
+    } else {
+      // Superadmin / Admin Kabupaten
+      if (filterKecamatan) {
+        where.OR = [
+          { kecamatanId: filterKecamatan },
+          { desa: { kd_kecamatan: filterKecamatan } },
+        ];
+      }
+      if (filterDinas) {
+        where.dinasId = filterDinas;
+      }
     }
 
     const penggunaList = await prisma.pengguna.findMany({
@@ -93,6 +105,10 @@ export async function GET(request: Request) {
         aktif: true,
         kecamatanId: true,
         desaId: true,
+        dinasId: true,
+        dinas: {
+          select: { id: true, kode: true, nama: true },
+        },
         kecamatan: {
           select: { nm_kecamatan: true },
         },
@@ -128,12 +144,12 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const { nama, username, password, role } = body;
-    let { kecamatanId, desaId } = body;
+    let { kecamatanId, desaId, dinasId } = body;
 
-    // 1. Admin Desa: tidak dapat menambah user sama sekali
-    if (currentUser.role === RolePengguna.ADMIN_DESA) {
+    // 1. Admin Desa & Admin Dinas: tidak dapat menambah user sama sekali
+    if (currentUser.role === RolePengguna.ADMIN_DESA || currentUser.role === RolePengguna.ADMIN_DINAS) {
       return NextResponse.json(
-        { success: false, message: "Admin Desa tidak memiliki izin untuk menambah akun pengguna." },
+        { success: false, message: "Peran Anda tidak memiliki izin untuk menambah akun pengguna." },
         { status: 403 }
       );
     }
@@ -179,16 +195,23 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. Admin Kabupaten: hanya dapat menambah user Admin Kecamatan dan Admin Desa
+    // 3. Admin Kabupaten: dapat menambah user Admin Dinas, Admin Kecamatan, dan Admin Desa
     if (currentUser.role === RolePengguna.ADMIN_KABUPATEN) {
-      const allowedRoles = ["ADMIN_KECAMATAN", "ADMIN_DESA"];
+      const allowedRoles = ["ADMIN_DINAS", "ADMIN_KECAMATAN", "ADMIN_DESA"];
       if (!allowedRoles.includes(role)) {
         return NextResponse.json(
           {
             success: false,
-            message: "Admin Kabupaten hanya dapat menambah user Admin Kecamatan dan Admin Desa.",
+            message: "Admin Kabupaten hanya dapat menambah user Admin Dinas, Admin Kecamatan, dan Admin Desa.",
           },
           { status: 403 }
+        );
+      }
+
+      if (role === "ADMIN_DINAS" && !dinasId) {
+        return NextResponse.json(
+          { success: false, message: "Dinas penugasan wajib dipilih untuk Admin Dinas." },
+          { status: 400 }
         );
       }
 
@@ -224,6 +247,23 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validasi penugasan Admin Dinas
+    if (role === "ADMIN_DINAS") {
+      if (!dinasId) {
+        return NextResponse.json(
+          { success: false, message: "Dinas penugasan wajib dipilih untuk Admin Dinas." },
+          { status: 400 }
+        );
+      }
+      const validDinas = await prisma.dinas.findUnique({ where: { id: dinasId } });
+      if (!validDinas) {
+        return NextResponse.json(
+          { success: false, message: "Dinas yang dipilih tidak ditemukan." },
+          { status: 400 }
+        );
+      }
+    }
+
     const normalizedUsername = username.toLowerCase().trim();
 
     const existing = await prisma.pengguna.findUnique({
@@ -256,7 +296,8 @@ export async function POST(request: Request) {
         username: normalizedUsername,
         password: hashedPassword,
         role: role as RolePengguna,
-        kecamatanId: (role === "SUPERADMIN" || role === "ADMIN_KABUPATEN") ? null : (kecamatanId || null),
+        dinasId: role === "ADMIN_DINAS" ? dinasId : null,
+        kecamatanId: (role === "SUPERADMIN" || role === "ADMIN_KABUPATEN" || role === "ADMIN_DINAS") ? null : (kecamatanId || null),
         desaId: role === "ADMIN_DESA" ? (desaId || null) : null,
         aktif: true,
       },
@@ -268,6 +309,8 @@ export async function POST(request: Request) {
         aktif: true,
         kecamatanId: true,
         desaId: true,
+        dinasId: true,
+        dinas: { select: { id: true, kode: true, nama: true } },
       },
     });
 
@@ -292,16 +335,16 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
-    if (currentUser.role === RolePengguna.ADMIN_DESA) {
+    if (currentUser.role === RolePengguna.ADMIN_DESA || currentUser.role === RolePengguna.ADMIN_DINAS) {
       return NextResponse.json(
-        { success: false, message: "Admin Desa tidak memiliki izin untuk mengubah akun pengguna." },
+        { success: false, message: "Peran Anda tidak memiliki izin untuk mengubah akun pengguna." },
         { status: 403 }
       );
     }
 
     const body = await request.json();
     const { id, nama, username, role, password, aktif, resetPassword } = body;
-    let { kecamatanId, desaId } = body;
+    let { kecamatanId, desaId, dinasId } = body;
 
     if (!id) {
       return NextResponse.json({ success: false, message: "ID pengguna wajib diisi." }, { status: 400 });
@@ -309,7 +352,7 @@ export async function PATCH(request: Request) {
 
     const targetUser = await prisma.pengguna.findUnique({
       where: { id },
-      include: { desa: true },
+      include: { desa: true, dinas: true },
     });
 
     if (!targetUser) {
@@ -348,12 +391,12 @@ export async function PATCH(request: Request) {
       }
     }
 
-    // Admin Kabupaten hanya boleh mengedit Admin Kecamatan & Admin Desa
+    // Admin Kabupaten hanya boleh mengedit Admin Dinas, Admin Kecamatan & Admin Desa
     if (currentUser.role === RolePengguna.ADMIN_KABUPATEN) {
-      const allowedRoles = ["ADMIN_KECAMATAN", "ADMIN_DESA"];
+      const allowedRoles = ["ADMIN_DINAS", "ADMIN_KECAMATAN", "ADMIN_DESA"];
       if (!allowedRoles.includes(targetUser.role)) {
         return NextResponse.json(
-          { success: false, message: "Admin Kabupaten hanya dapat mengelola akun Admin Kecamatan dan Admin Desa." },
+          { success: false, message: "Admin Kabupaten hanya dapat mengelola akun Admin Dinas, Admin Kecamatan, dan Admin Desa." },
           { status: 403 }
         );
       }
@@ -386,8 +429,35 @@ export async function PATCH(request: Request) {
     if (nama) updateData.nama = nama.trim();
     if (username) updateData.username = username.toLowerCase().trim();
     if (role) updateData.role = role as RolePengguna;
-    if (kecamatanId !== undefined) updateData.kecamatanId = kecamatanId || null;
-    if (desaId !== undefined) updateData.desaId = desaId || null;
+
+    const finalRole = role || targetUser.role;
+
+    if (finalRole === "ADMIN_DINAS") {
+      const effectiveDinasId = dinasId !== undefined ? dinasId : targetUser.dinasId;
+      if (!effectiveDinasId) {
+        return NextResponse.json(
+          { success: false, message: "Dinas penugasan wajib dipilih untuk Admin Dinas." },
+          { status: 400 }
+        );
+      }
+      const validDinas = await prisma.dinas.findUnique({ where: { id: effectiveDinasId } });
+      if (!validDinas) {
+        return NextResponse.json(
+          { success: false, message: "Dinas yang dipilih tidak ditemukan." },
+          { status: 400 }
+        );
+      }
+      updateData.dinasId = effectiveDinasId;
+      updateData.kecamatanId = null;
+      updateData.desaId = null;
+    } else {
+      if (role && role !== "ADMIN_DINAS") {
+        updateData.dinasId = null;
+      }
+      if (kecamatanId !== undefined) updateData.kecamatanId = kecamatanId || null;
+      if (desaId !== undefined) updateData.desaId = desaId || null;
+    }
+
     if (typeof aktif === "boolean") updateData.aktif = aktif;
 
     const newPwd = password || resetPassword;
@@ -406,6 +476,8 @@ export async function PATCH(request: Request) {
         aktif: true,
         kecamatanId: true,
         desaId: true,
+        dinasId: true,
+        dinas: { select: { id: true, kode: true, nama: true } },
       },
     });
 
@@ -430,9 +502,9 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
-    if (currentUser.role === RolePengguna.ADMIN_DESA) {
+    if (currentUser.role === RolePengguna.ADMIN_DESA || currentUser.role === RolePengguna.ADMIN_DINAS) {
       return NextResponse.json(
-        { success: false, message: "Admin Desa tidak memiliki izin untuk menghapus akun pengguna." },
+        { success: false, message: "Peran Anda tidak memiliki izin untuk menghapus akun pengguna." },
         { status: 403 }
       );
     }
@@ -474,10 +546,10 @@ export async function DELETE(request: Request) {
     }
 
     if (currentUser.role === RolePengguna.ADMIN_KABUPATEN) {
-      const allowedRoles = ["ADMIN_KECAMATAN", "ADMIN_DESA"];
+      const allowedRoles = ["ADMIN_DINAS", "ADMIN_KECAMATAN", "ADMIN_DESA"];
       if (!allowedRoles.includes(user.role)) {
         return NextResponse.json(
-          { success: false, message: "Admin Kabupaten hanya dapat menghapus akun Admin Kecamatan dan Admin Desa." },
+          { success: false, message: "Admin Kabupaten hanya dapat menghapus akun Admin Dinas, Admin Kecamatan, dan Admin Desa." },
           { status: 403 }
         );
       }

@@ -131,7 +131,11 @@ export async function POST(request: Request) {
       tahapYangDibatalkan = TahapVerifikasi.KECAMATAN;
       statusSesudah = StatusPengaduan.MENUNGGU_VERIFIKASI_KECAMATAN;
       keterangan = `Pembatalan verifikasi tahap Kecamatan oleh ${currentUser.nama} (${currentUser.role}). Alasan: ${alasan?.trim() || "Koreksi data oleh verifikator kecamatan"}`;
-    } else if (currentStatus === StatusPengaduan.DITINDAKLANJUTI || currentStatus === StatusPengaduan.DISETUJUI) {
+    } else if (
+      currentStatus === StatusPengaduan.DITERUSKAN_KE_DINAS ||
+      currentStatus === StatusPengaduan.DITINDAKLANJUTI ||
+      currentStatus === StatusPengaduan.DISETUJUI
+    ) {
       const latestVerif = pengaduan.verifikasi[0];
       const originTahap = latestVerif?.tahap || TahapVerifikasi.KABUPATEN;
 
@@ -302,6 +306,7 @@ export async function POST(request: Request) {
         where: { id: pengaduanId },
         data: {
           status: statusSesudah,
+          dinasId: (statusSesudah === StatusPengaduan.MENUNGGU_VERIFIKASI_KABUPATEN || statusSesudah === StatusPengaduan.MENUNGGU_VERIFIKASI_KECAMATAN || statusSesudah === StatusPengaduan.MENUNGGU_VERIFIKASI_DESA) ? null : pengaduan.dinasId,
           tanggalSelesai: currentStatus === StatusPengaduan.SELESAI ? null : undefined,
           tanggalDisetujui: statusSesudah === StatusPengaduan.MENUNGGU_VERIFIKASI_DESA ? null : pengaduan.tanggalDisetujui,
           catatan: alasan?.trim() ? `[Dibatalkan]: ${alasan.trim()}` : pengaduan.catatan,

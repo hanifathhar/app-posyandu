@@ -6,13 +6,23 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "rahasia-super-aman";
 
 async function getAuthUser(request: Request) {
-  const token = request.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
+  const cookieHeader = request.headers.get("cookie") || "";
+  const match = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
+  const token = match ? match[1] : request.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
   if (!token) return null;
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     return await prisma.pengguna.findUnique({
       where: { id: decoded.id },
-      select: { id: true, role: true, kecamatanId: true, desaId: true, nama: true },
+      select: {
+        id: true,
+        role: true,
+        kecamatanId: true,
+        desaId: true,
+        dinasId: true,
+        nama: true,
+        dinas: { select: { id: true, kode: true, nama: true } },
+      },
     });
   } catch (e) {
     return null;
@@ -26,6 +36,7 @@ export async function GET(request: Request) {
     const bidangId = searchParams.get("bidangId");
     const kd_kecamatan = searchParams.get("kd_kecamatan");
     const kd_desa = searchParams.get("kd_desa");
+    const dinasId = searchParams.get("dinasId");
     const search = searchParams.get("search")?.trim();
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
@@ -43,9 +54,19 @@ export async function GET(request: Request) {
       where.bidangId = bidangId;
     }
 
-    // Pembatasan Yurisdiksi Wilayah:
-    // Admin Desa HANYA bisa mengakses data desanya sendiri
-    if (currentUser?.role === "ADMIN_DESA" && currentUser.desaId) {
+    // Pembatasan Yurisdiksi Wilayah & Instansi:
+    if (currentUser?.role === "ADMIN_DINAS") {
+      // Admin Dinas HANYA bisa mengakses pengaduan yang diteruskan/ditugaskan ke dinasnya
+      if (currentUser.dinasId) {
+        where.dinasId = currentUser.dinasId;
+      } else {
+        where.dinasId = "NONE";
+      }
+      // Dukung filter wilayah Kecamatan dan Desa untuk Admin Dinas
+      if (kd_kecamatan) where.kd_kecamatan = kd_kecamatan;
+      if (kd_desa) where.kd_desa = kd_desa;
+    } else if (currentUser?.role === "ADMIN_DESA" && currentUser.desaId) {
+      // Admin Desa HANYA bisa mengakses data desanya sendiri
       where.kd_desa = currentUser.desaId;
     } else if (currentUser?.role === "ADMIN_KECAMATAN" && currentUser.kecamatanId) {
       // Admin Kecamatan HANYA bisa mengakses data kecamatannya sendiri
@@ -55,6 +76,7 @@ export async function GET(request: Request) {
       // Superadmin / Admin Kabupaten dapat melihat seluruhnya atau memfilter
       if (kd_kecamatan) where.kd_kecamatan = kd_kecamatan;
       if (kd_desa) where.kd_desa = kd_desa;
+      if (dinasId) where.dinasId = dinasId;
     }
 
     if (search) {
@@ -75,6 +97,7 @@ export async function GET(request: Request) {
         take: limit,
         orderBy: { tanggalPengaduan: "desc" },
         include: {
+          dinas: true,
           bidang: true,
           jenisPengaduan: true,
           desa: true,
@@ -136,6 +159,14 @@ export async function GET(request: Request) {
           kode: p.bidang.kode,
           nama: p.bidang.nm_bidang,
         },
+        dinas: p.dinas
+          ? {
+              id: p.dinas.id,
+              kode: p.dinas.kode,
+              nama: p.dinas.nama,
+            }
+          : null,
+        dinasId: p.dinasId,
         jenisPengaduan: p.jenisPengaduan.map((j) => ({
           id: j.id,
           nama: j.nama,
@@ -318,34 +349,49 @@ export async function DELETE(request: Request) {
     }
 
     const currentUser = await getAuthUser(request);
-    if (currentUser?.role === "ADMIN_DESA" && current.kd_desa !== currentUser.desaId) {
+    if (!currentUser) {
       return NextResponse.json(
-        { success: false, message: "Akses ditolak: Anda tidak berhak menghapus pengaduan di luar desa penugasan Anda." },
-        { status: 403 }
-      );
-    }
-    if (currentUser?.role === "ADMIN_KECAMATAN" && current.kd_kecamatan !== currentUser.kecamatanId) {
-      return NextResponse.json(
-        { success: false, message: "Akses ditolak: Anda tidak berhak menghapus pengaduan di luar kecamatan penugasan Anda." },
-        { status: 403 }
+        { success: false, message: "Sesi login tidak valid atau kadaluarsa. Silakan login kembali." },
+        { status: 401 }
       );
     }
 
-    // PENGUNCIAN DATA TERVERIFIKASI:
-    // Pengaduan yang telah diverifikasi tidak boleh dihapus
-    // kecuali oleh SUPERADMIN atau verifikasinya dibatalkan secara berjenjang terlebih dahulu.
-    if (
-      currentUser?.role !== "SUPERADMIN" &&
-      current.status !== StatusPengaduan.MENUNGGU_VERIFIKASI_DESA &&
-      current.status !== StatusPengaduan.BARU
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: `Akses ditolak: Pengaduan ini telah terverifikasi (Status: ${current.status}) dan tidak dapat dihapus. Anda harus membatalkan verifikasi secara berjenjang terlebih dahulu hingga tahap Desa jika ingin menghapus data ini (atau dilakukan oleh Superadmin).`,
-        },
-        { status: 400 }
-      );
+    // Role-based authorization: SUPERADMIN has full override to delete any pengaduan
+    if (currentUser.role !== "SUPERADMIN") {
+      if (currentUser.role === "ADMIN_DESA" && current.kd_desa !== currentUser.desaId) {
+        return NextResponse.json(
+          { success: false, message: "Akses ditolak: Anda tidak berhak menghapus pengaduan di luar desa penugasan Anda." },
+          { status: 403 }
+        );
+      }
+      if (currentUser.role === "ADMIN_KECAMATAN" && current.kd_kecamatan !== currentUser.kecamatanId) {
+        return NextResponse.json(
+          { success: false, message: "Akses ditolak: Anda tidak berhak menghapus pengaduan di luar kecamatan penugasan Anda." },
+          { status: 403 }
+        );
+      }
+      if (currentUser.role === "ADMIN_DINAS") {
+        return NextResponse.json(
+          { success: false, message: "Akses ditolak: Admin Dinas tidak memiliki kewenangan menghapus data pengaduan." },
+          { status: 403 }
+        );
+      }
+
+      // PENGUNCIAN DATA TERVERIFIKASI:
+      // Pengaduan yang telah diverifikasi tidak boleh dihapus
+      // kecuali oleh SUPERADMIN atau verifikasinya dibatalkan secara berjenjang terlebih dahulu.
+      if (
+        current.status !== StatusPengaduan.MENUNGGU_VERIFIKASI_DESA &&
+        current.status !== StatusPengaduan.BARU
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Akses ditolak: Pengaduan ini telah terverifikasi (Status: ${current.status}) dan tidak dapat dihapus. Anda harus membatalkan verifikasi secara berjenjang terlebih dahulu hingga tahap Desa jika ingin menghapus data ini (atau dilakukan oleh Superadmin).`,
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Safe cascading delete

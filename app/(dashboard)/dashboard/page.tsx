@@ -74,6 +74,9 @@ interface UserLevel {
   kecamatanNama?: string | null;
   desaId?: string | null;
   desaNama?: string | null;
+  dinasId?: string | null;
+  dinasNama?: string | null;
+  dinasKode?: string | null;
 }
 
 interface DashboardKPI {
@@ -81,6 +84,7 @@ interface DashboardKPI {
   menungguDesa: number;
   menungguKecamatan: number;
   menungguKabupaten: number;
+  diteruskanKeDinas?: number;
   ditindaklanjuti: number;
   selesai: number;
   perluPerbaikan: number;
@@ -152,6 +156,13 @@ export default function DashboardPage() {
             Verifikasi Dinas
           </span>
         );
+      case "DITERUSKAN_KE_DINAS":
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 mr-1.5 animate-pulse"></span>
+            Diteruskan ke Dinas
+          </span>
+        );
       case "DITINDAKLANJUTI":
         return (
           <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">
@@ -220,6 +231,7 @@ export default function DashboardPage() {
 
   const isDesa = userLevel.role === "ADMIN_DESA";
   const isKecamatan = userLevel.role === "ADMIN_KECAMATAN";
+  const isDinas = userLevel.role === "ADMIN_DINAS";
   const isKabupaten = ["ADMIN_KABUPATEN", "SUPERADMIN"].includes(userLevel.role);
 
   // Label Tingkat Kewenangan & Wilayah
@@ -241,6 +253,12 @@ export default function DashboardPage() {
     urgentActionCount = kpi.menungguKecamatan;
     urgentActionLabel = "Menunggu Verifikasi Tingkat Camat";
     urgentActionLink = "/pengaduan-admin?status=MENUNGGU_VERIFIKASI_KECAMATAN";
+  } else if (isDinas) {
+    roleTitle = userLevel.dinasNama || "Dinas Teknis SPM";
+    roleBadge = "Administrator Dinas";
+    urgentActionCount = kpi.diteruskanKeDinas || 0;
+    urgentActionLabel = "Perlu Tindak Lanjut Dinas";
+    urgentActionLink = "/pengaduan-admin?status=DITERUSKAN_KE_DINAS";
   } else {
     roleTitle = "Kabupaten Tapanuli Selatan";
     roleBadge = userLevel.role === "SUPERADMIN" ? "Super Administrator" : "Administrator Kabupaten / OPD";
@@ -285,6 +303,8 @@ export default function DashboardPage() {
                 ? `Pusat monitoring dan verifikasi pengaduan 6 Bidang SPM Posyandu untuk wilayah Desa ${userLevel.desaNama || ""}. Pastikan seluruh aduan warga tertangani tepat waktu.`
                 : isKecamatan
                 ? `Pusat kendali dan supervisi pengaduan SPM terintegrasi untuk seluruh desa di wilayah Kecamatan ${userLevel.kecamatanNama || ""}.`
+                : isDinas
+                ? `Pusat tindak lanjut pengaduan SPM yang didelegasikan oleh Admin Kabupaten untuk penanganan teknis pada ${userLevel.dinasNama || "Dinas"}. Wajib segera menindaklanjuti pengaduan yang diteruskan.`
                 : "Pusat Kendali Eksekutif Standar Pelayanan Minimal (SPM) Kabupaten Tapanuli Selatan. Memonitor koordinasi lintas 15 kecamatan dan 6 bidang pelayanan dasar."}
             </p>
           </div>

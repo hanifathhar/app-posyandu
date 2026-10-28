@@ -32,6 +32,7 @@ export async function GET(req: Request) {
       include: {
         kecamatan: true,
         desa: true,
+        dinas: true,
       },
     });
 
@@ -48,8 +49,10 @@ export async function GET(req: Request) {
         aktif: pengguna.aktif,
         kecamatanId: pengguna.kecamatanId,
         desaId: pengguna.desaId,
+        dinasId: pengguna.dinasId,
         kecamatan: pengguna.kecamatan ? { kd_kecamatan: pengguna.kecamatan.kd_kecamatan, nm_kecamatan: pengguna.kecamatan.nm_kecamatan } : null,
         desa: pengguna.desa ? { kd_desa: pengguna.desa.kd_desa, nm_desa: pengguna.desa.nm_desa } : null,
+        dinas: pengguna.dinas ? { id: pengguna.dinas.id, kode: pengguna.dinas.kode, nama: pengguna.dinas.nama } : null,
       },
     });
   } catch (error) {

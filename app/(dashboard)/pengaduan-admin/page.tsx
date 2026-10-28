@@ -58,8 +58,10 @@ interface CurrentUser {
   role: string;
   kecamatanId?: string | null;
   desaId?: string | null;
+  dinasId?: string | null;
   kecamatan?: { kd_kecamatan: string; nm_kecamatan: string } | null;
   desa?: { kd_desa: string; nm_desa: string } | null;
+  dinas?: { id: string; kode: string; nama: string } | null;
 }
 
 interface PengaduanAdminItem {
@@ -94,6 +96,12 @@ interface PengaduanAdminItem {
   jumlahTanggungan?: number | null;
   penghasilan?: string | null;
   status: string;
+  dinasId?: string | null;
+  dinas?: {
+    id: string;
+    kode: string;
+    nama: string;
+  } | null;
   alasanPenolakan?: string;
   catatan?: string;
   hasilPenyelesaian?: string;
@@ -131,12 +139,14 @@ function PengaduanAdminContent() {
   const [bidangList, setBidangList] = useState<any[]>([]);
   const [kecamatanList, setKecamatanList] = useState<any[]>([]);
   const [desaList, setDesaList] = useState<any[]>([]);
+  const [dinasList, setDinasList] = useState<any[]>([]);
 
   // Modal Detail & Verifikasi
   const [selectedItem, setSelectedItem] = useState<PengaduanAdminItem | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState<boolean>(false);
   const [previewDoc, setPreviewDoc] = useState<DokumenItem | null>(null);
   const [verifCatatan, setVerifCatatan] = useState<string>("");
+  const [selectedForwardDinasId, setSelectedForwardDinasId] = useState<string>("");
   const [verifSubmitting, setVerifSubmitting] = useState<boolean>(false);
   const [verifFeedback, setVerifFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
@@ -296,6 +306,11 @@ function PengaduanAdminContent() {
     fetch("/api/public/wilayah")
       .then((r) => r.json())
       .then((d) => d.success && setKecamatanList(d.data));
+
+    fetch("/api/admin/master-data/dinas?aktif=true")
+      .then((r) => r.json())
+      .then((d) => d.success && setDinasList(d.data))
+      .catch((e) => console.error("Gagal load daftar dinas:", e));
   }, []);
 
   // Load Daftar Desa berdasarkan Kecamatan yang Dipilih / Otoritas Wilayah
@@ -412,12 +427,60 @@ function PengaduanAdminContent() {
       return { canVerify: true, reason: "" };
     }
 
+    if (user.role === "ADMIN_DINAS") {
+      return {
+        canVerify: false,
+        reason: `Akses Terbatas: Anda login sebagai Admin ${user.dinas?.nama || "Dinas"}. Verifikasi berjenjang dilakukan oleh Desa, Kecamatan, dan Kabupaten. Peran Dinas adalah menindaklanjuti pengaduan yang diteruskan ke instansi Anda.`,
+      };
+    }
+
     return { canVerify: false, reason: "Peran akun Anda tidak memiliki hak akses untuk memverifikasi pengaduan ini." };
   };
 
   const getTindakLanjutAuth = (item: PengaduanAdminItem | null, user: CurrentUser | null) => {
     if (!item || !user) return { canAction: false, reason: "Memuat hak akses..." };
-    if (["SUPERADMIN", "ADMIN_KABUPATEN"].includes(user.role)) return { canAction: true, reason: "" };
+
+    if (user.role === "SUPERADMIN") return { canAction: true, reason: "" };
+
+    // Jika pengaduan berstatus DITERUSKAN_KE_DINAS atau memiliki dinasId yang ditugaskan:
+    // Hanya Admin Dinas terkait yang berwenang mengisi tindak lanjut.
+    if (item.status === "DITERUSKAN_KE_DINAS" || item.dinasId) {
+      if (user.role === "ADMIN_DINAS") {
+        if (!user.dinasId || item.dinasId !== user.dinasId) {
+          return {
+            canAction: false,
+            reason: `Akses Ditolak: Pengaduan ini ditugaskan kepada ${item.dinas?.nama || "dinas lain"}. Anda hanya berwenang menindaklanjuti pengaduan yang ditugaskan kepada ${user.dinas?.nama || "Dinas Anda"}.`,
+          };
+        }
+        return { canAction: true, reason: "" };
+      }
+
+      if (user.role === "ADMIN_KABUPATEN") {
+        return {
+          canAction: false,
+          reason: `Pengaduan ini telah diteruskan ke ${item.dinas?.nama || "Dinas terkait"}. Formulir tindak lanjut wajib dilaksanakan oleh Admin ${item.dinas?.nama || "Dinas terkait"}.`,
+        };
+      }
+
+      return {
+        canAction: false,
+        reason: "Pengaduan ini telah didelegasikan ke tingkat Dinas teknis.",
+      };
+    }
+
+    if (user.role === "ADMIN_KABUPATEN") {
+      return {
+        canAction: false,
+        reason: "Admin Kabupaten bertugas melakukan verifikasi dan meneruskan pengaduan ke Dinas teknis terkait.",
+      };
+    }
+
+    if (user.role === "ADMIN_DINAS") {
+      return {
+        canAction: false,
+        reason: "Pengaduan ini belum diteruskan oleh Admin Kabupaten ke Dinas Anda.",
+      };
+    }
     if (user.role === "ADMIN_KECAMATAN") {
       if (item.lokasi.kd_kecamatan && user.kecamatanId && item.lokasi.kd_kecamatan !== user.kecamatanId) {
         return {
@@ -519,6 +582,23 @@ function PengaduanAdminContent() {
         canRollback: false,
         targetTier: "Kecamatan",
         reason: "Hanya Admin Kecamatan asal pengaduan atau Admin Kabupaten yang dapat membatalkan verifikasi tahap Kecamatan.",
+      };
+    }
+
+    if (item.status === "DITERUSKAN_KE_DINAS") {
+      if (["SUPERADMIN", "ADMIN_KABUPATEN"].includes(user.role)) {
+        return {
+          canRollback: true,
+          targetTier: "Kabupaten",
+          targetStatus: "MENUNGGU_VERIFIKASI_KABUPATEN",
+          targetLabel: "Penerusan ke Dinas",
+          reason: "",
+        };
+      }
+      return {
+        canRollback: false,
+        targetTier: "Kabupaten",
+        reason: "Hanya Admin Kabupaten atau Superadmin yang dapat membatalkan penerusan pengaduan ke Dinas.",
       };
     }
 
@@ -730,6 +810,14 @@ function PengaduanAdminContent() {
     if (selectedItem.status === "MENUNGGU_VERIFIKASI_KECAMATAN") tahap = "KECAMATAN";
     if (selectedItem.status === "MENUNGGU_VERIFIKASI_KABUPATEN") tahap = "KABUPATEN";
 
+    if (tahap === "KABUPATEN" && keputusan === "DISETUJUI" && !selectedForwardDinasId) {
+      setVerifFeedback({
+        type: "error",
+        message: "Wajib memilih Dinas penanggung jawab yang ditugaskan untuk menindaklanjuti pengaduan ini.",
+      });
+      return;
+    }
+
     if ((keputusan === "DITOLAK" || keputusan === "PERLU_PERBAIKAN") && !verifCatatan.trim()) {
       setVerifFeedback({
         type: "error",
@@ -750,6 +838,7 @@ function PengaduanAdminContent() {
           tahap,
           keputusan,
           catatan: verifCatatan,
+          dinasId: tahap === "KABUPATEN" && keputusan === "DISETUJUI" ? selectedForwardDinasId : undefined,
         }),
       });
 
@@ -767,6 +856,8 @@ function PengaduanAdminContent() {
       setSelectedItem((prev: any) => ({
         ...prev,
         status: json.data.status,
+        dinasId: json.data.dinasId || prev.dinasId,
+        dinas: json.data.dinas || prev.dinas,
       }));
 
       fetchList();
@@ -944,6 +1035,8 @@ function PengaduanAdminContent() {
         return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 border border-orange-200">Verifikasi Camat</span>;
       case "MENUNGGU_VERIFIKASI_KABUPATEN":
         return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-200">Verifikasi Dinas</span>;
+      case "DITERUSKAN_KE_DINAS":
+        return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 border border-cyan-300">Diteruskan ke Dinas</span>;
       case "DITINDAKLANJUTI":
         return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 border border-cyan-200">Ditindaklanjuti</span>;
       case "SELESAI":
@@ -962,6 +1055,7 @@ function PengaduanAdminContent() {
     { label: "Verifikasi Desa", value: "MENUNGGU_VERIFIKASI_DESA" },
     { label: "Verifikasi Kecamatan", value: "MENUNGGU_VERIFIKASI_KECAMATAN" },
     { label: "Verifikasi Kabupaten", value: "MENUNGGU_VERIFIKASI_KABUPATEN" },
+    { label: "Diteruskan ke Dinas", value: "DITERUSKAN_KE_DINAS" },
     { label: "Ditindaklanjuti", value: "DITINDAKLANJUTI" },
     { label: "Selesai", value: "SELESAI" },
     { label: "Perlu Perbaikan", value: "PERLU_PERBAIKAN" },
@@ -970,18 +1064,28 @@ function PengaduanAdminContent() {
 
   const filteredStatusTabs = (() => {
     if (!currentUser) return statusTabs;
+    if (currentUser.role === "ADMIN_DINAS") {
+      return [
+        { label: "Semua Pengaduan Dinas", value: "" },
+        { label: "Perlu Tindak Lanjut", value: "DITERUSKAN_KE_DINAS" },
+        { label: "Ditindaklanjuti", value: "DITINDAKLANJUTI" },
+        { label: "Selesai", value: "SELESAI" },
+      ];
+    }
     if (currentUser.role === "ADMIN_DESA") {
       return statusTabs.filter(
         (t) =>
           t.value !== "MENUNGGU_VERIFIKASI_KECAMATAN" &&
-          t.value !== "MENUNGGU_VERIFIKASI_KABUPATEN"
+          t.value !== "MENUNGGU_VERIFIKASI_KABUPATEN" &&
+          t.value !== "DITERUSKAN_KE_DINAS"
       );
     }
     if (currentUser.role === "ADMIN_KECAMATAN") {
       return statusTabs.filter(
         (t) =>
           t.value !== "MENUNGGU_VERIFIKASI_DESA" &&
-          t.value !== "MENUNGGU_VERIFIKASI_KABUPATEN"
+          t.value !== "MENUNGGU_VERIFIKASI_KABUPATEN" &&
+          t.value !== "DITERUSKAN_KE_DINAS"
       );
     }
     return statusTabs;
@@ -998,17 +1102,30 @@ function PengaduanAdminContent() {
             </h1>
             {currentUser && (
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1.5 shadow-2xs">
-                <MapPin size={13} className="text-blue-600" />
-                {currentUser.role === "ADMIN_DESA"
-                  ? `Wilayah: Desa ${currentUser.desa?.nm_desa || currentUser.desaId || "-"}`
-                  : currentUser.role === "ADMIN_KECAMATAN"
-                    ? `Wilayah: Kec. ${currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId || "-"}`
-                    : `Wilayah: Kab. Tapanuli Selatan`}
+                {currentUser.role === "ADMIN_DINAS" ? (
+                  <>
+                    <Building2 size={13} className="text-cyan-600" />
+                    <span>Instansi: {currentUser.dinas?.nama || "Dinas Terkait"}</span>
+                  </>
+                ) : (
+                  <>
+                    <MapPin size={13} className="text-blue-600" />
+                    <span>
+                      {currentUser.role === "ADMIN_DESA"
+                        ? `Wilayah: Desa ${currentUser.desa?.nm_desa || currentUser.desaId || "-"}`
+                        : currentUser.role === "ADMIN_KECAMATAN"
+                          ? `Wilayah: Kec. ${currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId || "-"}`
+                          : `Wilayah: Kab. Tapanuli Selatan`}
+                    </span>
+                  </>
+                )}
               </span>
             )}
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Kelola, verifikasi berjenjang, dan pantau penyelesaian laporan pemenuhan standar pelayanan minimal.
+            {currentUser?.role === "ADMIN_DINAS"
+              ? `Tindak lanjuti pengaduan yang diteruskan oleh Admin Kabupaten kepada ${currentUser.dinas?.nama || "Dinas Anda"}.`
+              : "Kelola, verifikasi berjenjang, dan pantau penyelesaian laporan pemenuhan standar pelayanan minimal."}
           </p>
         </div>
 
@@ -1216,6 +1333,12 @@ function PengaduanAdminContent() {
                           </span>
                         ))}
                       </div>
+                      {p.dinas && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-2 py-0.5 rounded-md mt-1.5 shadow-2xs">
+                          <Building2 size={11} className="text-cyan-600" />
+                          <span>{p.dinas.nama}</span>
+                        </span>
+                      )}
                     </td>
                     <td className="px-5 py-3.5 whitespace-nowrap">
                       {getStatusBadge(p.status)}
@@ -1225,6 +1348,7 @@ function PengaduanAdminContent() {
                         <button
                           onClick={() => {
                             setSelectedItem(p);
+                            setSelectedForwardDinasId(p.dinasId || "");
                             setVerifFeedback(null);
                             setVerifCatatan("");
                             setDetailModalOpen(true);
@@ -1450,6 +1574,26 @@ function PengaduanAdminContent() {
                   ))}
                 </div>
               </div>
+
+              {/* Dinas Penanggung Jawab jika sudah diteruskan */}
+              {selectedItem.dinas && (
+                <div className="p-4 rounded-xl border border-cyan-200 bg-cyan-50/60 flex items-center gap-3 shadow-2xs">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-100 border border-cyan-200 flex items-center justify-center text-cyan-800 shrink-0">
+                    <Building2 size={20} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[10px] font-bold text-cyan-800 uppercase tracking-wider block">
+                      Dinas Penanggung Jawab Tindak Lanjut:
+                    </span>
+                    <span className="font-extrabold text-slate-900 text-sm block">
+                      {selectedItem.dinas.nama} ({selectedItem.dinas.kode})
+                    </span>
+                    <span className="text-[11px] text-cyan-700 block">
+                      Wajib menindaklanjuti dan menyelesaikan permohonan/pengaduan warga ini.
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Uraian Masalah */}
               <div>
@@ -1688,6 +1832,31 @@ function PengaduanAdminContent() {
                       />
                     </div>
 
+                    {/* PILIH DINAS PENANGGUNG JAWAB (KHUSUS TINGKAT KABUPATEN) */}
+                    {selectedItem.status === "MENUNGGU_VERIFIKASI_KABUPATEN" && (
+                      <div className="p-3.5 rounded-xl border border-blue-200 bg-white space-y-2 shadow-2xs">
+                        <label className="block text-[11px] font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                          <Building2 size={14} className="text-blue-600" />
+                          <span>Pilih Dinas Penanggung Jawab Tindak Lanjut *:</span>
+                        </label>
+                        <select
+                          value={selectedForwardDinasId}
+                          onChange={(e) => setSelectedForwardDinasId(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        >
+                          <option value="">-- Pilih Dinas yang Wajib Menindaklanjuti --</option>
+                          {dinasList.map((d) => (
+                            <option key={d.id} value={d.id}>
+                              {d.nama}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="text-[10px] text-slate-500 leading-relaxed">
+                          Pengaduan yang disetujui pada tahap ini akan dialihkan ke status <strong>Diteruskan ke Dinas</strong> dan akun Admin Dinas terkait <strong>wajib menindaklanjuti</strong> hingga tuntas.
+                        </p>
+                      </div>
+                    )}
+
                     <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
                       <div className="flex items-center gap-2">
                         <button
@@ -1742,7 +1911,7 @@ function PengaduanAdminContent() {
                               ? "Setujui & Teruskan ke Kecamatan"
                               : selectedItem.status === "MENUNGGU_VERIFIKASI_KECAMATAN"
                                 ? "Setujui & Teruskan ke Kabupaten"
-                                : "Setujui & Terbitkan Tindak Lanjut"}
+                                : "Setujui & Teruskan ke Dinas"}
                           </span>
                         </button>
                       </div>
@@ -1949,11 +2118,29 @@ function PengaduanAdminContent() {
                 </div>
               )}
 
-              {/* FORM CATAT TINDAK LANJUT LAPANGAN (KHUSUS STATUS DITINDAKLANJUTI & SELESAI) */}
-              {(selectedItem.status === "DITINDAKLANJUTI" || selectedItem.status === "SELESAI") && (() => {
+              {/* FORM CATAT TINDAK LANJUT LAPANGAN (KHUSUS STATUS DITERUSKAN_KE_DINAS, DITINDAKLANJUTI & SELESAI) */}
+              {(selectedItem.status === "DITERUSKAN_KE_DINAS" || selectedItem.status === "DITINDAKLANJUTI" || selectedItem.status === "SELESAI") && (() => {
                 const tlAuth = getTindakLanjutAuth(selectedItem, currentUser);
 
                 if (!tlAuth.canAction) {
+                  if (currentUser?.role === "ADMIN_KABUPATEN") {
+                    return (
+                      <div className="p-4 rounded-2xl border border-cyan-200 bg-cyan-50/70 text-cyan-950 flex items-start space-x-3 shadow-2xs">
+                        <div className="w-9 h-9 rounded-xl bg-cyan-100 border border-cyan-300/70 flex items-center justify-center text-cyan-800 shrink-0 mt-0.5">
+                          <Building2 size={18} />
+                        </div>
+                        <div className="space-y-1">
+                          <h5 className="font-bold text-xs uppercase tracking-wider text-cyan-900">
+                            Pengaduan Ditangani oleh {selectedItem.dinas?.nama || "Dinas Terkait"}
+                          </h5>
+                          <p className="text-xs text-cyan-800 leading-relaxed">
+                            Pengaduan ini telah berhasil diverifikasi pada tingkat Kabupaten dan didelegasikan kepada <strong>{selectedItem.dinas?.nama || "Dinas Terkait"}</strong>. Formulir pencatatan tindak lanjut lapangan wajib diisi langsung oleh <strong>Admin Dinas</strong> yang ditugaskan. Admin Kabupaten tidak mengisi formulir tindak lanjut, melainkan memantau seluruh proses penyelesaian pada riwayat intervensi di atas.
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 flex items-start space-x-2.5">
                       <AlertCircle size={18} className="text-slate-500 shrink-0 mt-0.5" />
@@ -1976,7 +2163,19 @@ function PengaduanAdminContent() {
                       </h4>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {selectedItem.status === "DITERUSKAN_KE_DINAS" && (
+                      <div className="p-3.5 rounded-xl border border-cyan-200 bg-cyan-50/90 text-cyan-950 flex items-start space-x-2.5">
+                        <Building2 size={16} className="text-cyan-700 shrink-0 mt-0.5" />
+                        <div className="space-y-0.5">
+                          <span className="font-bold text-xs block">Tugas Penanganan dari Admin Kabupaten</span>
+                          <p className="text-[11px] text-cyan-800 leading-relaxed">
+                            Pengaduan ini telah diteruskan secara resmi kepada <strong>{selectedItem.dinas?.nama || "Dinas Anda"}</strong> untuk ditindaklanjuti. Menyimpan formulir ini akan mengubah status pengaduan menjadi <strong>Ditindaklanjuti</strong> (atau <strong>Selesai</strong> jika Anda menandai selesai).
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
                       <div className="md:col-span-1">
                         <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
                           Jenis Tindakan:
@@ -2052,7 +2251,24 @@ function PengaduanAdminContent() {
               <div className="flex items-center space-x-2">
                 {(currentUser?.role === "SUPERADMIN" || (!isItemVerified(selectedItem) && canManageItem(selectedItem))) && (
                   <>
-
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditModal(selectedItem)}
+                      className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 font-bold text-xs transition shadow-2xs cursor-pointer"
+                      title="Edit Data Pengaduan"
+                    >
+                      <Edit size={14} />
+                      <span>Edit Pengaduan</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDeleteModal(selectedItem)}
+                      className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-bold text-xs transition shadow-2xs cursor-pointer"
+                      title="Hapus Pengaduan"
+                    >
+                      <Trash2 size={14} />
+                      <span>Hapus Pengaduan</span>
+                    </button>
                   </>
                 )}
               </div>
@@ -2143,10 +2359,10 @@ function PengaduanAdminContent() {
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
                   >
                     <option value="">-- Pilih Penghasilan --</option>
-                    <option value="< 1 jt /bulan">&lt; 1 jt /bulan</option>
-                    <option value="1 jt s/d. 2.5 juta">1 jt s/d. 2.5 juta</option>
-                    <option value="2.6 jt sd 5 jt">2.6 jt sd 5 jt</option>
-                    <option value="> 5 jt">&gt; 5 jt</option>
+                    <option value="< 1 juta">&lt; 1 juta</option>
+                    <option value="1 juta - 2.5 juta">1 juta - 2.5 juta</option>
+                    <option value="2.6 juta - 5 juta">2.6 juta - 5 juta</option>
+                    <option value="> 5 juta">&gt; 5 juta</option>
                   </select>
                 </div>
               </div>
@@ -2250,13 +2466,31 @@ function PengaduanAdminContent() {
               <strong>{deleteItem.pelapor.nama}</strong>? Seluruh dokumen dan riwayat verifikasi terkait akan ikut terhapus.
             </p>
 
-            <div className="pt-2 flex justify-end space-x-2">
+            <div className="pt-2 flex items-center justify-end space-x-2">
               <button
                 type="button"
                 onClick={() => setDeleteModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold"
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold transition cursor-pointer"
               >
                 Batal
+              </button>
+              <button
+                type="button"
+                disabled={deleteSubmitting}
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition flex items-center space-x-1.5 shadow-sm disabled:opacity-50 cursor-pointer"
+              >
+                {deleteSubmitting ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" />
+                    <span>Menghapus...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={14} />
+                    <span>Ya, Hapus Permanen</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

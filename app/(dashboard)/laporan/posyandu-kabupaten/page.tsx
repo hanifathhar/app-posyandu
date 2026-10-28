@@ -49,6 +49,8 @@ interface DetailLaporanItem {
   tindakLanjutKecamatan: string;
   tindakLanjutOpd: string;
   tindakLanjutTerakhir: string;
+  dinas?: { id: string; kode: string; nama: string } | null;
+  namaDinas?: string | null;
   keterangan: string;
   tanggalSelesai?: string | null;
 }
@@ -409,7 +411,16 @@ export default function LaporanPosyanduKabupatenPage() {
                           {row.bidang}
                         </td>
                         <td className="border border-black px-4 py-2.5 whitespace-pre-wrap leading-relaxed">
-                          {row.tindakLanjutOpd || row.tindakLanjutTerakhir || "-"}
+                          <div className="text-slate-800 print:text-black">
+                            {row.tindakLanjutOpd && row.namaDinas && row.tindakLanjutOpd.startsWith(`[${row.namaDinas}]: `)
+                              ? row.tindakLanjutOpd.replace(`[${row.namaDinas}]: `, "")
+                              : row.tindakLanjutOpd || row.tindakLanjutTerakhir || "-"}
+                          </div>
+                          {row.namaDinas && (
+                            <div className="text-slate-800 print:text-black">
+                              ({row.namaDinas})
+                            </div>
+                          )}
                         </td>
                         <td className="border border-black px-3 py-2.5 text-center font-bold">
                           <span

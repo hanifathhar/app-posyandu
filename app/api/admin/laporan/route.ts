@@ -36,6 +36,10 @@ export async function GET(request: Request) {
 
     const where: any = {};
 
+    if (currentUser?.role === "ADMIN_DINAS" && currentUser.dinasId) {
+      where.dinasId = currentUser.dinasId;
+    }
+
     if (startDate || endDate) {
       where.tanggalPengaduan = {};
       if (startDate) where.tanggalPengaduan.gte = new Date(startDate);
@@ -151,6 +155,7 @@ export async function GET(request: Request) {
       orderBy: { tanggalPengaduan: "asc" },
       take: 500,
       include: {
+        dinas: true,
         bidang: true,
         jenisPengaduan: true,
         kecamatan: true,
@@ -251,8 +256,14 @@ export async function GET(request: Request) {
           rekapitulasiTemuan: d.deskripsi,
           tindakLanjutDesa: d.tindakLanjut[0]?.uraian || d.hasilPenyelesaian || d.catatan || "-",
           tindakLanjutKecamatan: d.tindakLanjut[0]?.uraian || d.hasilPenyelesaian || d.catatan || "-",
-          tindakLanjutOpd: d.tindakLanjut[0]?.uraian || d.hasilPenyelesaian || d.catatan || "-",
+          tindakLanjutOpd: d.dinas?.nama
+            ? d.tindakLanjut[0]?.uraian || d.hasilPenyelesaian || d.catatan
+              ? `[${d.dinas.nama}]: ${d.tindakLanjut[0]?.uraian || d.hasilPenyelesaian || d.catatan}`
+              : `[${d.dinas.nama}]: Diteruskan ke OPD terkait (menunggu tindak lanjut)`
+            : d.tindakLanjut[0]?.uraian || d.hasilPenyelesaian || d.catatan || "-",
           tindakLanjutTerakhir: d.tindakLanjut[0]?.uraian || d.hasilPenyelesaian || "-",
+          dinas: d.dinas ? { id: d.dinas.id, kode: d.dinas.kode, nama: d.dinas.nama } : null,
+          namaDinas: d.dinas?.nama || null,
           keterangan,
           tanggalSelesai: d.tanggalSelesai,
         };

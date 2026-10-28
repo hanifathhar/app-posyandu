@@ -172,6 +172,27 @@ async function main() {
   }
   console.log("✅ 6 Bidang SPM dan Jenis Pengaduan berhasil disematkan.");
 
+  // 4.5 SEED MASTER DINAS / OPD PEMKAB
+  const dinasData = [
+    { kode: "DINKES", nama: "Dinas Kesehatan", deskripsi: "Pengampu SPM Bidang Kesehatan (Pelayanan kesehatan ibu, bayi, balita, usia pendidikan dasar, produktif, lansia, hipertensi, DM, ODGJ, TB, HIV).", kontak: "0634-123456" },
+    { kode: "DINSOS", nama: "Dinas Sosial", deskripsi: "Pengampu SPM Bidang Sosial (Bansos warga rentan, disabilitas, lansia terlantar, korban bencana).", kontak: "0634-234567" },
+    { kode: "DISDIK", nama: "Dinas Pendidikan", deskripsi: "Pengampu SPM Bidang Pendidikan (Pendidikan anak usia dini, pendidikan dasar, pendidikan kesetaraan).", kontak: "0634-345678" },
+    { kode: "DPUPR", nama: "Dinas Pekerjaan Umum dan Penataan Ruang", deskripsi: "Pengampu SPM Bidang Pekerjaan Umum (Pemenuhan kebutuhan air minum dan pengelolaan air limbah domestik).", kontak: "0634-456789" },
+    { kode: "DISPERKIM", nama: "Dinas Perumahan dan Kawasan Permukiman", deskripsi: "Pengampu SPM Bidang Perumahan Rakyat (Penyediaan dan rehabilitasi rumah layak huni bagi korban bencana/relokasi program).", kontak: "0634-567890" },
+    { kode: "SATPOLPP", nama: "Satuan Polisi Pamong Praja", deskripsi: "Pengampu SPM Bidang Ketenteraman, Ketertiban Umum, dan Perlindungan Masyarakat.", kontak: "0634-678901" },
+  ];
+
+  const createdDinas: Record<string, string> = {};
+  for (const dinas of dinasData) {
+    const res = await prisma.dinas.upsert({
+      where: { kode: dinas.kode },
+      update: { nama: dinas.nama, deskripsi: dinas.deskripsi, kontak: dinas.kontak, aktif: true },
+      create: { kode: dinas.kode, nama: dinas.nama, deskripsi: dinas.deskripsi, kontak: dinas.kontak, aktif: true },
+    });
+    createdDinas[dinas.kode] = res.id;
+  }
+  console.log("✅ Master Dinas / OPD berhasil disematkan.");
+
   // 5. SEED PENGGUNA DEFAULT
   const hashedPassword = await bcrypt.hash("admin123", 10);
 
@@ -184,8 +205,22 @@ async function main() {
     },
     {
       username: "admin_kabupaten",
-      nama: "Admin Dinsos/Dinkes Kabupaten",
+      nama: "Admin Sekretariat SPM Kabupaten",
       role: RolePengguna.ADMIN_KABUPATEN,
+      password: hashedPassword,
+    },
+    {
+      username: "admin_dinkes",
+      nama: "Admin Dinas Kesehatan",
+      role: RolePengguna.ADMIN_DINAS,
+      dinasId: createdDinas["DINKES"],
+      password: hashedPassword,
+    },
+    {
+      username: "admin_dinsos",
+      nama: "Admin Dinas Sosial",
+      role: RolePengguna.ADMIN_DINAS,
+      dinasId: createdDinas["DINSOS"],
       password: hashedPassword,
     },
     {
@@ -208,7 +243,7 @@ async function main() {
   for (const u of usersToCreate) {
     await prisma.pengguna.upsert({
       where: { username: u.username },
-      update: { nama: u.nama, role: u.role, aktif: true },
+      update: { nama: u.nama, role: u.role, dinasId: (u as any).dinasId || null, aktif: true },
       create: u,
     });
   }

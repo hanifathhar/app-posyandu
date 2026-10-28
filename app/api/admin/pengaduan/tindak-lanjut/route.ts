@@ -15,7 +15,7 @@ export async function POST(request: Request) {
         const decoded = jwt.verify(token, JWT_SECRET) as any;
         currentUser = await prisma.pengguna.findUnique({
           where: { id: decoded.id },
-          include: { kecamatan: true, desa: true },
+          include: { kecamatan: true, desa: true, dinas: true },
         });
       } catch (e) {
         console.warn("Invalid JWT in tindak-lanjut");
@@ -40,21 +40,51 @@ export async function POST(request: Request) {
 
     const pengaduan = await prisma.pengaduan.findUnique({
       where: { id: pengaduanId },
-      include: { desa: true, kecamatan: true },
+      include: { desa: true, kecamatan: true, dinas: true },
     });
 
     if (!pengaduan) {
       return NextResponse.json({ success: false, message: "Pengaduan tidak ditemukan." }, { status: 404 });
     }
 
-    // Otorisasi Wilayah
-    if (currentUser.role === "ADMIN_DESA" && (!currentUser.desaId || pengaduan.kd_desa !== currentUser.desaId)) {
+    // Otorisasi Wilayah & Dinas
+    if (currentUser.role === "ADMIN_DINAS") {
+      if (!currentUser.dinasId || pengaduan.dinasId !== currentUser.dinasId) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Akses ditolak: Anda hanya berwenang menindaklanjuti pengaduan yang ditugaskan ke ${currentUser.dinas?.nama || "Dinas Anda"}.`,
+          },
+          { status: 403 }
+        );
+      }
+      if (
+        pengaduan.status !== StatusPengaduan.DITERUSKAN_KE_DINAS &&
+        pengaduan.status !== StatusPengaduan.DITINDAKLANJUTI &&
+        pengaduan.status !== StatusPengaduan.SELESAI
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Pengaduan ini belum diteruskan oleh Admin Kabupaten ke Dinas Anda.",
+          },
+          { status: 400 }
+        );
+      }
+    } else if (currentUser.role === "ADMIN_KABUPATEN") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Akses ditolak: Admin Kabupaten bertugas memverifikasi dan meneruskan pengaduan ke Dinas. Formulir tindak lanjut wajib dilaksanakan oleh Admin Dinas yang ditugaskan.`,
+        },
+        { status: 403 }
+      );
+    } else if (currentUser.role === "ADMIN_DESA" && (!currentUser.desaId || pengaduan.kd_desa !== currentUser.desaId)) {
       return NextResponse.json(
         { success: false, message: `Akses ditolak: Anda hanya berwenang menindaklanjuti pengaduan di Desa ${currentUser.desa?.nm_desa || currentUser.desaId}.` },
         { status: 403 }
       );
-    }
-    if (currentUser.role === "ADMIN_KECAMATAN" && (!currentUser.kecamatanId || pengaduan.kd_kecamatan !== currentUser.kecamatanId)) {
+    } else if (currentUser.role === "ADMIN_KECAMATAN" && (!currentUser.kecamatanId || pengaduan.kd_kecamatan !== currentUser.kecamatanId)) {
       return NextResponse.json(
         { success: false, message: `Akses ditolak: Anda hanya berwenang menindaklanjuti pengaduan di Kecamatan ${currentUser.kecamatan?.nm_kecamatan || currentUser.kecamatanId}.` },
         { status: 403 }

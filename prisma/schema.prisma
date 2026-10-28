@@ -24,6 +24,7 @@ enum BidangSPM {
 enum RolePengguna {
   SUPERADMIN
   ADMIN_KABUPATEN
+  ADMIN_DINAS
   ADMIN_KECAMATAN
   ADMIN_DESA
   OPERATOR
@@ -39,6 +40,7 @@ enum StatusPengaduan {
   PERLU_PERBAIKAN
   DISETUJUI
   DITOLAK
+  DITERUSKAN_KE_DINAS
   DITINDAKLANJUTI
   SELESAI
 }
@@ -94,12 +96,16 @@ model Pengguna {
 
   // Admin desa menggunakan desaId.
   // Admin kecamatan menggunakan kecamatanId.
-  // Admin kabupaten tidak memerlukan keduanya.
+  // Admin dinas menggunakan dinasId.
+  // Admin kabupaten tidak memerlukan ketiganya.
   kecamatanId String?
   kecamatan   Kecamatan? @relation("PenggunaKecamatan", fields: [kecamatanId], references: [kd_kecamatan], onDelete: Restrict)
 
   desaId String?
   desa   Desa?   @relation("PenggunaDesa", fields: [desaId], references: [kd_desa], onDelete: Restrict)
+
+  dinasId String?
+  dinas   Dinas?  @relation(fields: [dinasId], references: [id], onDelete: Restrict)
 
   pengaduanDibuat    Pengaduan[] @relation("PengaduanDibuat")
   pengaduanDitangani Pengaduan[] @relation("PetugasPengaduan")
@@ -115,6 +121,7 @@ model Pengguna {
   @@index([role, aktif])
   @@index([kecamatanId])
   @@index([desaId])
+  @@index([dinasId])
   @@map("pengguna")
 }
 
@@ -263,6 +270,29 @@ model JenisPengaduan {
 }
 
 // ======================================================
+// MASTER DINAS / OPD
+// ======================================================
+
+model Dinas {
+  id        String   @id @default(cuid())
+  kode      String   @unique
+  nama      String
+  deskripsi String?  @db.Text
+  kontak    String?
+  aktif     Boolean  @default(true)
+
+  pengguna  Pengguna[]
+  pengaduan Pengaduan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([nama])
+  @@index([aktif])
+  @@map("dinas")
+}
+
+// ======================================================
 // PENGADUAN UTAMA
 // ======================================================
 
@@ -288,6 +318,10 @@ model Pengaduan {
 
   posyanduId String
   posyandu   Posyandu @relation(fields: [posyanduId], references: [id], onDelete: Restrict)
+
+  // Dinas OPD tujuan tindak lanjut (ditunjuk oleh Admin Kabupaten)
+  dinasId String?
+  dinas   Dinas?  @relation(fields: [dinasId], references: [id], onDelete: Restrict)
 
   // Kondisi Sosial Ekonomi Pemohon
   jumlahTanggungan Int?
@@ -331,6 +365,7 @@ model Pengaduan {
   @@index([bidangId, status])
   @@index([kd_desa, status])
   @@index([kd_kecamatan, status])
+  @@index([dinasId, status])
   @@index([posyanduId])
   @@index([pelaporId])
   @@index([petugasId])

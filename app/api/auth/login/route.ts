@@ -42,6 +42,7 @@ export async function POST(req: Request) {
       include: {
         kecamatan: true,
         desa: true,
+        dinas: true,
       },
     });
 
@@ -67,6 +68,7 @@ export async function POST(req: Request) {
         role: pengguna.role,
         kecamatanId: pengguna.kecamatanId,
         desaId: pengguna.desaId,
+        dinasId: pengguna.dinasId,
       },
       JWT_SECRET,
       { expiresIn: "1d" }
@@ -81,6 +83,8 @@ export async function POST(req: Request) {
         role: pengguna.role,
         kecamatanId: pengguna.kecamatanId,
         desaId: pengguna.desaId,
+        dinasId: pengguna.dinasId,
+        dinas: pengguna.dinas ? { id: pengguna.dinas.id, kode: pengguna.dinas.kode, nama: pengguna.dinas.nama } : null,
       },
       token,
     });

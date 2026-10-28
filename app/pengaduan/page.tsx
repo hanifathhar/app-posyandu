@@ -509,6 +509,12 @@ function PengaduanMasyarakatContent() {
             Verifikasi Kabupaten
           </span>
         );
+      case "DITERUSKAN_KE_DINAS":
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-800 border border-cyan-200">
+            Diteruskan ke Dinas
+          </span>
+        );
       case "DITINDAKLANJUTI":
         return (
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-800 border border-cyan-200">
@@ -942,7 +948,7 @@ function PengaduanMasyarakatContent() {
                       >
                         <option value="">-- Pilih Rentang Penghasilan/Bulan --</option>
                         <option value="< 1 juta">&lt; 1 juta</option>
-                        <option value="1 jt - 2.5 juta">1 juta - 2.5 juta</option>
+                        <option value="1 juta - 2.5 juta">1 juta - 2.5 juta</option>
                         <option value="2.6 juta - 5 juta">2.6 juta - 5 juta</option>
                         <option value="> 5 juta">&gt; 5 juta</option>
                       </select>
@@ -1368,6 +1374,7 @@ function PengaduanMasyarakatContent() {
                         "MENUNGGU_VERIFIKASI_DESA",
                         "MENUNGGU_VERIFIKASI_KECAMATAN",
                         "MENUNGGU_VERIFIKASI_KABUPATEN",
+                        "DITERUSKAN_KE_DINAS",
                         "DISETUJUI",
                         "DITINDAKLANJUTI",
                         "SELESAI",
@@ -1381,6 +1388,7 @@ function PengaduanMasyarakatContent() {
                           "MENUNGGU_VERIFIKASI_DESA",
                           "MENUNGGU_VERIFIKASI_KECAMATAN",
                           "MENUNGGU_VERIFIKASI_KABUPATEN",
+                          "DITERUSKAN_KE_DINAS",
                           "DISETUJUI",
                           "DITINDAKLANJUTI",
                           "SELESAI",
@@ -1401,6 +1409,7 @@ function PengaduanMasyarakatContent() {
                       className={`p-3 rounded-2xl border ${[
                         "MENUNGGU_VERIFIKASI_KECAMATAN",
                         "MENUNGGU_VERIFIKASI_KABUPATEN",
+                        "DITERUSKAN_KE_DINAS",
                         "DISETUJUI",
                         "DITINDAKLANJUTI",
                         "SELESAI",
@@ -1413,6 +1422,7 @@ function PengaduanMasyarakatContent() {
                         className={`w-6 h-6 rounded-full text-xs font-bold mx-auto flex items-center justify-center mb-1 ${[
                           "MENUNGGU_VERIFIKASI_KECAMATAN",
                           "MENUNGGU_VERIFIKASI_KABUPATEN",
+                          "DITERUSKAN_KE_DINAS",
                           "DISETUJUI",
                           "DITINDAKLANJUTI",
                           "SELESAI",
@@ -1430,13 +1440,13 @@ function PengaduanMasyarakatContent() {
                     </div>
 
                     <div
-                      className={`p-3 rounded-2xl border ${["DITINDAKLANJUTI", "SELESAI"].includes(trackingResult.status)
+                      className={`p-3 rounded-2xl border ${["DITERUSKAN_KE_DINAS", "DITINDAKLANJUTI", "SELESAI"].includes(trackingResult.status)
                         ? "border-emerald-200 bg-emerald-50/80 shadow-2xs"
                         : "border-slate-200 bg-slate-50"
                         }`}
                     >
                       <div
-                        className={`w-6 h-6 rounded-full text-xs font-bold mx-auto flex items-center justify-center mb-1 ${["DITINDAKLANJUTI", "SELESAI"].includes(trackingResult.status)
+                        className={`w-6 h-6 rounded-full text-xs font-bold mx-auto flex items-center justify-center mb-1 ${["DITERUSKAN_KE_DINAS", "DITINDAKLANJUTI", "SELESAI"].includes(trackingResult.status)
                           ? "bg-emerald-600 text-white"
                           : "bg-slate-300 text-slate-600"
                           }`}

@@ -55,6 +55,8 @@ export default function Sidebar({
             setOpenMenu("Verifikasi Desa");
           } else if (userRole === "ADMIN_KECAMATAN") {
             setOpenMenu("Verifikasi Kecamatan");
+          } else if (userRole === "ADMIN_DINAS") {
+            setOpenMenu("Pengaduan Dinas");
           } else {
             setOpenMenu("Pengaduan SPM");
           }
@@ -87,7 +89,7 @@ export default function Sidebar({
       title: "Dashboard",
       icon: <LayoutDashboard size={18} />,
       href: "/dashboard",
-      roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN", "ADMIN_DESA", "OPERATOR", "PETUGAS", "VERIFIKATOR"],
+      roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_DINAS", "ADMIN_KECAMATAN", "ADMIN_DESA", "OPERATOR", "PETUGAS", "VERIFIKATOR"],
     },
     // Menu Khusus Admin Desa
     {
@@ -113,6 +115,19 @@ export default function Sidebar({
         { label: "Ditindaklanjuti & Selesai", href: "/pengaduan-admin?status=DITINDAKLANJUTI" },
       ],
     },
+    // Menu Khusus Admin Dinas (OPD Pengampu)
+    {
+      title: "Pengaduan Dinas",
+      icon: <FileText size={18} />,
+      href: "/pengaduan-admin",
+      roles: ["ADMIN_DINAS"],
+      children: [
+        { label: "Semua Tugas Dinas", href: "/pengaduan-admin" },
+        { label: "Perlu Ditindaklanjuti", href: "/pengaduan-admin?status=DITERUSKAN_KE_DINAS" },
+        { label: "Sedang Ditindaklanjuti", href: "/pengaduan-admin?status=DITINDAKLANJUTI" },
+        { label: "Selesai Penanganan", href: "/pengaduan-admin?status=SELESAI" },
+      ],
+    },
     // Menu Khusus Admin Kabupaten & Superadmin
     {
       title: "Pengaduan",
@@ -124,22 +139,24 @@ export default function Sidebar({
         { label: "Verifikasi Desa", href: "/pengaduan-admin?status=MENUNGGU_VERIFIKASI_DESA" },
         { label: "Verifikasi Kecamatan", href: "/pengaduan-admin?status=MENUNGGU_VERIFIKASI_KECAMATAN" },
         { label: "Verifikasi Kabupaten", href: "/pengaduan-admin?status=MENUNGGU_VERIFIKASI_KABUPATEN" },
+        { label: "Diteruskan ke Dinas", href: "/pengaduan-admin?status=DITERUSKAN_KE_DINAS" },
         { label: "Ditindaklanjuti & Selesai", href: "/pengaduan-admin?status=DITINDAKLANJUTI" },
       ],
     },
     {
       title: "Tindak Lanjut & Intervensi",
       icon: <HeartHandshake size={18} />,
-      href: "/pengaduan-admin?status=DITINDAKLANJUTI",
-      roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN", "ADMIN_DESA", "PETUGAS"],
+      href: "/pengaduan-admin?status=DITERUSKAN_KE_DINAS",
+      roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_DINAS", "ADMIN_KECAMATAN", "ADMIN_DESA", "PETUGAS"],
     },
     // Master Data hanya untuk SUPERADMIN dan ADMIN_KABUPATEN
     {
       title: "Master Data",
       icon: <Database size={18} />,
-      href: "/master-data/wilayah",
+      href: "/master-data/dinas",
       roles: ["SUPERADMIN", "ADMIN_KABUPATEN"],
       children: [
+        { label: "Master Dinas / OPD", href: "/master-data/dinas" },
         { label: "Wilayah & Posyandu", href: "/master-data/wilayah" },
         { label: "6 Bidang & Jenis SPM", href: "/master-data/bidang-spm" },
         { label: "Data Pelapor", href: "/master-data/pelapor" },
@@ -155,13 +172,13 @@ export default function Sidebar({
     {
       title: "Laporan",
       icon: <BarChart3 size={18} />,
-      href: "/laporan/posyandu-desa",
-      roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN", "ADMIN_DESA"],
+      href: "/laporan/rekap-spm",
+      roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_DINAS", "ADMIN_KECAMATAN", "ADMIN_DESA"],
       children: [
+        { label: "Rekapitulasi Capaian 6 SPM", href: "/laporan/rekap-spm", roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_DINAS", "ADMIN_KECAMATAN", "ADMIN_DESA"] },
         { label: "Laporan Posyandu Desa", href: "/laporan/posyandu-desa", roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN", "ADMIN_DESA"] },
         { label: "Laporan Posyandu Kecamatan", href: "/laporan/posyandu-kecamatan", roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN"] },
         { label: "Laporan Posyandu Kabupaten", href: "/laporan/posyandu-kabupaten", roles: ["SUPERADMIN", "ADMIN_KABUPATEN"] },
-        { label: "Rekapitulasi Capaian 6 SPM", href: "/laporan/rekap-spm", roles: ["SUPERADMIN", "ADMIN_KABUPATEN", "ADMIN_KECAMATAN", "ADMIN_DESA"] },
       ],
     },
   ];
@@ -258,7 +275,11 @@ export default function Sidebar({
                   <ShieldCheck size={14} className="shrink-0 text-amber-300" />
                   <span>{userInfo.role?.replace(/_/g, " ")}</span>
                 </div>
-                {userInfo.desa?.nm_desa ? (
+                {userInfo.dinas?.nama ? (
+                  <span className="text-[10px] text-sky-200 font-semibold truncate">
+                    {userInfo.dinas.nama}
+                  </span>
+                ) : userInfo.desa?.nm_desa ? (
                   <span className="text-[10px] text-sky-200 font-medium truncate">
                     Desa {userInfo.desa.nm_desa}
                   </span>

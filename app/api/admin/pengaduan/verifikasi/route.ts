@@ -35,6 +35,7 @@ export async function POST(request: Request) {
       tahap,
       keputusan,
       catatan,
+      dinasId,
       tindakanLangsung,
       statusAkhir,
       jenisTindakan,
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
 
     const pengaduan = await prisma.pengaduan.findUnique({
       where: { id: pengaduanId },
-      include: { desa: true, kecamatan: true },
+      include: { desa: true, kecamatan: true, dinas: true },
     });
 
     if (!pengaduan) {
@@ -113,11 +114,17 @@ export async function POST(request: Request) {
           { status: 403 }
         );
       }
+    } else if (currentUser.role === "ADMIN_DINAS") {
+      return NextResponse.json(
+        { success: false, message: "Akses ditolak: Admin Dinas tidak memproses verifikasi berjenjang. Admin Dinas bertugas menindaklanjuti pengaduan yang telah diteruskan ke dinas." },
+        { status: 403 }
+      );
     }
 
     const statusSebelum = pengaduan.status;
     let statusSesudah: StatusPengaduan = statusSebelum;
     let keterangan = "";
+    let selectedDinasName = "";
 
     if (tindakanLangsung && keputusan === "DISETUJUI") {
       statusSesudah = statusAkhir === "SELESAI" ? StatusPengaduan.SELESAI : StatusPengaduan.DITINDAKLANJUTI;
@@ -134,10 +141,29 @@ export async function POST(request: Request) {
         keterangan = `Verifikasi Desa disetujui oleh kader/admin desa. Diteruskan ke verifikasi Kecamatan.`;
       } else if (tahap === "KECAMATAN") {
         statusSesudah = StatusPengaduan.MENUNGGU_VERIFIKASI_KABUPATEN;
-        keterangan = `Verifikasi Kecamatan disetujui oleh Admin Kecamatan. Diteruskan ke Dinas Kabupaten terkait.`;
+        keterangan = `Verifikasi Kecamatan disetujui oleh Admin Kecamatan. Diteruskan ke verifikasi Kabupaten.`;
       } else if (tahap === "KABUPATEN") {
-        statusSesudah = StatusPengaduan.DITINDAKLANJUTI;
-        keterangan = `Verifikasi Kabupaten disetujui oleh OPD Pengampu SPM. Pengaduan masuk tahap tindak lanjut/intervensi.`;
+        if (!dinasId) {
+          return NextResponse.json(
+            { success: false, message: "Dinas tujuan wajib dipilih saat menyetujui pengaduan di tingkat Kabupaten." },
+            { status: 400 }
+          );
+        }
+
+        const dinasTarget = await prisma.dinas.findUnique({
+          where: { id: dinasId },
+        });
+
+        if (!dinasTarget) {
+          return NextResponse.json(
+            { success: false, message: "Dinas tujuan yang dipilih tidak ditemukan di master data." },
+            { status: 400 }
+          );
+        }
+
+        selectedDinasName = dinasTarget.nama;
+        statusSesudah = StatusPengaduan.DITERUSKAN_KE_DINAS;
+        keterangan = `Verifikasi Kabupaten disetujui oleh Admin Kabupaten. Pengaduan resmi diteruskan ke ${dinasTarget.nama} untuk ditindaklanjuti. Catatan: ${catatan?.trim() || "-"}`;
       }
     }
 
@@ -158,7 +184,9 @@ export async function POST(request: Request) {
           keputusan: keputusan as KeputusanVerifikasi,
           catatan: tindakanLangsung
             ? `[Penanganan Langsung ${tahap}]: ${uraianTindakan.trim()}${catatan ? ` - ${catatan.trim()}` : ""}`
-            : catatan?.trim() || null,
+            : tahap === "KABUPATEN" && keputusan === "DISETUJUI" && selectedDinasName
+              ? `[Diteruskan ke ${selectedDinasName}] ${catatan?.trim() || ""}`.trim()
+              : catatan?.trim() || null,
           putaran: prevVerifCount + 1,
         },
       }),
@@ -166,6 +194,7 @@ export async function POST(request: Request) {
         where: { id: pengaduanId },
         data: {
           status: statusSesudah,
+          dinasId: (tahap === "KABUPATEN" && keputusan === "DISETUJUI" && dinasId) ? dinasId : pengaduan.dinasId,
           alasanPenolakan: keputusan === "DITOLAK" ? catatan?.trim() || "Ditolak oleh verifikator" : pengaduan.alasanPenolakan,
           catatan: catatan?.trim() || pengaduan.catatan,
           tahapPerbaikanKe: keputusan === "PERLU_PERBAIKAN" ? (tahap as TahapVerifikasi) : null,
@@ -193,6 +222,7 @@ export async function POST(request: Request) {
           },
         },
         include: {
+          dinas: true,
           bidang: true,
           jenisPengaduan: true,
           desa: true,

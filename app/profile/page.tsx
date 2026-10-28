@@ -25,6 +25,7 @@ interface UserData {
   aktif?: boolean;
   kecamatanId?: string | null;
   desaId?: string | null;
+  dinasId?: string | null;
   kecamatan?: {
     kd_kecamatan: string;
     nm_kecamatan: string;
@@ -32,6 +33,12 @@ interface UserData {
   desa?: {
     kd_desa: string;
     nm_desa: string;
+  } | null;
+  dinas?: {
+    id: string;
+    kode: string;
+    nama: string;
+    deskripsi?: string | null;
   } | null;
 }
 
@@ -135,6 +142,8 @@ export default function ProfilePage() {
         return "Administrator Sistem";
       case "ADMIN_KABUPATEN":
         return "Administrator Kabupaten";
+      case "ADMIN_DINAS":
+        return "Administrator Dinas";
       case "ADMIN_KECAMATAN":
         return "Administrator Kecamatan";
       case "ADMIN_DESA":
@@ -154,6 +163,8 @@ export default function ProfilePage() {
         return "Administrator Sistem";
       case "ADMIN_KABUPATEN":
         return "Administrator Kabupaten";
+      case "ADMIN_DINAS":
+        return "Administrator Dinas";
       case "ADMIN_KECAMATAN":
         return "Administrator Kecamatan";
       case "ADMIN_DESA":
@@ -252,6 +263,17 @@ export default function ProfilePage() {
                       Aktif &amp; Terverifikasi
                     </span>
                   </div>
+
+                  {/* Info Dinas untuk Admin Dinas */}
+                  {user.dinas && (
+                    <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <span className="text-slate-500 font-normal">Dinas Instansi:</span>
+                      <span className="font-semibold text-slate-800 sm:text-right flex items-center gap-1.5">
+                        <Building2 size={14} className="text-blue-600 shrink-0" />
+                        <span>{user.dinas.nama} ({user.dinas.kode})</span>
+                      </span>
+                    </div>
+                  )}
 
                   {/* Info Wilayah (Desa / Kecamatan) jika ada */}
                   {(user.desa || user.kecamatan) && (

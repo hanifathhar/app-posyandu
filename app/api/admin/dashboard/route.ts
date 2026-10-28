@@ -19,20 +19,22 @@ export async function GET(request?: Request) {
         const decoded = jwt.verify(token, JWT_SECRET) as any;
         currentUser = await prisma.pengguna.findUnique({
           where: { id: decoded.id },
-          include: { kecamatan: true, desa: true },
+          include: { kecamatan: true, desa: true, dinas: true },
         });
       } catch (e) {
         console.warn("Invalid JWT token on dashboard route");
       }
     }
 
-    // 2. Susun Filter Wilayah Berdasarkan Hak Akses Role
+    // 2. Susun Filter Wilayah/Dinas Berdasarkan Hak Akses Role
     const baseWhere: any = {};
 
     if (currentUser?.role === "ADMIN_DESA" && currentUser.desaId) {
       baseWhere.kd_desa = currentUser.desaId;
     } else if (currentUser?.role === "ADMIN_KECAMATAN" && currentUser.kecamatanId) {
       baseWhere.kd_kecamatan = currentUser.kecamatanId;
+    } else if (currentUser?.role === "ADMIN_DINAS" && currentUser.dinasId) {
+      baseWhere.dinasId = currentUser.dinasId;
     }
 
     // Filter Periode Waktu jika dipilih
@@ -47,12 +49,13 @@ export async function GET(request?: Request) {
       baseWhere.tanggalPengaduan = { gte: startOfYear, lte: endOfYear };
     }
 
-    // 3. KPI Counts Sesuai Wilayah & Periode
+    // 3. KPI Counts Sesuai Wilayah/Dinas & Periode
     const [
       total,
       menungguDesa,
       menungguKecamatan,
       menungguKabupaten,
+      diteruskanKeDinas,
       ditindaklanjuti,
       selesai,
       perluPerbaikan,
@@ -62,6 +65,7 @@ export async function GET(request?: Request) {
       prisma.pengaduan.count({ where: { ...baseWhere, status: StatusPengaduan.MENUNGGU_VERIFIKASI_DESA } }),
       prisma.pengaduan.count({ where: { ...baseWhere, status: StatusPengaduan.MENUNGGU_VERIFIKASI_KECAMATAN } }),
       prisma.pengaduan.count({ where: { ...baseWhere, status: StatusPengaduan.MENUNGGU_VERIFIKASI_KABUPATEN } }),
+      prisma.pengaduan.count({ where: { ...baseWhere, status: StatusPengaduan.DITERUSKAN_KE_DINAS } }),
       prisma.pengaduan.count({ where: { ...baseWhere, status: StatusPengaduan.DITINDAKLANJUTI } }),
       prisma.pengaduan.count({ where: { ...baseWhere, status: StatusPengaduan.SELESAI } }),
       prisma.pengaduan.count({ where: { ...baseWhere, status: StatusPengaduan.PERLU_PERBAIKAN } }),
@@ -201,6 +205,9 @@ export async function GET(request?: Request) {
           kecamatanNama: currentUser?.kecamatan?.nm_kecamatan || null,
           desaId: currentUser?.desaId || null,
           desaNama: currentUser?.desa?.nm_desa || null,
+          dinasId: currentUser?.dinasId || null,
+          dinasNama: currentUser?.dinas?.nama || null,
+          dinasKode: currentUser?.dinas?.kode || null,
         },
         periode,
         kpi: {
@@ -208,11 +215,12 @@ export async function GET(request?: Request) {
           menungguDesa,
           menungguKecamatan,
           menungguKabupaten,
+          diteruskanKeDinas,
           ditindaklanjuti,
           selesai,
           perluPerbaikan,
           ditolak,
-          totalMenungguVerifikasi: menungguDesa + menungguKecamatan + menungguKabupaten,
+          totalMenungguVerifikasi: menungguDesa + menungguKecamatan + menungguKabupaten + diteruskanKeDinas,
           totalSelesaiDanDitindak,
           resolutionRate,
         },

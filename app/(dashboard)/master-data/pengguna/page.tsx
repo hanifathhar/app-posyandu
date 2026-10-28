@@ -31,6 +31,8 @@ interface PenggunaSPM {
   aktif: boolean;
   kecamatanId: string | null;
   desaId: string | null;
+  dinasId: string | null;
+  dinas?: { id: string; kode: string; nama: string };
   kecamatan?: { nm_kecamatan: string };
   desa?: { nm_desa: string; kd_kecamatan?: string };
   _count?: {
@@ -48,9 +50,10 @@ export default function ManajemenPenggunaPage() {
   const [roleFilter, setRoleFilter] = useState("");
   const [kecamatanFilter, setKecamatanFilter] = useState("");
 
-  // Referensi Wilayah untuk Assignment Form & Filter
+  // Referensi Wilayah & Dinas untuk Assignment Form & Filter
   const [kecamatanList, setKecamatanList] = useState<any[]>([]);
   const [desaList, setDesaList] = useState<any[]>([]);
+  const [dinasList, setDinasList] = useState<any[]>([]);
 
   // Modal Create
   const [modalOpen, setModalOpen] = useState(false);
@@ -61,6 +64,7 @@ export default function ManajemenPenggunaPage() {
     role: "ADMIN_DESA",
     kecamatanId: "",
     desaId: "",
+    dinasId: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -79,6 +83,7 @@ export default function ManajemenPenggunaPage() {
     role: "ADMIN_DESA",
     kecamatanId: "",
     desaId: "",
+    dinasId: "",
   });
   const [editSubmitting, setEditSubmitting] = useState(false);
   const [editFeedback, setEditFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -127,6 +132,9 @@ export default function ManajemenPenggunaPage() {
     fetch("/api/admin/master-data/wilayah?type=desa")
       .then((r) => r.json())
       .then((d) => d.success && setDesaList(d.data));
+    fetch("/api/admin/master-data/dinas?aktif=true")
+      .then((r) => r.json())
+      .then((d) => d.success && setDinasList(d.data));
   }, []);
 
   // Periksa apakah user yang sedang login boleh menambah user
@@ -142,7 +150,7 @@ export default function ManajemenPenggunaPage() {
     if (currentUser.role === "SUPERADMIN") return true;
 
     if (currentUser.role === "ADMIN_KABUPATEN") {
-      return target.role === "ADMIN_KECAMATAN" || target.role === "ADMIN_DESA";
+      return target.role === "ADMIN_DINAS" || target.role === "ADMIN_KECAMATAN" || target.role === "ADMIN_DESA";
     }
 
     if (currentUser.role === "ADMIN_KECAMATAN") {
@@ -172,6 +180,7 @@ export default function ManajemenPenggunaPage() {
       role: defaultRole,
       kecamatanId: defaultKecamatan,
       desaId: "",
+      dinasId: "",
     });
     setModalOpen(true);
   };
@@ -186,6 +195,7 @@ export default function ManajemenPenggunaPage() {
       role: u.role,
       kecamatanId: u.kecamatanId || u.desa?.kd_kecamatan || "",
       desaId: u.desaId || "",
+      dinasId: u.dinasId || "",
     });
     setEditFeedback(null);
     setEditModalOpen(true);
@@ -290,6 +300,7 @@ export default function ManajemenPenggunaPage() {
           role: "ADMIN_DESA",
           kecamatanId: "",
           desaId: "",
+          dinasId: "",
         });
         fetchUsers();
       }, 1000);
@@ -306,6 +317,8 @@ export default function ManajemenPenggunaPage() {
         return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-purple-100 text-purple-800 border border-purple-200">SUPERADMIN</span>;
       case "ADMIN_KABUPATEN":
         return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-100 text-blue-800 border border-blue-200">ADMIN KABUPATEN</span>;
+      case "ADMIN_DINAS":
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-cyan-100 text-cyan-800 border border-cyan-200">ADMIN DINAS (OPD)</span>;
       case "ADMIN_KECAMATAN":
         return <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-indigo-100 text-indigo-800 border border-indigo-200">ADMIN KECAMATAN</span>;
       case "ADMIN_DESA":
@@ -382,6 +395,7 @@ export default function ManajemenPenggunaPage() {
               <option value="">Semua Peran / Role</option>
               <option value="SUPERADMIN">SUPERADMIN</option>
               <option value="ADMIN_KABUPATEN">ADMIN KABUPATEN</option>
+              <option value="ADMIN_DINAS">ADMIN DINAS (OPD)</option>
               <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
               <option value="ADMIN_DESA">ADMIN DESA / KADER</option>
               <option value="VERIFIKATOR">VERIFIKATOR</option>
@@ -494,7 +508,12 @@ export default function ManajemenPenggunaPage() {
                           <td className="px-5 py-3.5">{getRoleBadge(user.role)}</td>
 
                           <td className="px-5 py-3.5">
-                            {user.role === "SUPERADMIN" || user.role === "ADMIN_KABUPATEN" ? (
+                            {user.role === "ADMIN_DINAS" ? (
+                              <span className="text-slate-800 font-semibold flex items-center gap-1.5">
+                                <Building2 size={14} className="text-cyan-600" />
+                                {user.dinas?.nama || "Dinas Belum Ditentukan"}
+                              </span>
+                            ) : user.role === "SUPERADMIN" || user.role === "ADMIN_KABUPATEN" ? (
                               <span className="text-slate-600 font-semibold flex items-center gap-1.5">
                                 <ShieldCheck size={14} className="text-blue-600" />
                                 Seluruh Kab. Tapanuli Selatan
@@ -615,11 +634,10 @@ export default function ManajemenPenggunaPage() {
             <form onSubmit={handleCreateUser} className="p-6 space-y-3.5 text-xs">
               {feedback && (
                 <div
-                  className={`p-3 rounded-xl border text-xs font-semibold ${
-                    feedback.type === "success"
+                  className={`p-3 rounded-xl border text-xs font-semibold ${feedback.type === "success"
                       ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                       : "bg-rose-50 border-rose-200 text-rose-800"
-                  }`}
+                    }`}
                 >
                   {feedback.message}
                 </div>
@@ -680,24 +698,27 @@ export default function ManajemenPenggunaPage() {
                       setFormData({
                         ...formData,
                         role: r,
-                        kecamatanId: r === "SUPERADMIN" || r === "ADMIN_KABUPATEN" ? "" : formData.kecamatanId,
+                        kecamatanId: r === "SUPERADMIN" || r === "ADMIN_KABUPATEN" || r === "ADMIN_DINAS" ? "" : formData.kecamatanId,
                         desaId: r === "ADMIN_DESA" ? formData.desaId : "",
+                        dinasId: r === "ADMIN_DINAS" ? formData.dinasId : "",
                       });
                     }}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
                   >
                     {currentUser?.role === "ADMIN_KABUPATEN" ? (
-                      // Admin Kabupaten: dapat menambah user admin kecamatan dan admin desa
+                      // Admin Kabupaten: dapat menambah user admin dinas, admin kecamatan dan admin desa
                       <>
+                        <option value="ADMIN_DINAS">ADMIN DINAS / OPD</option>
                         <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
                         <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
                       </>
                     ) : (
-                      // Superadmin: sudah sesuai (semua role)
+                      // Superadmin: semua role
                       <>
                         <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
                         <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
-                        <option value="ADMIN_KABUPATEN">ADMIN KABUPATEN (DINAS)</option>
+                        <option value="ADMIN_DINAS">ADMIN DINAS / OPD</option>
+                        <option value="ADMIN_KABUPATEN">ADMIN KABUPATEN (SEKRETARIAT SPM)</option>
                         <option value="SUPERADMIN">SUPERADMIN (TEKNIS SISTEM)</option>
                         <option value="VERIFIKATOR">VERIFIKATOR</option>
                       </>
@@ -705,6 +726,26 @@ export default function ManajemenPenggunaPage() {
                   </select>
                 )}
               </div>
+
+              {/* Pilihan Dinas jika Role ADMIN_DINAS */}
+              {formData.role === "ADMIN_DINAS" && (
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Pilih Dinas / OPD Penugasan *:</label>
+                  <select
+                    required
+                    value={formData.dinasId}
+                    onChange={(e) => setFormData({ ...formData, dinasId: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
+                  >
+                    <option value="">-- Pilih Dinas Penugasan --</option>
+                    {dinasList.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.nama}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Otoritas Wilayah jika Admin Kecamatan yang sedang login: Kecamatan terkunci */}
               {currentUser?.role === "ADMIN_KECAMATAN" ? (
@@ -823,11 +864,10 @@ export default function ManajemenPenggunaPage() {
             <form onSubmit={handleSaveEdit} className="p-6 space-y-3.5 text-xs">
               {editFeedback && (
                 <div
-                  className={`p-3 rounded-xl border text-xs font-semibold ${
-                    editFeedback.type === "success"
+                  className={`p-3 rounded-xl border text-xs font-semibold ${editFeedback.type === "success"
                       ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                       : "bg-rose-50 border-rose-200 text-rose-800"
-                  }`}
+                    }`}
                 >
                   {editFeedback.message}
                 </div>
@@ -884,14 +924,16 @@ export default function ManajemenPenggunaPage() {
                       setEditForm({
                         ...editForm,
                         role: r,
-                        kecamatanId: r === "SUPERADMIN" || r === "ADMIN_KABUPATEN" ? "" : editForm.kecamatanId,
+                        kecamatanId: r === "SUPERADMIN" || r === "ADMIN_KABUPATEN" || r === "ADMIN_DINAS" ? "" : editForm.kecamatanId,
                         desaId: r === "ADMIN_DESA" ? editForm.desaId : "",
+                        dinasId: r === "ADMIN_DINAS" ? editForm.dinasId : "",
                       });
                     }}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
                   >
                     {currentUser?.role === "ADMIN_KABUPATEN" ? (
                       <>
+                        <option value="ADMIN_DINAS">ADMIN DINAS / OPD</option>
                         <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
                         <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
                       </>
@@ -899,7 +941,8 @@ export default function ManajemenPenggunaPage() {
                       <>
                         <option value="ADMIN_DESA">ADMIN DESA / KADER POSYANDU</option>
                         <option value="ADMIN_KECAMATAN">ADMIN KECAMATAN</option>
-                        <option value="ADMIN_KABUPATEN">ADMIN KABUPATEN (DINAS)</option>
+                        <option value="ADMIN_DINAS">ADMIN DINAS / OPD</option>
+                        <option value="ADMIN_KABUPATEN">ADMIN KABUPATEN (SEKRETARIAT SPM)</option>
                         <option value="SUPERADMIN">SUPERADMIN (TEKNIS SISTEM)</option>
                         <option value="VERIFIKATOR">VERIFIKATOR</option>
                       </>
@@ -907,6 +950,26 @@ export default function ManajemenPenggunaPage() {
                   </select>
                 )}
               </div>
+
+              {/* Pilihan Dinas jika Role ADMIN_DINAS */}
+              {editForm.role === "ADMIN_DINAS" && (
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Pilih Dinas / OPD Penugasan *:</label>
+                  <select
+                    required
+                    value={editForm.dinasId}
+                    onChange={(e) => setEditForm({ ...editForm, dinasId: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium"
+                  >
+                    <option value="">-- Pilih Dinas Penugasan --</option>
+                    {dinasList.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.nama} ({d.kode})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {currentUser?.role === "ADMIN_KECAMATAN" ? (
                 <>
